@@ -38,6 +38,9 @@ link config/opencode/cli.json .config/opencode/cli.json
 link config/zed/settings.json .config/zed/settings.json
 link config/git/ignore .config/git/ignore
 link git/.gitconfig .gitconfig
+link git/ignore-global .gitignore
+link vscode/settings.json "Library/Application Support/Code/User/settings.json"
+link vscode/keybindings.json "Library/Application Support/Code/User/keybindings.json"
 
 # Never symlink secrets: create placeholder if missing
 if [ ! -f "$HOME/.zsh/secrets.zsh" ]; then

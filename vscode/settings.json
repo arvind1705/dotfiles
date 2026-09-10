@@ -1,0 +1,147 @@
+{
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.ipynb": "jupyter-notebook",
+        "*.html": "workbench.editor.browser"
+    },
+    "workbench.iconTheme": "vscode-icons",
+    "vsicons.dontShowNewVersionMessage": true,
+    "terminal.integrated.inheritEnv": false,
+    "git.confirmSync": false,
+    "files.autoSave": "afterDelay",
+    "git.autofetch": true,
+    "explorer.confirmDelete": false,
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "editor.inlineSuggest.enabled": true,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": true,
+        "markdown": true,
+        "scminput": false,
+        "yaml": true,
+        "python": true
+    },
+    "files.exclude": {
+        "**/.trunk/*out": true,
+        "**/.trunk/*out/": true,
+        "**/.trunk/*actions/": true,
+        "**/.trunk/*logs/": true,
+        "**/.trunk/*plugins/": true,
+        "**/.trunk/*notifications/": true
+    },
+    "terminal.integrated.enableMultiLinePasteWarning": "auto",
+    "files.watcherExclude": {
+        "**/.trunk/*out": true,
+        "**/.trunk/*out/": true,
+        "**/.trunk/*actions/": true,
+        "**/.trunk/*logs/": true,
+        "**/.trunk/*plugins/": true,
+        "**/.bloop": true,
+        "**/.metals": true,
+        "**/.ammonite": true,
+        "**/.trunk/*notifications/": true
+    },
+    "explorer.confirmDragAndDrop": false,
+    "application.shellEnvironmentResolutionTimeout": 25,
+    "notebook.formatOnSave.enabled": true,
+    "notebook.codeActionsOnSave": {
+        "notebook.source.fixAll": "explicit",
+        "notebook.source.organizeImports": "explicit"
+    },
+    "[python]": {
+        "editor.formatOnType": true,
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        }
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "jupyter.askForKernelRestart": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.largeFileOptimizations": false,
+    "editor.formatOnSave": true,
+    "workbench.startupEditor": "none",
+    "git.openRepositoryInParentFolders": "never",
+    "workbench.editor.empty.hint": "hidden",
+    "python.autoComplete.extraPaths": [],
+    "python.analysis.extraPaths": [],
+    "git.ignoreRebaseWarning": true,
+    "workbench.editor.enablePreview": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "terminal.integrated.allowedLinkSchemes": [
+        "file",
+        "http",
+        "https",
+        "mailto",
+        "vscode",
+        "vscode-insiders",
+        "docker-desktop"
+    ],
+    "editor.wordWrap": "on",
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "gitlens.views.scm.grouped.views": {
+        "commits": true,
+        "branches": false,
+        "remotes": true,
+        "stashes": true,
+        "tags": true,
+        "worktrees": true,
+        "contributors": true,
+        "fileHistory": false,
+        "repositories": false,
+        "searchAndCompare": false,
+        "launchpad": false
+    },
+    "git.suggestSmartCommit": false,
+    "gitlens.views.branches.showRemoteBranches": true,
+    "editor.unicodeHighlight.nonBasicASCII": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "github.copilot.selectedCompletionModel": "",
+    "[markdown]": {
+        "diffEditor.ignoreTrimWhitespace": true
+    },
+    "explorer.fileNesting.patterns": {
+        "*.ts": "${capture}.js",
+        "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+        "*.jsx": "${capture}.js",
+        "*.tsx": "${capture}.ts",
+        "tsconfig.json": "tsconfig.*.json",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+        "*.sqlite": "${capture}.${extname}-*",
+        "*.db": "${capture}.${extname}-*",
+        "*.sqlite3": "${capture}.${extname}-*",
+        "*.db3": "${capture}.${extname}-*",
+        "*.sdb": "${capture}.${extname}-*",
+        "*.s3db": "${capture}.${extname}-*"
+    },
+    "diffEditor.maxComputationTime": 0,
+    "comments.openView": "never",
+    "github.copilot.nextEditSuggestions.enabled": false,
+    "extensions.ignoreRecommendations": true,
+    "chat.viewSessions.orientation": "stacked",
+    "python.createEnvironment.trigger": "off",
+    "chat.agent.sandbox.advanced.runtime": {
+        "enableWeakerNestedSandbox": false
+    },
+    "gitlens.rebaseEditor.ordering": "asc",
+    "workbench.experimental.modernUI": false,
+    "workbench.colorTheme": "Visual Studio Dark",
+    "network.meteredConnection": "off",
+    "gitlens.gitCommands.skipConfirmations": [
+        "fetch:command",
+        "stash-push:command",
+        "pull:command"
+    ]
+}
