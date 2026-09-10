@@ -1,0 +1,21 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+add_newline = false
+
+format = "$python$directory$git_branch$character"
+
+[directory]
+format = "[$path](bold cyan) "
+
+[git_branch]
+format = "on [$branch](bold green) "
+
+[python]
+format = "[(\\($virtualenv\\))](bold purple) "
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[➜](bold red)"
+
+[package]
+disabled = true

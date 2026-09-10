@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "server": {
+    "port": 49374,
+    "hostname": "0.0.0.0"
+  },
+  "providers": {
+    "sensenova": {
+      "settings": {
+        "baseURL": "https://token.sensenova.ai/v1"
+      }
+    }
+  },
+  "permission": {
+    "read": "allow",
+    "external_directory": {
+      "~/aruba/**": "allow",
+      "/tmp/**": "allow"
+    }
+  }
+}
