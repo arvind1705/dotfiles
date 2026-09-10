@@ -1,0 +1,29 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+[Backquote]",
+        "command": "workbench.action.terminal.new",
+        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+    },
+    {
+        "key": "ctrl+shift+[Backquote]",
+        "command": "-workbench.action.terminal.new",
+        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+    },
+{
+  "key": "shift+enter",
+  "command": "workbench.action.terminal.sendSequence",
+  "args": {
+    "text": "\u001b\r"
+  },
+  "when": "terminalFocus"
+},
+{
+  "key": "shift+tab",
+  "command": "workbench.action.terminal.sendSequence",
+  "args": {
+    "text": "\u001b[Z"
+  },
+  "when": "terminalFocus"
+}
+]

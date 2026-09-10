@@ -1,6 +1,6 @@
 # dotfiles
 
-Sanitized, secrets-free configs for zsh, ghostty, starship, opencode, zed, git.
+Sanitized, secrets-free configs for zsh, ghostty, starship, opencode, zed, git, vscode.
 
 No emails, API keys, passwords, or tokens are committed. See `.gitignore`.
 
@@ -13,6 +13,8 @@ No emails, API keys, passwords, or tokens are committed. See `.gitignore`.
 - `config/zed/settings.json` → `~/.config/zed/settings.json`
 - `config/git/ignore` → `~/.config/git/ignore`
 - `git/.gitconfig` → `~/.gitconfig` (placeholder, no identity)
+- `git/ignore-global` → `~/.gitignore`
+- `vscode/settings.json`, `keybindings.json` → `~/Library/Application Support/Code/User/`
 - `Brewfile` → `brew bundle`
 
 ## Never committed
