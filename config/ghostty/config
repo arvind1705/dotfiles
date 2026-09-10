@@ -1,0 +1,72 @@
+### Visual configuration
+theme = Github Dark Default
+window-theme = dark
+macos-titlebar-style = tabs
+
+# Softer terminal text
+foreground = #B8BEC8
+
+# Inactive pane separation
+unfocused-split-opacity = 0.85
+
+macos-icon = xray
+
+window-colorspace = srgb
+alpha-blending = linear-corrected
+
+# Font
+font-family = JetBrains Mono
+font-size = 13
+font-thicken = false
+
+macos-non-native-fullscreen = true
+mouse-hide-while-typing = true
+focus-follows-mouse = false
+
+
+### Clipboard
+copy-on-select = false
+
+keybind = super+c=copy_to_clipboard
+keybind = super+c=copy_to_clipboard:plain
+
+
+### Scrollback
+scrollback-limit = 50000000
+
+
+### Shell integration
+shell-integration = zsh
+shell-integration-features = no-cursor
+
+
+### Working directory
+working-directory = home
+window-inherit-working-directory = false
+tab-inherit-working-directory = false
+split-inherit-working-directory = false
+
+
+### Keybindings
+
+# Tabs
+keybind = super+alt+left=previous_tab
+keybind = super+alt+right=next_tab
+
+# Panes
+keybind = super+left=goto_split:previous
+keybind = super+right=goto_split:next
+
+# Vim
+keybind = super+s=text:\x1b:w\n
+
+# Insert newline without executing
+keybind = shift+enter=text:\n
+
+
+### Window behavior
+desktop-notifications = false
+quit-after-last-window-closed = true
+window-new-tab-position = end
+window-save-state = never
+confirm-close-surface = false

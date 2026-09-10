@@ -1,0 +1,12 @@
+# Per-user git config — sanitized template, no email/name committed.
+# Copy to ~/.gitconfig and fill in locally:
+#   git config --global user.name "Your Name"
+#   git config --global user.email "you@example.com"
+[pull]
+	ff = false
+	rebase = true
+[core]
+	pager = cat
+	excludesFile = ~/.gitignore
+[pager]
+	diff = cat
