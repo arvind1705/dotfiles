@@ -11,11 +11,23 @@
       }
     }
   },
-  "permission": {
-    "read": "allow",
-    "external_directory": {
-      "~/aruba/**": "allow",
-      "/tmp/**": "allow"
+  "permissions": [
+    { "action": "read", "resource": "*", "effect": "allow" },
+    { "action": "edit", "resource": "~/.gemini/**", "effect": "allow" },
+    {
+      "action": "external_directory",
+      "resource": "~/.gemini/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/aruba/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/tmp/**",
+      "effect": "allow"
     }
-  }
+  ]
 }
