@@ -9,7 +9,9 @@ foreground = #B8BEC8
 # Inactive pane separation
 unfocused-split-opacity = 0.85
 
-macos-icon = xray
+# Icon
+macos-icon = custom
+macos-custom-icon = ~/.config/ghostty/material-ocean.icns
 
 window-colorspace = srgb
 alpha-blending = linear-corrected
