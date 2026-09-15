@@ -36,6 +36,10 @@ export PATH="$HOME/.opencode/bin:$PATH"
 
 export EDITOR="cot"
 
+export GOPATH="$HOME/.cache/go"
+export GOMODCACHE="$HOME/.cache/go/pkg/mod"
+
+
 
 # =============================================================================
 #   SECRETS
