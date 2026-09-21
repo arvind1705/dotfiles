@@ -75,8 +75,7 @@
     "python.autoComplete.extraPaths": [],
     "python.analysis.extraPaths": [],
     "git.ignoreRebaseWarning": true,
-    "workbench.editor.enablePreview": false,
-    "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.ignoreTrimWhitespace": true,
     "terminal.integrated.allowedLinkSchemes": [
         "file",
         "http",
@@ -137,7 +136,7 @@
     },
     "gitlens.rebaseEditor.ordering": "asc",
     "workbench.experimental.modernUI": false,
-    "workbench.colorTheme": "Visual Studio Dark",
+    "workbench.colorTheme": "Dark+",
     "network.meteredConnection": "off",
     "gitlens.gitCommands.skipConfirmations": [
         "fetch:command",
