@@ -72,3 +72,5 @@ quit-after-last-window-closed = true
 window-new-tab-position = end
 window-save-state = never
 confirm-close-surface = false
+
+auto-update-channel = tip

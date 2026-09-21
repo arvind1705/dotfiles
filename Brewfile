@@ -29,15 +29,20 @@ cask "ghostty"
 cask "maccy"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
+# Replacement for Docker Desktop
+cask "orbstack"
 # Control your tools with a few keystrokes
 cask "raycast"
 # JDK from the Eclipse Foundation (Adoptium)
 cask "temurin@25"
 vscode "charliermarsh.ruff"
-vscode "commandcode.commandcode-vscode"
 vscode "eamodio.gitlens"
 vscode "ms-python.python"
 vscode "ms-python.vscode-pylance"
 vscode "ms-python.vscode-python-envs"
 vscode "vscode-icons-team.vscode-icons"
+npm "9router"
+npm "better-sqlite3"
 npm "command-code"
+npm "sql.js"
+npm "systray2"

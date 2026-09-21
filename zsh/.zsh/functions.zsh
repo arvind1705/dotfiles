@@ -15,13 +15,6 @@ uall() {
     echo "✗ brew failed"
   fi
 
-  echo "→ cmd"
-  if cmd update >/dev/null 2>&1; then
-    echo "✓ cmd $(cmd --version 2>/dev/null)"
-  else
-    echo "✗ cmd failed"
-  fi
-
   echo "→ opencode"
   if opencode upgrade >/dev/null 2>&1; then
     echo "✓ $(opencode --version 2>/dev/null)"

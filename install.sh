@@ -35,7 +35,6 @@ link config/ghostty/config .config/ghostty/config
 link config/starship.toml .config/starship.toml
 link config/opencode/opencode.json .config/opencode/opencode.json
 link config/opencode/cli.json .config/opencode/cli.json
-link config/zed/settings.json .config/zed/settings.json
 link config/git/ignore .config/git/ignore
 link git/.gitconfig .gitconfig
 link git/ignore-global .gitignore

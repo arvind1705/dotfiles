@@ -3,7 +3,7 @@
 # =============================================================================
 
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
+ZSH_THEME=""
 plugins=(git)
 
 fpath=("$HOME/.docker/completions" $fpath)
@@ -21,6 +21,8 @@ source "$HOME/.zsh/integrations.zsh"
 # =============================================================================
 #   PATH
 # =============================================================================
+
+typeset -U path PATH
 
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -68,3 +70,4 @@ source "$HOME/.zsh/functions.zsh"
 # =============================================================================
 
 source "$HOME/.zsh/aliases.zsh"
+

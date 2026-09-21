@@ -3,7 +3,7 @@
   "animations": true,
   "theme": {
     "name": "opencode",
-    "mode": "dark"
+    "mode": "system"
   },
   "session": {
     "terminal": false,
@@ -22,7 +22,9 @@
   },
   "attention": {
     "enabled": true,
-    "volume": 1
+    "volume": 1,
+    "notifications": true,
+    "sound": true
   },
   "terminal": {
     "copy": "select"
