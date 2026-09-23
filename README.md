@@ -6,7 +6,7 @@ No emails, API keys, passwords, or tokens are committed. See `.gitignore`.
 
 ## Layout
 
-- `zsh/` → `~/.zshrc`, `~/.zprofile`, `~/.zshenv`, `~/.profile`, `~/.zsh/*`
+- `zsh/` → `~/.zshrc`, `~/.zprofile`, `~/.zshenv`, `~/.profile`, `~/.zsh/*` (incl. `oc.zsh`, which provides `ocgo`)
 - `config/ghostty/config` → `~/.config/ghostty/config`
 - `config/starship.toml` → `~/.config/starship.toml`
 - `config/opencode/opencode.json`, `cli.json` → `~/.config/opencode/`
