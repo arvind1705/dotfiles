@@ -31,6 +31,7 @@ link zsh/.zsh/aliases.zsh .zsh/aliases.zsh
 link zsh/.zsh/functions.zsh .zsh/functions.zsh
 link zsh/.zsh/integrations.zsh .zsh/integrations.zsh
 link zsh/.zsh/runtimes.zsh .zsh/runtimes.zsh
+link zsh/.zsh/oc.zsh .zsh/oc.zsh
 link config/ghostty/config .config/ghostty/config
 link config/starship.toml .config/starship.toml
 link config/opencode/opencode.json .config/opencode/opencode.json
