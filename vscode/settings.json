@@ -142,5 +142,7 @@
         "fetch:command",
         "stash-push:command",
         "pull:command"
-    ]
+    ],
+    "hediet.vscode-drawio.resizeImages": null,
+    "gitlens.views.branches.branches.layout": "list"
 }
