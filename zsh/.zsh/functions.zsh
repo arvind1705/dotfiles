@@ -22,13 +22,6 @@ uall() {
     echo "✗ opencode failed"
   fi
 
-  echo "→ codex"
-  if codex update >/dev/null 2>&1; then
-    echo "✓ codex $(codex --version 2>/dev/null)"
-  else
-    echo "✗ codex failed"
-  fi
-
   echo "→ agy"
   if agy update >/dev/null 2>&1; then
     echo "✓ agy $(agy --version 2>/dev/null)"
