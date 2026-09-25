@@ -34,7 +34,7 @@ link zsh/.zsh/runtimes.zsh .zsh/runtimes.zsh
 link zsh/.zsh/oc.zsh .zsh/oc.zsh
 link config/ghostty/config .config/ghostty/config
 link config/starship.toml .config/starship.toml
-link config/opencode/opencode.json .config/opencode/opencode.json
+link config/opencode/opencode.jsonc .config/opencode/opencode.jsonc
 link config/opencode/cli.json .config/opencode/cli.json
 link config/git/ignore .config/git/ignore
 link git/.gitconfig .gitconfig
