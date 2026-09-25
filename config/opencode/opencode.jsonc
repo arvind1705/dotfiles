@@ -18,5 +18,13 @@
       "resource": "/tmp/**",
       "effect": "allow"
     }
-  ]
+  ],
+  "mcp": {
+    "servers": {
+      "openwiki": {
+        "type": "local",
+        "command": ["openwiki", "mcp", "--host", "opencode"]
+      }
+    }
+  }
 }

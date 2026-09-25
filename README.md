@@ -9,7 +9,7 @@ No emails, API keys, passwords, or tokens are committed. See `.gitignore`.
 - `zsh/` → `~/.zshrc`, `~/.zprofile`, `~/.zshenv`, `~/.profile`, `~/.zsh/*` (incl. `oc.zsh`, which provides `ocgo`)
 - `config/ghostty/config` → `~/.config/ghostty/config`
 - `config/starship.toml` → `~/.config/starship.toml`
-- `config/opencode/opencode.json`, `cli.json` → `~/.config/opencode/`
+- `config/opencode/opencode.jsonc`, `cli.json` → `~/.config/opencode/`
 - `config/git/ignore` → `~/.config/git/ignore`
 - `git/.gitconfig` → `~/.gitconfig` (placeholder, no identity)
 - `git/ignore-global` → `~/.gitignore`
