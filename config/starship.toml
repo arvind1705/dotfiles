@@ -2,6 +2,8 @@
 
 add_newline = false
 
+scan_timeout = 1000
+
 format = "$python$directory$git_branch$character"
 
 [directory]
