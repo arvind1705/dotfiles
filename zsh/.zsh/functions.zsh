@@ -22,13 +22,6 @@ upall() {
     echo "✗ opencode failed"
   fi
 
-  echo "→ agy"
-  if agy update >/dev/null 2>&1; then
-    echo "✓ agy $(agy --version 2>/dev/null)"
-  else
-    echo "✗ agy failed"
-  fi
-
   echo "→ cmd"
   if cmd update >/dev/null 2>&1; then
     echo "✓ cmd $(cmd --version 2>/dev/null)"

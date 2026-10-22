@@ -104,7 +104,6 @@
         "launchpad": false
     },
     "git.suggestSmartCommit": false,
-    "gitlens.views.branches.showRemoteBranches": true,
     "editor.unicodeHighlight.nonBasicASCII": false,
     "editor.unicodeHighlight.invisibleCharacters": false,
     "github.copilot.selectedCompletionModel": "",
@@ -141,8 +140,12 @@
     "gitlens.gitCommands.skipConfirmations": [
         "fetch:command",
         "stash-push:command",
-        "pull:command"
+        "pull:command",
+        "push:command"
     ],
     "hediet.vscode-drawio.resizeImages": null,
-    "gitlens.views.branches.branches.layout": "list"
+    "gitlens.views.branches.branches.layout": "list",
+    "gitlens.views.showRelativeDateMarkers": false,
+    "gitlens.views.branches.showRemoteBranches": true,
+    "gitlens.graph.details.location": "auto"
 }

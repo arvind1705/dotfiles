@@ -80,4 +80,26 @@ source "$HOME/.zsh/aliases.zsh"
 
 
 # bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+[ -s "/Users/aravindg/.bun/_bun" ] && source "/Users/aravindg/.bun/_bun"
+# oMLX: CLI shim path begin
+case ":$PATH:" in
+  *":$HOME/.omlx/bin:"*) ;;
+  *) export PATH="$HOME/.omlx/bin:$PATH" ;;
+esac
+# oMLX: CLI shim path end
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/aravindg/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/aravindg/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/aravindg/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/aravindg/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
