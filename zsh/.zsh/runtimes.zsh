@@ -50,3 +50,6 @@ conda() {
   unset -f load-conda     # Clean up the loader
   conda "$@"              # Now resolves to conda's shell function from the hook
 }
+
+
+export APP_ENV="DEVELOPMENT"

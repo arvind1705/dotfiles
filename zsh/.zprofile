@@ -1,5 +1,5 @@
 # The following lines were added by Docker Desktop to add commands to your PATH.
-export PATH="$PATH:$HOME/.docker/bin"
+export PATH="$PATH:/Users/aravindg/.docker/bin"
 # End of Docker Desktop section.
 
 # Setting PATH for Python 3.14
@@ -9,7 +9,7 @@ export PATH
 
 
 # Added by Antigravity CLI installer
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="/Users/aravindg/.local/bin:$PATH"
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.

@@ -27,7 +27,7 @@ focus-follows-mouse = false
 
 
 ### Clipboard
-copy-on-select = false
+copy-on-select = true
 
 keybind = super+c=copy_to_clipboard
 keybind = super+c=copy_to_clipboard:plain
