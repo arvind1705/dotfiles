@@ -29,6 +29,27 @@ upall() {
     echo "✗ cmd failed"
   fi
 
+  echo "→ uv"
+  if uv self update >/dev/null 2>&1; then
+    echo "✓ $(uv --version 2>/dev/null)"
+  else
+    echo "✗ uv self update failed"
+  fi
+
+  echo "→ ruff"
+  if uv tool install ruff@latest >/dev/null 2>&1; then
+    echo "✓ $(ruff --version 2>/dev/null)"
+  else
+    echo "✗ ruff failed"
+  fi
+
+  echo "→ codex"
+  if codex update >/dev/null 2>&1; then
+    echo "✓ $(codex --version 2>/dev/null)"
+  else
+    echo "✗ codex failed"
+  fi
+
   echo "✓ All upgrades complete"
 }
 
