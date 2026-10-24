@@ -1,5 +1,5 @@
 channels:
   - defaults
 
-auto_activate: false
+auto_activate_base: true
 changeps1: false
