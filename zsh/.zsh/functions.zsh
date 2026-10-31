@@ -50,6 +50,13 @@ upall() {
     echo "✗ codex failed"
   fi
 
+  echo "→ claude"
+  if claude update >/dev/null 2>&1; then
+    echo "✓ $(claude --version 2>/dev/null)"
+  else
+    echo "✗ claude failed"
+  fi
+
   echo "✓ All upgrades complete"
 }
 
