@@ -1,5 +1,5 @@
 # =============================================================================
-#   LANGUAGE RUNTIMES (lazy-loaded)
+#   LANGUAGE RUNTIMES (lazy-loaded where possible)
 # =============================================================================
 
 # NVM — lazy-loaded for fast shell startup
@@ -41,9 +41,15 @@ corepack() { load-nvm; command corepack "$@"; }
 pnpm()    { load-nvm; command pnpm "$@"; }
 yarn()    { load-nvm; command yarn "$@"; }
 
-# Conda is loaded eagerly via the conda init block in ~/.zshrc.
-# Base auto-activates (auto_activate_base: true in ~/.condarc), so
-# `python`/`python3` resolve to miniconda's Python by default.
-
-
-export APP_ENV="DEVELOPMENT"
+# Conda — eager init so `conda activate` is always available
+__conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="$HOME/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup

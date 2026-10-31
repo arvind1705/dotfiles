@@ -11,3 +11,6 @@ if [[ -n "$GHOSTTY_RESOURCES_DIR" ]]; then
     ghostty-integration
     unfunction ghostty-integration
 fi
+
+# OrbStack CLI integration (adds completions; PATH is set in ~/.zsh/path.zsh)
+[[ -f "$HOME/.orbstack/shell/init.zsh" ]] && source "$HOME/.orbstack/shell/init.zsh"
