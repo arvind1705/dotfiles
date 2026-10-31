@@ -1,4 +1,4 @@
-# POSIX login-shell environment (sh/bash).
+# POSIX login-shell environment (sh).
 # zsh reads ~/.zshenv and ~/.zshrc instead.
 
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"

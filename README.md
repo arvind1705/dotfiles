@@ -13,7 +13,7 @@ auto-installed. Keep it in sync by copying changes here after you edit a config.
   - `.zshenv` — environment for every zsh process
   - `.zprofile` — login-shell PATH (runs after macOS `path_helper`)
   - `.zshrc` — interactive shell setup
-  - `.profile` — POSIX fallback for `sh` (bash uses `~/.bash_profile`)
+  - `.profile` — POSIX fallback for `sh`
   - `.zsh/path.zsh` — single source of PATH entries
   - `.zsh/integrations.zsh`, `runtimes.zsh`, `functions.zsh`, `oc.zsh` (provides `ocgo`), `aliases.zsh`
 - `config/ghostty/config`
