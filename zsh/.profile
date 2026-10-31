@@ -1,14 +1,19 @@
-# The following lines were added by Docker Desktop to add commands to your PATH.
-export PATH="$PATH:/Users/aravindg/.docker/bin"
-# End of Docker Desktop section.
+# POSIX login-shell environment (sh/bash).
+# zsh reads ~/.zshenv and ~/.zshrc instead.
 
-. "$HOME/.cargo/env"
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.bun/bin:$PATH"
+export PATH="$HOME/.opencode/bin:$PATH"
+export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"
+export PATH="/Library/Frameworks/Python.framework/Versions/3.14/bin:$PATH"
+export PATH="$PATH:$HOME/.orbstack/bin"
 
-# Added by Antigravity CLI installer
-export PATH="/Users/aravindg/.local/bin:$PATH"
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/aravindg/.lmstudio/bin"
-# End of LM Studio CLI section
-
+export BUN_INSTALL="$HOME/.bun"
+export EDITOR="subl -w"
+export ARUBA_HOME="$HOME/aruba"
+export GOPATH="$HOME/.cache/go"
+export GOMODCACHE="$HOME/.cache/go/pkg/mod"
+export AWS_PROFILE="shared_repo"
+export APP_ENV="DEVELOPMENT"
