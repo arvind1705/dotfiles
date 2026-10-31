@@ -11,7 +11,8 @@
     "markdown": "rendered",
     "grouping": "auto",
     "new_location": "launch",
-    "sidebar": "auto"
+    "sidebar": "auto",
+    "verbosity": "medium"
   },
   "tabs": {
     "layout": "horizontal",
