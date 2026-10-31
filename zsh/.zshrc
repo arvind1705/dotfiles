@@ -36,7 +36,7 @@ export PATH="$HOME/.opencode/bin:$PATH"
 #   ENVIRONMENT
 # =============================================================================
 
-export EDITOR="cot"
+export EDITOR="subl -w"
 
 export GOPATH="$HOME/.cache/go"
 export GOMODCACHE="$HOME/.cache/go/pkg/mod"
@@ -102,3 +102,7 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/aravindg/.local/bin:$PATH"
