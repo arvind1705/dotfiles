@@ -13,7 +13,6 @@ auto-installed. Keep it in sync by copying changes here after you edit a config.
   - `.zshenv` — environment for every zsh process
   - `.zprofile` — login-shell PATH (runs after macOS `path_helper`)
   - `.zshrc` — interactive shell setup
-  - `.profile` — POSIX fallback for `sh`
   - `.zsh/path.zsh` — single source of PATH entries
   - `.zsh/integrations.zsh`, `runtimes.zsh`, `functions.zsh`, `oc.zsh` (provides `ocgo`), `aliases.zsh`
 - `config/ghostty/config`
@@ -38,7 +37,7 @@ Copy the files back to their live paths by hand, e.g.:
 
 ```sh
 cp config/opencode/opencode.jsonc ~/.config/opencode/
-cp zsh/.zshenv zsh/.zprofile zsh/.zshrc zsh/.profile ~/
+cp zsh/.zshenv zsh/.zprofile zsh/.zshrc ~/
 mkdir -p ~/.zsh && cp zsh/.zsh/*.zsh ~/.zsh/
 cp zsh/.zsh/secrets.zsh.example ~/.zsh/   # then create secrets.zsh from it
 brew bundle
