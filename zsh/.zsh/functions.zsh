@@ -51,8 +51,8 @@ upall() {
 #   GIT / ARUBA
 # =============================================================================
 
-# Fetch all git repos under $ARUBA_HOME in parallel
-fetcharuba() {
+# Fetch all git repos under $ARUBA_HOME in parallel (runs inside tmux; see fetcharuba)
+_fetcharuba_run() {
     local jobs=20
 
     find "$ARUBA_HOME" -type d -name .git -print0 |
@@ -68,6 +68,28 @@ fetcharuba() {
             printf "[ERROR] %s\n" "$name" >&2
         fi
     ' _
+}
+
+# Run the aruba fetch inside a tmux session you attach to; session auto-closes when done
+fetcharuba() {
+    if [[ -z "${ARUBA_HOME:-}" || ! -d "$ARUBA_HOME" ]]; then
+        printf 'fetcharuba: ARUBA_HOME is not set or not a directory: %s\n' "${ARUBA_HOME:-<unset>}" >&2
+        return 1
+    fi
+
+    if ! command -v tmux >/dev/null 2>&1; then
+        _fetcharuba_run
+        return
+    fi
+
+    local session="fetcharuba"
+    local cmd="zsh -i -c '_fetcharuba_run'"
+
+    if [[ -n "${TMUX:-}" ]]; then
+        tmux new-window -n "$session" "$cmd"
+    else
+        tmux new-session -A -s "$session" "$cmd"
+    fi
 }
 
 
