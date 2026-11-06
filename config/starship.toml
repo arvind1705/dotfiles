@@ -4,7 +4,7 @@ add_newline = false
 
 scan_timeout = 5000
 
-format = "$python$directory$git_branch$character"
+format = "$hostname$python$directory$git_branch$character"
 
 [directory]
 format = "[$path](bold cyan) "
@@ -13,7 +13,7 @@ format = "[$path](bold cyan) "
 format = "on [$branch](bold green) "
 
 [python]
-format = "[(\\($virtualenv\\))](bold purple) "
+format = "[(\\($virtualenv\\) )](bold purple)"
 
 [character]
 success_symbol = "[➜](bold green)"
@@ -21,3 +21,8 @@ error_symbol = "[➜](bold red)"
 
 [package]
 disabled = true
+
+[hostname]
+ssh_only = false
+format = "[MacBook]($style) "
+style = "bold blue"
