@@ -22,13 +22,6 @@ upall() {
     echo "✗ opencode failed"
   fi
 
-  echo "→ cmd"
-  if cmd update >/dev/null 2>&1; then
-    echo "✓ cmd $(cmd --version 2>/dev/null)"
-  else
-    echo "✗ cmd failed"
-  fi
-
   echo "→ codex"
   if codex update >/dev/null 2>&1; then
     echo "✓ $(codex --version 2>/dev/null)"
