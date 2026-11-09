@@ -36,6 +36,13 @@ upall() {
     echo "✗ claude failed"
   fi
 
+  echo "→ agy"
+  if agy update >/dev/null 2>&1; then
+    echo "✓ $(agy --version 2>/dev/null)"
+  else
+    echo "✗ agy failed"
+  fi
+
   echo "✓ All upgrades complete"
 }
 
