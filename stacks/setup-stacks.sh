@@ -92,6 +92,10 @@ fi
 if [[ -d /etc/systemd/system ]]; then
   echo "==> Installing systemd stack@.service for boot auto-start..."
   sudo cp "$STACKS_DIR/systemd/stack@.service" /etc/systemd/system/stack@.service
+  if [[ -d "$STACKS_DIR/systemd/stack@langfuse.service.d" ]]; then
+    sudo mkdir -p /etc/systemd/system/stack@langfuse.service.d
+    sudo cp "$STACKS_DIR/systemd/stack@langfuse.service.d/override.conf" /etc/systemd/system/stack@langfuse.service.d/
+  fi
   sudo systemctl daemon-reload
 
   # Enable all stacks on boot
