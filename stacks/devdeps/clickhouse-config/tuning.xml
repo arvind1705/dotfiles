@@ -1,0 +1,14 @@
+<clickhouse>
+    <!--
+      ClickHouse by default creates 512 background schedule pool threads, plus
+      16 threads for each sub-pool (message broker, distributed, buffer flush, etc.).
+      For a local development / Langfuse instance, these are massively oversized.
+    -->
+    <background_schedule_pool_size>16</background_schedule_pool_size>
+    <background_buffer_flush_schedule_pool_size>2</background_buffer_flush_schedule_pool_size>
+    <background_message_broker_schedule_pool_size>2</background_message_broker_schedule_pool_size>
+    <background_distributed_schedule_pool_size>1</background_distributed_schedule_pool_size>
+    <background_fetches_pool_size>2</background_fetches_pool_size>
+    <background_move_pool_size>2</background_move_pool_size>
+    <background_common_pool_size>2</background_common_pool_size>
+</clickhouse>
