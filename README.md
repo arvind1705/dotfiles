@@ -99,6 +99,9 @@ Use the `stacks.sh` CLI for everyday management:
 # Check status of all containers
 ./stacks/stacks.sh status
 
+# Probe real-time HTTP and TCP health of all endpoints
+./stacks/stacks.sh health
+
 # Start, stop, or restart all stacks
 ./stacks/stacks.sh up
 ./stacks/stacks.sh down
