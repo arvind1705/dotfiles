@@ -1,0 +1,15 @@
+name: 9router
+
+services:
+  9router:
+    image: decolua/9router:latest
+    pull_policy: always
+    container_name: 9router
+    restart: unless-stopped
+    ports:
+      - "${ROUTER_PORT:-20128}:20128"
+    environment:
+      DATA_DIR: /app/data
+      INITIAL_PASSWORD: "${INITIAL_PASSWORD:-change_me}"
+    volumes:
+      - "${DATA_DIR:-/home/aravind/data/9router}:/app/data"

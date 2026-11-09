@@ -1,0 +1,28 @@
+http://qbittorrent.local {
+	reverse_proxy __LAN_IP__:8081
+}
+http://jellyfin.local {
+	reverse_proxy __LAN_IP__:8096
+}
+http://langfuse.local {
+	reverse_proxy __LAN_IP__:3005
+}
+http://clickhouse.local {
+	reverse_proxy __LAN_IP__:8124
+}
+http://minio.local {
+	reverse_proxy __LAN_IP__:9092
+}
+http://minio-console.local {
+	reverse_proxy __LAN_IP__:9094
+}
+http://dgraph.local {
+	reverse_proxy __LAN_IP__:8080
+}
+http://devbox.local {
+	root * /srv/devbox-index
+	file_server
+}
+http://9router.local {
+	reverse_proxy __LAN_IP__:20128
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>devbox services</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 620px; margin: 48px auto; padding: 0 24px; color: #1a1a1a; line-height: 1.6; }
+h1 { font-size: 22px; margin-bottom: 0; }
+h2 { font-size: 15px; margin-top: 28px; margin-bottom: 4px; }
+ul { list-style: none; padding: 0; margin-top: 0; }
+li { padding: 6px 0; border-bottom: 1px solid #eee; }
+a { color: #0645ad; text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font-family: monospace; font-size: 14px; background: #f4f4f4; padding: 1px 6px; }
+.desc { color: #555; font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>devbox</h1>
+<h2>Media</h2>
+<ul>
+<li><a href="http://jellyfin.local">jellyfin.local</a> <span class="desc">Jellyfin</span></li>
+<li><a href="http://qbittorrent.local">qbittorrent.local</a> <span class="desc">qBittorrent WebUI</span></li>
+</ul>
+<h2>Apps</h2>
+<ul>
+<li><a href="http://langfuse.local">langfuse.local</a> <span class="desc">Langfuse</span></li>
+<li><a href="http://9router.local">9router.local</a> <span class="desc">9router AI gateway</span></li>
+</ul>
+<h2>Infra web</h2>
+<ul>
+<li><a href="http://minio-console.local">minio-console.local</a> <span class="desc">MinIO console</span></li>
+<li><a href="http://minio.local/minio/health/live">minio.local</a> <span class="desc">S3 API</span></li>
+<li><a href="http://clickhouse.local/ping">clickhouse.local</a> <span class="desc">ClickHouse HTTP</span></li>
+<li><a href="http://dgraph.local/health">dgraph.local</a> <span class="desc">Dgraph HTTP</span></li>
+</ul>
+<h2>TCP endpoints</h2>
+<ul>
+<li><code>postgres.local:5432</code> <span class="desc">PostgreSQL</span></li>
+<li><code>redis.local:6380</code> <span class="desc">Redis</span></li>
+<li><code>clickhouse.local:9002</code> <span class="desc">ClickHouse native</span></li>
+<li><code>dgraph.local:9080</code> <span class="desc">Dgraph gRPC</span></li>
+</ul>
+</body>
+</html>

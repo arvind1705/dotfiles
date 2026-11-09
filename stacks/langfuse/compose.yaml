@@ -1,0 +1,23 @@
+name: aruba-langfuse
+services:
+  langfuse-worker:
+    image: docker.langfuse.com/langfuse/langfuse-worker:4
+    restart: unless-stopped
+    env_file:
+      - ./langfuse.env
+    networks:
+      - ai-infra-local
+
+  langfuse-web:
+    image: docker.langfuse.com/langfuse/langfuse:4
+    restart: unless-stopped
+    env_file:
+      - ./langfuse.env
+    ports:
+      - "${LAN_IP:-192.168.0.172}:3005:3000"
+    networks:
+      - ai-infra-local
+
+networks:
+  ai-infra-local:
+    external: true

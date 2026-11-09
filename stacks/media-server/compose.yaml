@@ -1,0 +1,58 @@
+# ---------------------------------------------------------------------------
+# Home media server: Jellyfin (stream) + qBittorrent (download)
+#
+#   * LAN-only: every published port is bound to ${LAN_IP}, never 0.0.0.0.
+#   * One media folder: library/. qBittorrent downloads straight into it,
+#     Jellyfin streams it. No hardlinks, no helper script.
+#   * Host paths == container paths, so paths stay predictable.
+# ---------------------------------------------------------------------------
+
+name: entertainment
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      TZ: ${TZ:-Etc/UTC}
+      # Helps LAN clients resolve the server at the right address.
+      JELLYFIN_PublishedServerUrl: ${JELLYFIN_PUBLISHED_URL:-http://jellyfin.local}
+    # Intel Quick Sync hardware transcoding: /dev/dri + render/video groups.
+    group_add:
+      - "${RENDER_GID:-991}"
+      - "${VIDEO_GID:-44}"
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - ${MEDIA_ROOT}/config/jellyfin:/config
+      - ${MEDIA_ROOT}/library:${MEDIA_ROOT}/library
+    ports:
+      - "${LAN_IP:-192.168.0.172}:${JELLYFIN_PORT:-8096}:8096/tcp"
+      # UDP 7359 = Jellyfin's LAN auto-discovery beacon for the TV app.
+      - "${LAN_IP:-192.168.0.172}:7359:7359/udp"
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Etc/UTC}
+      # Must equal the HOST port. qBittorrent 5.x validates the Host header's
+      # port against its own WebUI port, so host 8081 -> container 8080 gets
+      # rejected with "Invalid Host header, port mismatch". Keep both identical.
+      WEBUI_PORT: ${QBT_WEBUI_PORT:-8081}
+      TORRENTING_PORT: ${QBT_LISTEN_PORT:-6881}
+    volumes:
+      - ${MEDIA_ROOT}/config/qbittorrent:/config
+      # qBittorrent saves straight into the library (its DefaultSavePath is
+      # /downloads/movies), so finished files show up in Jellyfin immediately.
+      # Incomplete torrents go to /downloads/incomplete.
+      - ${MEDIA_ROOT}/library:/downloads
+    ports:
+      - "${LAN_IP:-192.168.0.172}:${QBT_WEBUI_PORT:-8081}:${QBT_WEBUI_PORT:-8081}/tcp"
+      # Incoming BitTorrent peer connections (see README for router forwarding).
+      - "${LAN_IP:-192.168.0.172}:${QBT_LISTEN_PORT:-6881}:${QBT_LISTEN_PORT:-6881}/tcp"
+      - "${LAN_IP:-192.168.0.172}:${QBT_LISTEN_PORT:-6881}:${QBT_LISTEN_PORT:-6881}/udp"
+    restart: unless-stopped

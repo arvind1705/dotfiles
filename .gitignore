@@ -13,6 +13,10 @@
 .gemini/
 .docker/
 .env
+.env.*
+!.env.example
+*.env
+!*.env.example
 .envrc
 
 # Runtime / machine-specific — never commit
@@ -26,7 +30,15 @@ config/raycast/node-compile-cache/
 .zcompdump*
 .DS_Store
 
+# Persistent state & volumes in stacks
+stacks/**/data/
+stacks/**/backup/
+stacks/**/config/
+stacks/**/library/
+data/
+
 # Python / editor noise (kept minimal)
 __pycache__/
 *.py[codz]
 .venv/
+*.log

@@ -1,0 +1,12 @@
+[Unit]
+Description=Restrict Aruba dev dependency containers to the Mac on the LAN
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/aruba-devdeps-lan-filter
+
+[Install]
+WantedBy=multi-user.target

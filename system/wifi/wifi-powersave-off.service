@@ -1,0 +1,12 @@
+[Unit]
+Description=Disable Wi-Fi power saving
+After=network.target
+ConditionPathExists=/sys/class/net/wlp3s0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/iw dev wlp3s0 set power_save off
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

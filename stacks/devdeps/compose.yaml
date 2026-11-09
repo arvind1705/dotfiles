@@ -1,0 +1,105 @@
+name: aruba-devdeps
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kg_mcp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kg_mcp_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-kg_mcp_db}
+    ports:
+      - "${LAN_IP:-192.168.0.172}:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kg_mcp} -d ${POSTGRES_DB:-kg_mcp_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${LAN_IP:-192.168.0.172}:6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  dgraph:
+    image: dgraph/standalone:latest
+    ports:
+      - "${LAN_IP:-192.168.0.172}:8080:8080"
+      - "${LAN_IP:-192.168.0.172}:9080:9080"
+    volumes:
+      - dgraph_data:/dgraph
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    restart: unless-stopped
+
+  langfuse-clickhouse:
+    image: clickhouse/clickhouse-server:25.12
+    user: "101:101"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clickhouse}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse}
+    ports:
+      - "${LAN_IP:-192.168.0.172}:8124:8123"
+      - "${LAN_IP:-192.168.0.172}:9002:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  langfuse-minio:
+    image: cgr.dev/chainguard/minio
+    entrypoint: sh
+    command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-miniosecret}
+      MINIO_SERVER_URL: http://minio.local
+      MINIO_BROWSER_REDIRECT_URL: http://minio-console.local
+    ports:
+      - "${LAN_IP:-192.168.0.172}:9092:9000"
+      - "${LAN_IP:-192.168.0.172}:9094:9001"
+    extra_hosts:
+      - "minio.local:host-gateway"
+      - "minio-console.local:host-gateway"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  dgraph_data:
+  clickhouse_data:
+  clickhouse_logs:
+  minio_data:
+
+networks:
+  default:
+    name: ai-infra-local
