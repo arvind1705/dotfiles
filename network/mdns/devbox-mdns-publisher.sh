@@ -9,7 +9,9 @@ detect_ip() {
     | awk '{for (i=1; i<=NF; i++) if ($i=="src") {print $(i+1); exit}}'
 }
 detect_ipv6() {
-  ip -6 addr show scope link 2>/dev/null \
+  # Only publish global routable IPv6; ignore link-local fe80:: addresses
+  # which break macOS mDNS resolution when connected without scope IDs.
+  ip -6 addr show scope global 2>/dev/null \
     | awk '/inet6/ {print $2; exit}' | cut -d/ -f1
 }
 
@@ -17,6 +19,7 @@ IPV4="${LAN_IP:-$(detect_ip)}"; IPV4="${IPV4:-127.0.0.1}"
 IPV6="$(detect_ipv6 || true)"
 
 HOSTNAMES=(
+  "devbox.local"
   "jellyfin.local"
   "qbittorrent.local"
   "langfuse.local"

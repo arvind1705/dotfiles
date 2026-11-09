@@ -3,11 +3,16 @@ name: 9router
 services:
   9router:
     image: decolua/9router:latest
-    pull_policy: always
     container_name: 9router
     restart: unless-stopped
     ports:
       - "${ROUTER_PORT:-20128}:20128"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:20128/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
     environment:
       DATA_DIR: /app/data
       INITIAL_PASSWORD: "${INITIAL_PASSWORD:-change_me}"

@@ -5,6 +5,10 @@ http://jellyfin.local {
 	reverse_proxy __LAN_IP__:8096
 }
 http://langfuse.local {
+	handle /health {
+		rewrite * /api/public/health
+		reverse_proxy __LAN_IP__:3005
+	}
 	reverse_proxy __LAN_IP__:3005
 }
 http://clickhouse.local {
@@ -20,9 +24,14 @@ http://dgraph.local {
 	reverse_proxy __LAN_IP__:8080
 }
 http://devbox.local {
+	respond /health "OK" 200
 	root * /srv/devbox-index
 	file_server
 }
 http://9router.local {
+	handle /health {
+		rewrite * /api/health
+		reverse_proxy __LAN_IP__:20128
+	}
 	reverse_proxy __LAN_IP__:20128
 }

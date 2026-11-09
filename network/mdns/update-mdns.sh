@@ -12,7 +12,9 @@ detect_ipv4() {
 }
 
 detect_ipv6() {
-  ip -6 addr show scope link 2>/dev/null \
+  # Only publish global routable IPv6; ignore link-local fe80:: addresses
+  # which break macOS mDNS resolution when connected without scope IDs.
+  ip -6 addr show scope global 2>/dev/null \
     | awk '/inet6/ {print $2; exit}' | cut -d/ -f1
 }
 

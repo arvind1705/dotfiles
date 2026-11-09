@@ -16,6 +16,7 @@ Commands:
   down      Stop stack(s)
   restart   Restart stack(s)
   status    Show status of all containers
+  health    Probe HTTP and TCP service endpoints
   logs      Tail logs for stack(s)
 
 Available stacks:
@@ -71,6 +72,64 @@ run_cmd() {
   )
 }
 
+check_health() {
+  local lan_ip
+  lan_ip="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i=1; i<=NF; i++) if ($i=="src") {print $(i+1); exit}}' || true)"
+  lan_ip="${lan_ip:-127.0.0.1}"
+
+  echo "========================================================================"
+  echo " DEVBOX INFRASTRUCTURE HEALTH PROBE"
+  echo "========================================================================"
+  printf "%-22s %-34s %s\n" "SERVICE" "ENDPOINT" "STATUS"
+  echo "------------------------------------------------------------------------"
+
+  # TCP Checks
+  local tcp_endpoints=(
+    "PostgreSQL:$lan_ip:5432"
+    "Redis:$lan_ip:6380"
+    "Dgraph gRPC:$lan_ip:9080"
+    "ClickHouse native:$lan_ip:9002"
+    "9router direct:$lan_ip:20128"
+    "Langfuse direct:$lan_ip:3005"
+  )
+  for item in "${tcp_endpoints[@]}"; do
+    local name="${item%%:*}"
+    local addr="${item#*:}"
+    local host="${addr%:*}"
+    local port="${addr##*:}"
+    if (timeout 2 bash -c "exec 3<>/dev/tcp/$host/$port" 2>/dev/null); then
+      printf "%-22s %-34s \033[32mONLINE\033[0m\n" "$name" "$addr"
+    else
+      printf "%-22s %-34s \033[31mOFFLINE\033[0m\n" "$name" "$addr"
+    fi
+  done
+
+  # HTTP Checks (via Caddy :80)
+  local http_endpoints=(
+    "Devbox Dashboard:http://devbox.local/health"
+    "Langfuse:http://langfuse.local/health"
+    "9router:http://9router.local/health"
+    "ClickHouse HTTP:http://clickhouse.local"
+    "Dgraph HTTP:http://dgraph.local"
+    "MinIO S3:http://minio.local"
+    "MinIO console:http://minio-console.local"
+    "Jellyfin:http://jellyfin.local"
+    "qBittorrent:http://qbittorrent.local"
+  )
+  for item in "${http_endpoints[@]}"; do
+    local name="${item%%:*}"
+    local url="${item#*:}"
+    local code
+    code=$(curl -s -o /dev/null -w "%{http_code}" -m 3 -L "$url" 2>/dev/null || echo "000")
+    if [[ "$code" =~ ^(200|204|301|302|307|308|403)$ ]]; then
+      printf "%-22s %-34s \033[32mONLINE\033[0m (HTTP %s)\n" "$name" "$url" "$code"
+    else
+      printf "%-22s %-34s \033[31mOFFLINE\033[0m (HTTP %s)\n" "$name" "$url" "$code"
+    fi
+  done
+  echo "========================================================================"
+}
+
 case "$CMD" in
   up|down|restart)
     if [[ -n "$TARGET" ]]; then
@@ -86,6 +145,9 @@ case "$CMD" in
     echo " DEVBOX CONTAINER STATUS"
     echo "========================================================================"
     docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    ;;
+  health)
+    check_health
     ;;
   logs)
     if [[ -n "$TARGET" ]]; then
