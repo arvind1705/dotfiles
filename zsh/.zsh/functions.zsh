@@ -8,11 +8,23 @@
 
 # Upgrade all development tools
 upall() {
-  echo "→ brew"
-  if brew update >/dev/null 2>&1 && brew upgrade -y >/dev/null 2>&1 && brew cleanup >/dev/null 2>&1; then
-    echo "✓ brew latest"
-  else
-    echo "✗ brew failed"
+  # OS package manager: Homebrew on macOS, apt on Ubuntu
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    if command -v brew >/dev/null 2>&1; then
+      echo "→ brew"
+      if brew update >/dev/null 2>&1 && brew upgrade >/dev/null 2>&1 && brew cleanup >/dev/null 2>&1; then
+        echo "✓ brew latest"
+      else
+        echo "✗ brew failed"
+      fi
+    fi
+  elif [[ -r /etc/os-release ]] && grep -q '^ID=ubuntu$' /etc/os-release; then
+    echo "→ apt"
+    if sudo apt update -qq && sudo apt upgrade -y -qq && sudo apt autoremove -y -qq && sudo apt autoclean -qq; then
+      echo "✓ apt latest"
+    else
+      echo "✗ apt failed"
+    fi
   fi
 
   echo "→ opencode"
