@@ -31,7 +31,7 @@ mkdir -p "$HOME/data/9router"
 chmod 700 "$HOME/data/9router"
 
 # Media storage dirs
-MEDIA_ROOT="${MEDIA_ROOT:-$HOME/entertainment}"
+MEDIA_ROOT="${MEDIA_ROOT:-$HOME/data/media}"
 mkdir -p \
   "$MEDIA_ROOT/config/jellyfin" \
   "$MEDIA_ROOT/config/qbittorrent" \
