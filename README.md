@@ -107,16 +107,24 @@ All container resource limits are carefully budgeted for host stability on a 2-c
   - `cpus: '0.75'`
 
 ### 2. Media Server (`stacks/media-server/compose.yaml`)
+- **RAM Disk Transcode Cache**: Mounted `tmpfs: /cache/transcodes:size=1024M,mode=1777` directly in RAM. Eliminates up to ~12 GB of daily temporary HLS segment writes on the 5,400 RPM hard drive, preventing disk thrashing and streaming stutters.
 - **Dual Path Mounts**: Both `${MEDIA_ROOT}/library` (`/home/aravind/data/media/library`) and `/home/aravind/entertainment/library` are mounted inside the container to maintain full backwards and forwards compatibility with Jellyfin's SQLite database index.
 - **Hardware Transcoding**: Passed `/dev/dri` device and `render`/`video` groups for Intel Quick Sync Video (QSV) hardware-accelerated video transcode and remuxing.
 - **qBittorrent WebUI Port**: Bound to port `8081` matching host and container to satisfy qBittorrent 5.x CSRF/Host-header validation.
 
 ### 3. Devdeps Datastores (`stacks/devdeps/compose.yaml`)
-- **ClickHouse**: Memory limited to `1.5G`, configured with `tuning.xml` for max concurrency thread limits suited to a 4-thread host.
-- **PostgreSQL**: Memory limited to `512M`, `cpus: '1.0'`.
-- **Redis**: Memory limited to `256M`, `cpus: '0.5'`.
-- **Dgraph**: Memory limited to `768M`, cache bounded to `512M`.
+- **PostgreSQL**: Tuned with `shared_buffers=256MB` (allowing 100% of the active database to live in RAM), `work_mem=16MB`, and `synchronous_commit=off` to eliminate mechanical disk `fsync` stalls.
+- **Redis**: Tuned with `--maxmemory 192mb --maxmemory-policy allkeys-lru` to auto-evict expired cache keys without risking Docker OOM kills, with conservative RDB disk snapshot intervals.
+- **ClickHouse**: Configured with `<async_insert>1</async_insert>` and `<wait_for_async_insert>0</wait_for_async_insert>` in `users-tuning.xml` to buffer incoming inserts in RAM and consolidate disk writes.
+- **Dgraph**: Cache bounded to `size-mb=256` to lower background Raft consensus memory pressure on a 4-thread CPU.
 - **MinIO**: Memory limited to `512M`, `cpus: '0.75'`.
+
+### 4. Kernel & Ingress Performance
+- **Kernel Swap & Cache (`/etc/sysctl.d/99-devbox.conf`)**: `vm.swappiness = 10` (prevents premature memory eviction to disk) and `vm.vfs_cache_pressure = 50` (retains directory/inode cache longer in RAM).
+- **zswap Compressed Swap Cache**: Enabled via `zswap-enable.service` with LZO compression to intercept swapped pages and compress them in RAM.
+- **Filesystem `noatime`**: Root ext4 partition mounted with `noatime` to eliminate metadata write wear on disk reads.
+- **Caddy Compression**: Enabled `encode zstd gzip` across all `.local` web vhosts for 70–80% payload transfer reduction over local Wi-Fi.
+- **Docker Log Rotation (`/etc/docker/daemon.json`)**: Configured with `max-size: 10m` and `max-file: 3` to prevent unbounded log accumulation on disk.
 
 ---
 

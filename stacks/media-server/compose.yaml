@@ -27,6 +27,8 @@ services:
       - ${MEDIA_ROOT}/config/jellyfin:/config
       - ${MEDIA_ROOT}/library:${MEDIA_ROOT}/library
       - ${MEDIA_ROOT}/library:/home/aravind/entertainment/library
+    tmpfs:
+      - /cache/transcodes:size=1024M,mode=1777
     ports:
       - "${LAN_IP:-192.168.0.172}:${JELLYFIN_PORT:-8096}:8096/tcp"
       # UDP 7359 = Jellyfin's LAN auto-discovery beacon for the TV app.

@@ -1,10 +1,13 @@
 http://qbittorrent.local {
+	encode zstd gzip
 	reverse_proxy __LAN_IP__:8081
 }
 http://jellyfin.local {
+	encode zstd gzip
 	reverse_proxy __LAN_IP__:8096
 }
 http://langfuse.local {
+	encode zstd gzip
 	handle /health {
 		rewrite * /api/public/health
 		reverse_proxy __LAN_IP__:3005
@@ -12,18 +15,22 @@ http://langfuse.local {
 	reverse_proxy __LAN_IP__:3005
 }
 http://clickhouse.local {
+	encode zstd gzip
 	reverse_proxy __LAN_IP__:8124
 }
 http://minio.local {
 	reverse_proxy __LAN_IP__:9092
 }
 http://minio-console.local {
+	encode zstd gzip
 	reverse_proxy __LAN_IP__:9094
 }
 http://dgraph.local {
+	encode zstd gzip
 	reverse_proxy __LAN_IP__:8080
 }
 http://devbox.local, http://__LAN_IP__, http://localhost, http://127.0.0.1 {
+	encode zstd gzip
 	respond /health "OK" 200
 
 	handle /api/system* {
@@ -67,6 +74,7 @@ http://devbox.local, http://__LAN_IP__, http://localhost, http://127.0.0.1 {
 	file_server
 }
 http://9router.local {
+	encode zstd gzip
 	handle /health {
 		rewrite * /api/health
 		reverse_proxy __LAN_IP__:20128

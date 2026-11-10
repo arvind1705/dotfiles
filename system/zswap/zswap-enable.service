@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable Linux Kernel zswap compressed swap cache
+DefaultDependencies=no
+After=systemd-modules-load.service
+Before=basic.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo 1 > /sys/module/zswap/parameters/enabled'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=basic.target

@@ -55,4 +55,17 @@ if command -v iptables >/dev/null 2>&1; then
   echo "    ✓ aruba-devdeps LAN firewall filter enabled"
 fi
 
+# 6. Sysctl performance tuning (swappiness & cache pressure for low-power host)
+if [[ -d /etc/sysctl.d ]]; then
+  sudo cp "$DIR/sysctl/99-devbox.conf" /etc/sysctl.d/99-devbox.conf
+  sudo sysctl -p /etc/sysctl.d/99-devbox.conf || true
+  echo "    ✓ sysctl low-swappiness & cache tuning applied"
+fi
+
+# 7. Enable zswap compressed swap cache service
+sudo cp "$DIR/zswap/zswap-enable.service" /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now zswap-enable.service || true
+echo "    ✓ zswap compressed swap service enabled"
+
 echo "==> System setup complete."

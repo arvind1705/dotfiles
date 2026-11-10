@@ -6,6 +6,18 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-kg_mcp}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kg_mcp_pass}
       POSTGRES_DB: ${POSTGRES_DB:-kg_mcp_db}
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+      - "-c"
+      - "effective_cache_size=1GB"
+      - "-c"
+      - "synchronous_commit=off"
     ports:
       - "${LAN_IP:-192.168.0.172}:5432:5432"
     volumes:
@@ -27,6 +39,18 @@ services:
 
   redis:
     image: redis:7-alpine
+    command:
+      - "redis-server"
+      - "--maxmemory"
+      - "192mb"
+      - "--maxmemory-policy"
+      - "allkeys-lru"
+      - "--save"
+      - "900"
+      - "1"
+      - "--save"
+      - "300"
+      - "10"
     ports:
       - "${LAN_IP:-192.168.0.172}:6380:6379"
     volumes:
@@ -48,7 +72,7 @@ services:
   dgraph:
     image: dgraph/standalone:latest
     environment:
-      DGRAPH_ALPHA_CACHE: "size-mb=512; percentage=40,40,20;"
+      DGRAPH_ALPHA_CACHE: "size-mb=256; percentage=40,40,20;"
     ports:
       - "${LAN_IP:-192.168.0.172}:8080:8080"
       - "${LAN_IP:-192.168.0.172}:9080:9080"
