@@ -1,14 +1,49 @@
 <clickhouse>
-    <!--
-      ClickHouse by default creates 512 background schedule pool threads, plus
-      16 threads for each sub-pool (message broker, distributed, buffer flush, etc.).
-      For a local development / Langfuse instance, these are massively oversized.
-    -->
-    <background_schedule_pool_size>16</background_schedule_pool_size>
-    <background_buffer_flush_schedule_pool_size>2</background_buffer_flush_schedule_pool_size>
-    <background_message_broker_schedule_pool_size>2</background_message_broker_schedule_pool_size>
+    <!-- Background pools: restrict merge and schedule threads for 2-core CPU -->
+    <background_pool_size>2</background_pool_size>
+    <background_merges_mutations_concurrency_ratio>1</background_merges_mutations_concurrency_ratio>
+    <background_schedule_pool_size>4</background_schedule_pool_size>
+    <background_buffer_flush_schedule_pool_size>1</background_buffer_flush_schedule_pool_size>
+    <background_message_broker_schedule_pool_size>1</background_message_broker_schedule_pool_size>
     <background_distributed_schedule_pool_size>1</background_distributed_schedule_pool_size>
-    <background_fetches_pool_size>2</background_fetches_pool_size>
-    <background_move_pool_size>2</background_move_pool_size>
-    <background_common_pool_size>2</background_common_pool_size>
+    <background_fetches_pool_size>1</background_fetches_pool_size>
+    <background_move_pool_size>1</background_move_pool_size>
+    <background_common_pool_size>1</background_common_pool_size>
+
+    <!-- Adjust merge tree pool entry thresholds to match small background pool -->
+    <merge_tree>
+        <number_of_free_entries_in_pool_to_execute_mutation>0</number_of_free_entries_in_pool_to_execute_mutation>
+        <number_of_free_entries_in_pool_to_lower_max_size_of_merge>0</number_of_free_entries_in_pool_to_lower_max_size_of_merge>
+        <number_of_free_entries_in_pool_to_execute_optimize_entire_partition>0</number_of_free_entries_in_pool_to_execute_optimize_entire_partition>
+    </merge_tree>
+
+    <!-- Disable memory profiler -->
+    <total_memory_profiler_step>0</total_memory_profiler_step>
+
+    <!-- Disable heavy internal profiler and metric logs -->
+    <trace_log remove="1"/>
+    <metric_log remove="1"/>
+    <asynchronous_metric_log remove="1"/>
+    <part_log remove="1"/>
+    <text_log remove="1"/>
+    <processors_profile_log remove="1"/>
+    <opentelemetry_span_log remove="1"/>
+    <query_metric_log remove="1"/>
+    <query_views_log remove="1"/>
+
+    <!-- Retain only lightweight query and error logs with relaxed flush interval -->
+    <query_log>
+        <database>system</database>
+        <table>query_log</table>
+        <flush_interval_milliseconds>30000</flush_interval_milliseconds>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+    </query_log>
+    <error_log>
+        <database>system</database>
+        <table>error_log</table>
+        <flush_interval_milliseconds>30000</flush_interval_milliseconds>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+    </error_log>
 </clickhouse>

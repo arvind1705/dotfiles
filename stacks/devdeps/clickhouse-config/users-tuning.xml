@@ -1,0 +1,19 @@
+<clickhouse>
+    <!--
+      ClickHouse User & Query Execution Profile Tuning for Devbox:
+      - Disables sampling query profiler (query_profiler_*_time_period_ns=0) to prevent
+        constant timer interrupts, profiling overhead, and trace_log thrashing.
+      - Disables memory profiler step allocations.
+      - Restricts max query execution threads to 2 (matches 2 physical cores).
+      - Sets a safe default max execution time timeout of 60s for runaway queries.
+    -->
+    <profiles>
+        <default>
+            <query_profiler_real_time_period_ns>0</query_profiler_real_time_period_ns>
+            <query_profiler_cpu_time_period_ns>0</query_profiler_cpu_time_period_ns>
+            <memory_profiler_step>0</memory_profiler_step>
+            <max_threads>2</max_threads>
+            <max_execution_time>60</max_execution_time>
+        </default>
+    </profiles>
+</clickhouse>
