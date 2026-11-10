@@ -3,61 +3,63 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Devbox Command Center | http://devbox.local</title>
+<title>Devbox Portal | http://devbox.local</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
 <style>
 :root {
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  
-  /* Dark theme (default) */
-  --bg-base: #090d16;
-  --bg-surface: rgba(17, 24, 39, 0.75);
-  --bg-surface-hover: rgba(26, 36, 56, 0.9);
-  --bg-card: rgba(15, 23, 42, 0.8);
-  --bg-chip: rgba(255, 255, 255, 0.05);
-  --bg-chip-hover: rgba(255, 255, 255, 0.1);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* Dark Theme (Default) */
+  --bg-app: #0b0f17;
+  --bg-card: #111726;
+  --bg-card-hover: #151d30;
+  --bg-subtle: rgba(255, 255, 255, 0.04);
+  --bg-subtle-hover: rgba(255, 255, 255, 0.08);
   --border: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(99, 102, 241, 0.6);
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
-  
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-glow: rgba(99, 102, 241, 0.25);
-  
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-hover: rgba(99, 102, 241, 0.45);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-subtle: rgba(99, 102, 241, 0.12);
+
   --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.12);
+  --success-subtle: rgba(16, 185, 129, 0.12);
   --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.12);
+  --warning-subtle: rgba(245, 158, 11, 0.12);
   --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  
+  --danger-subtle: rgba(239, 68, 68, 0.12);
+
   --radius-sm: 6px;
-  --radius: 12px;
-  --radius-lg: 16px;
-  
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--border);
-  --shadow-hover: 0 14px 30px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.35);
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
 }
 
 [data-theme="light"] {
-  --bg-base: #f8fafc;
-  --bg-surface: rgba(255, 255, 255, 0.88);
-  --bg-surface-hover: rgba(241, 245, 249, 0.95);
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --bg-chip: rgba(0, 0, 0, 0.04);
-  --bg-chip-hover: rgba(0, 0, 0, 0.08);
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-subtle: rgba(0, 0, 0, 0.03);
+  --bg-subtle-hover: rgba(0, 0, 0, 0.06);
   --border: rgba(0, 0, 0, 0.08);
-  --border-focus: rgba(99, 102, 241, 0.6);
-  --text-main: #0f172a;
-  --text-muted: #475569;
-  --text-dim: #94a3b8;
-  --primary-glow: rgba(99, 102, 241, 0.15);
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
-  --shadow-hover: 0 14px 30px -4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.4);
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-hover: rgba(99, 102, 241, 0.5);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+
+  --accent-subtle: rgba(99, 102, 241, 0.08);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 10px 25px -4px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -68,1994 +70,1391 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-base);
-  color: var(--text-main);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
   line-height: 1.5;
-  position: relative;
-  overflow-x: hidden;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  padding-bottom: 48px;
 }
 
-/* Background Ambient Glow */
-.bg-ambient {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.ambient-circle-1 {
-  position: absolute;
-  top: -120px;
-  right: -80px;
-  width: 550px;
-  height: 550px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(50px);
-}
-.ambient-circle-2 {
-  position: absolute;
-  top: 360px;
-  left: -180px;
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(60px);
-}
-.ambient-grid {
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(to right, var(--border) 1px, transparent 1px),
-                    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.35;
-  mask-image: linear-gradient(to bottom, black 25%, transparent 85%);
-  -webkit-mask-image: linear-gradient(to bottom, black 25%, transparent 85%);
-}
-
-.wrapper {
-  position: relative;
-  z-index: 1;
-  max-width: 1220px;
+.container {
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 32px 24px 64px 24px;
+  padding: 28px 20px;
 }
 
 /* Header */
 header {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  margin-bottom: 24px;
-}
-.header-top {
-  display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
 }
-.brand-area {
+
+.brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
+
 .brand-icon {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  background: var(--accent);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  box-shadow: 0 4px 14px var(--primary-glow);
   flex-shrink: 0;
 }
 .brand-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
-.brand-title-group h1 {
-  font-size: 22px;
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-title {
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.brand-title-group p {
-  font-size: 13px;
-  color: var(--text-muted);
+
+.brand-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 2px;
-}
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
-/* Badges */
-.system-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 9px;
-  border-radius: 9999px;
-  font-size: 11.5px;
-  font-weight: 500;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(8px);
-  color: var(--text-muted);
-}
-.system-badge code {
+.badge-tag {
   font-family: var(--font-mono);
-  color: var(--text-main);
-  font-size: 11.5px;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
+.badge-tag:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle-hover);
+  border-color: var(--border-hover);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status Pill */
 .status-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 9999px;
-  font-size: 12.5px;
-  font-weight: 600;
-  background: var(--success-bg);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--success-subtle);
   color: var(--success);
   border: 1px solid rgba(16, 185, 129, 0.25);
-  backdrop-filter: blur(8px);
 }
-.badge-pill {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  padding: 2px 7px;
-  border-radius: 9999px;
-  background: var(--bg-chip);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  transition: color 0.4s ease, border-color 0.4s ease;
-}
-.pulse-dot {
-  width: 8px;
-  height: 8px;
+.status-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: currentColor;
-  position: relative;
-}
-.pulse-dot::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  background-color: currentColor;
-  opacity: 0.4;
-  animation: pulse 2s infinite ease-in-out;
-}
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.8); opacity: 0; }
-  100% { transform: scale(1); opacity: 0; }
 }
 
-/* Button UI */
+/* Button */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 500;
   cursor: pointer;
   border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-main);
+  background: var(--bg-card);
+  color: var(--text-primary);
   transition: all 0.15s ease;
-  backdrop-filter: blur(8px);
   text-decoration: none;
 }
 .btn:hover {
-  background: var(--bg-surface-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
-}
-.btn-primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
-.btn-primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-  box-shadow: 0 4px 12px var(--primary-glow);
+  background: var(--bg-subtle-hover);
+  border-color: var(--border-hover);
 }
 .btn-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  border-radius: var(--radius-sm);
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
-/* Stats Row */
-.stats-grid {
+/* Telemetry Section */
+.telemetry-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 24px;
 }
-.stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s ease;
-}
-.stat-card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-}
-.stat-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-chip);
-  color: var(--text-main);
-  flex-shrink: 0;
-}
-.stat-icon svg {
-  width: 20px;
-  height: 20px;
-}
-.stat-content {
-  flex: 1;
-  min-width: 0;
-}
-.stat-label {
-  font-size: 11.5px;
-  color: var(--text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.stat-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-main);
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-.stat-sub {
-  font-size: 11.5px;
-  color: var(--text-dim);
-  font-weight: 400;
-}
 
-/* System Telemetry Section (btop style) */
-.telemetry-section {
-  margin-bottom: 28px;
+.telemetry-box {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-card);
-}
-.telemetry-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.telemetry-title-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.telemetry-icon-box {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.telemetry-icon-box svg {
-  width: 20px;
-  height: 20px;
-}
-.telemetry-title {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.telemetry-badge {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  padding: 2px 7px;
-  border-radius: 4px;
-  background: rgba(99, 102, 241, 0.12);
-  color: var(--primary);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  font-weight: 600;
-}
-.telemetry-sub {
-  font-size: 12px;
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-  margin-top: 1px;
-}
-.telemetry-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  background: var(--success-bg);
-  color: var(--success);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-.telemetry-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-.telemetry-card {
-  background: var(--bg-chip);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 16px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  position: relative;
-  overflow: hidden;
+  gap: 8px;
 }
-.telemetry-card-top {
+
+.telemetry-box-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.telemetry-card-label {
-  font-size: 11.5px;
+
+.telemetry-label {
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
-.telemetry-val-large {
-  font-size: 26px;
-  font-weight: 800;
+
+.telemetry-pill {
   font-family: var(--font-mono);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
 }
-.meter-bar-track {
+
+.telemetry-value-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.telemetry-num {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+.telemetry-subtext {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bar-track {
   width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.07);
+  height: 4px;
+  background: var(--bg-subtle);
   border-radius: 9999px;
   overflow: hidden;
-  position: relative;
 }
-[data-theme="light"] .meter-bar-track {
-  background: rgba(0, 0, 0, 0.07);
-}
-.meter-bar-fill {
+.bar-fill {
   height: 100%;
   border-radius: 9999px;
+  background: var(--accent);
   transition: width 0.4s ease, background-color 0.3s ease;
-}
-.telemetry-meta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11.5px;
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-}
-.proc-table-wrapper {
-  overflow-x: auto;
-  max-height: 130px;
-}
-.proc-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-}
-.proc-table th {
-  text-align: left;
-  color: var(--text-dim);
-  font-weight: 600;
-  padding: 3px 6px;
-  border-bottom: 1px solid var(--border);
-  font-size: 10.5px;
-}
-.proc-table td {
-  padding: 4px 6px;
-  color: var(--text-main);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-}
-.proc-cpu-badge {
-  padding: 1px 5px;
-  border-radius: 4px;
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--primary);
-  font-weight: 600;
 }
 
 /* Search and Filters */
 .toolbar {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-@media (min-width: 768px) {
-  .toolbar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-.search-container {
-  position: relative;
-  flex: 1;
-  max-width: 440px;
-}
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  color: var(--text-dim);
-  pointer-events: none;
-}
-.search-input {
-  width: 100%;
-  padding: 9px 38px 9px 36px;
-  font-size: 13.5px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-main);
-  backdrop-filter: blur(8px);
-  outline: none;
-  transition: all 0.2s ease;
-}
-.search-input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--primary-glow);
-}
-.search-shortcut {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 11px;
-  font-family: var(--font-mono);
-  background: var(--bg-chip);
-  border: 1px solid var(--border);
-  padding: 1px 6px;
-  border-radius: 4px;
-  color: var(--text-dim);
-  pointer-events: none;
-}
-.filter-tabs {
-  display: flex;
   align-items: center;
-  gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-.filter-btn {
-  padding: 6px 14px;
-  border-radius: 9999px;
-  font-size: 12.5px;
-  font-weight: 500;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-.filter-btn:hover {
-  background: var(--bg-surface-hover);
-  color: var(--text-main);
-}
-.filter-btn.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-/* Service Sections & Cards */
-.section-title {
-  font-size: 13.5px;
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 32px 7px 32px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.search-input:focus {
+  border-color: var(--accent);
+}
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.search-kbd {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.filter-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+.filter-btn.active {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border-color: var(--border);
   font-weight: 600;
-  color: var(--text-muted);
+}
+
+/* Category Section Header */
+.category-header {
+  font-size: 13px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 32px 0 16px 0;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin: 28px 0 12px 0;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.section-title::after {
-  content: '';
+.category-header:first-of-type {
+  margin-top: 8px;
+}
+.category-header::after {
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--border);
 }
 
-.services-grid {
+/* Cards Grid */
+.cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
 }
 
-.card {
+.service-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-card);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
-.card:hover {
-  border-color: rgba(99, 102, 241, 0.35);
+.service-card:hover {
+  border-color: var(--border-hover);
   box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
+
 .card-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
 }
-.card-title-group {
+
+.card-title-wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
-.service-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+
+.card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--text-primary);
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
-.service-icon svg {
-  width: 22px;
-  height: 22px;
-}
-.service-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-main);
-  line-height: 1.2;
-}
-.service-category-tag {
-  font-size: 10.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-dim);
-  margin-top: 2px;
+.card-icon svg {
+  width: 17px;
+  height: 17px;
 }
 
-/* Card Health Badge */
-.health-badge {
+.card-name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.card-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-stack {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* Service Status Badge */
+.health-tag {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 9px;
+  padding: 2px 7px;
   border-radius: 9999px;
-  font-size: 11.5px;
-  font-weight: 600;
-  background: var(--bg-chip);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
-  color: var(--text-dim);
-  transition: all 0.2s ease;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
 }
-.health-badge.online {
-  background: var(--success-bg);
-  border-color: rgba(16, 185, 129, 0.25);
+.health-tag.online {
+  background: var(--success-subtle);
   color: var(--success);
+  border-color: rgba(16, 185, 129, 0.25);
 }
-.health-badge.offline {
-  background: var(--danger-bg);
-  border-color: rgba(239, 68, 68, 0.25);
+.health-tag.offline {
+  background: var(--danger-subtle);
   color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.25);
 }
-.health-badge.checking {
-  background: var(--warning-bg);
-  border-color: rgba(245, 158, 11, 0.25);
+.health-tag.checking {
+  background: var(--warning-subtle);
   color: var(--warning);
+  border-color: rgba(245, 158, 11, 0.25);
 }
 .health-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: currentColor;
 }
 .health-latency {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 10px;
   opacity: 0.85;
 }
 
 .card-desc {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.45;
-  margin-bottom: 16px;
-  flex: 1;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.card-details {
-  background: var(--bg-chip);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  margin-bottom: 16px;
+.card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
 }
-.endpoint-text {
-  color: var(--text-main);
+
+.endpoint-pill {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  background: var(--bg-subtle);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 200px;
+  cursor: pointer;
 }
-.endpoint-port {
-  color: var(--text-dim);
-  font-size: 11.5px;
-  margin-left: 6px;
+.endpoint-pill:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 .card-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-.card-actions .btn {
-  flex: 1;
+  gap: 6px;
 }
 
-/* Copy Snippet Area for TCP cards */
-.snippet-box {
-  background: var(--bg-chip);
-  border: 1px solid var(--border);
+.btn-sm {
+  padding: 4px 9px;
+  font-size: 11.5px;
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  margin-bottom: 14px;
+}
+
+/* Snippet row for TCP/CLI */
+.snippet-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
 }
 .snippet-code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+/* Collapsible Cheatsheet */
+.cheatsheet-wrap {
+  margin-top: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  overflow: hidden;
+}
+.cheatsheet-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.cheatsheet-toggle:hover {
+  background: var(--bg-subtle);
+}
+.cheatsheet-body {
+  padding: 0 16px 14px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.cli-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+}
+.cli-card code {
   font-family: var(--font-mono);
   font-size: 11.5px;
-  color: var(--text-main);
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.btn-copy-tiny {
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 4px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-}
-.btn-copy-tiny:hover {
-  color: var(--text-main);
-  border-color: rgba(255, 255, 255, 0.25);
-  background: var(--bg-surface-hover);
-}
 
-/* Cheatsheet Section */
-.cheatsheet-section {
-  margin-top: 48px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  backdrop-filter: blur(12px);
-}
-.cheatsheet-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.cheatsheet-title {
-  font-size: 16px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.cli-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
-}
-.cli-item {
-  background: var(--bg-chip);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.cli-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.cli-code-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.cli-code {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.1);
-  padding: 3px 6px;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-
-/* Toast Notifications */
+/* Toast */
 .toast-container {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 1000;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   gap: 8px;
   pointer-events: none;
 }
 .toast {
-  background: var(--text-main);
-  color: var(--bg-base);
-  padding: 10px 16px;
+  background: #1e293b;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 500;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   gap: 8px;
   opacity: 0;
-  transform: translateY(12px);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: auto;
+  transform: translateY(10px);
+  animation: toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
+[data-theme="light"] .toast {
+  background: #0f172a;
+}
+@keyframes toastIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
 }
 
 /* Footer */
 footer {
-  margin-top: 56px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
+  margin-top: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 16px;
-  font-size: 12.5px;
-  color: var(--text-dim);
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
 }
-.footer-links {
-  display: flex;
-  gap: 16px;
-}
-.footer-links a {
-  color: var(--text-muted);
+footer a {
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: color 0.15s ease;
 }
-.footer-links a:hover {
-  color: var(--text-main);
+footer a:hover {
+  color: var(--accent);
 }
 </style>
 </head>
 <body>
 
-<div class="bg-ambient">
-  <div class="ambient-circle-1"></div>
-  <div class="ambient-circle-2"></div>
-  <div class="ambient-grid"></div>
-</div>
-
-<div class="wrapper">
-  <!-- Top Header -->
+<div class="container">
+  <!-- Clean Minimal Header -->
   <header>
-    <div class="header-top">
-      <div class="brand-area">
-        <div class="brand-icon">
-          <!-- Server icon -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-            <line x1="6" y1="6" x2="6.01" y2="6"></line>
-            <line x1="6" y1="18" x2="6.01" y2="18"></line>
-          </svg>
-        </div>
-        <div class="brand-title-group">
-          <h1>Devbox Command Center</h1>
-          <p>
-            <span>Central Local Ingress &amp; Service Portal</span>
-            <span>•</span>
-            <span class="system-badge">Host: <code>devbox.local</code></span>
-            <span class="system-badge" style="cursor:pointer;" onclick="copyToClipboard('192.168.0.172', 'LAN IP copied')" title="Click to copy IP">LAN: <code>192.168.0.172</code></span>
-            <span class="system-badge" id="header-cpu-pill" style="display:none;">CPU: <code id="header-cpu-val">--%</code></span>
-            <span class="system-badge" id="header-mem-pill" style="display:none;">RAM: <code id="header-mem-val">--%</code></span>
-          </p>
-        </div>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+          <line x1="6" y1="6" x2="6.01" y2="6"></line>
+          <line x1="6" y1="18" x2="6.01" y2="18"></line>
+        </svg>
       </div>
-
-      <div class="header-actions">
-        <div id="overall-status-pill" class="status-pill">
-          <span class="pulse-dot"></span>
-          <span id="overall-status-text">Checking Services...</span>
+      <div class="brand-info">
+        <div class="brand-title">Devbox Portal</div>
+        <div class="brand-meta">
+          <span>Host: <code>devbox.local</code></span>
+          <span>•</span>
+          <span class="badge-tag" onclick="copyText('192.168.0.172', 'LAN IP copied')" title="Click to copy IP">LAN: 192.168.0.172</span>
         </div>
-
-        <button class="btn btn-icon" id="btn-refresh" title="Probe All Endpoints &amp; Refresh" onclick="refreshAll()">
-          <svg id="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-          </svg>
-        </button>
-
-        <button class="btn btn-icon" id="btn-theme" title="Toggle Theme" onclick="toggleTheme()">
-          <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-        </button>
       </div>
     </div>
 
-    <!-- Quick Stats Grid -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.12); color: #818cf8;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="2" y1="12" x2="22" y2="12"></line>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">Web Ingress</div>
-          <div class="stat-value">Caddy v2 <span class="stat-sub">Port 80</span></div>
-        </div>
+    <div class="header-controls">
+      <div id="overall-status-pill" class="status-pill">
+        <span class="status-dot"></span>
+        <span id="overall-status-text">Probing services...</span>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #34d399;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">Online Services</div>
-          <div class="stat-value" id="stats-online-count">10 / 10 <span class="stat-sub" id="stats-latency">~3ms</span></div>
-        </div>
-      </div>
+      <button class="btn btn-icon" id="btn-refresh" title="Probe All Endpoints &amp; Refresh" onclick="refreshAll()">
+        <svg id="refresh-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+      </button>
 
-      <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.12); color: #fbbf24;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-            <line x1="12" y1="22.08" x2="12" y2="12"></line>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">Docker Stacks</div>
-          <div class="stat-value">4 Stacks <span class="stat-sub">Compose</span></div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(236, 72, 153, 0.12); color: #f472b6;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-            <line x1="12" y1="20" x2="12.01" y2="20"></line>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">LAN Discovery</div>
-          <div class="stat-value">Avahi mDNS <span class="stat-sub">*.local</span></div>
-        </div>
-      </div>
+      <button class="btn btn-icon" id="btn-theme" title="Toggle Theme" onclick="toggleTheme()">
+        <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <!-- System Telemetry Section (btop style) -->
-  <section class="telemetry-section" id="telemetry-section">
-    <div class="telemetry-header">
-      <div class="telemetry-title-group">
-        <div class="telemetry-icon-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-        </div>
-        <div>
-          <div class="telemetry-title">
-            <span>Hardware &amp; System Telemetry</span>
-            <span class="telemetry-badge">btop live</span>
-          </div>
-          <div class="telemetry-sub" id="telemetry-cpu-name">Intel Core i7 • Linux x86_64</div>
-        </div>
+  <!-- Clean Minimal Telemetry Bar -->
+  <section class="telemetry-row" id="telemetry-row">
+    <!-- CPU -->
+    <div class="telemetry-box">
+      <div class="telemetry-box-top">
+        <span class="telemetry-label">CPU Load</span>
+        <span class="telemetry-pill" id="cpu-temp">--°C</span>
       </div>
-
-      <div class="telemetry-controls">
-        <div class="live-pill" id="live-indicator">
-          <span class="pulse-dot"></span>
-          <span id="live-text">LIVE 2s</span>
-        </div>
-        <button class="btn-copy-tiny" id="btn-toggle-telemetry" onclick="toggleTelemetryCollapse()">Collapse</button>
+      <div class="telemetry-value-wrap">
+        <span class="telemetry-num" id="cpu-val">--%</span>
+        <span class="telemetry-subtext" id="cpu-load">Load: --</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="cpu-bar" style="width: 0%;"></div>
       </div>
     </div>
 
-    <div class="telemetry-grid" id="telemetry-grid">
-      <!-- CPU Box -->
-      <div class="telemetry-card">
-        <div class="telemetry-card-top">
-          <span class="telemetry-card-label">CPU Utilization</span>
-          <span class="badge-pill" id="telemetry-temp-badge">--°C</span>
-        </div>
-        <div class="telemetry-val-large" id="telemetry-cpu-val">--%</div>
-        <div class="meter-bar-track">
-          <div class="meter-bar-fill" id="telemetry-cpu-bar" style="width: 0%; background-color: var(--success);"></div>
-        </div>
-        <div id="telemetry-cpu-threads-row" style="display: flex; gap: 4px; margin-top: -2px;">
-          <!-- Populated with per-thread bars -->
-        </div>
-        <div class="telemetry-meta-row">
-          <span>Load: <span id="telemetry-load-val">-- / -- / --</span></span>
-          <span id="telemetry-cores-val">2 Cores / 4 Threads</span>
-        </div>
+    <!-- RAM -->
+    <div class="telemetry-box">
+      <div class="telemetry-box-top">
+        <span class="telemetry-label">Memory</span>
+        <span class="telemetry-pill" id="ram-swap">Swap: --%</span>
       </div>
+      <div class="telemetry-value-wrap">
+        <span class="telemetry-num" id="ram-val">--%</span>
+        <span class="telemetry-subtext" id="ram-sub">-- / -- GiB</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="ram-bar" style="width: 0%;"></div>
+      </div>
+    </div>
 
-      <!-- Memory Box -->
-      <div class="telemetry-card">
-        <div class="telemetry-card-top">
-          <span class="telemetry-card-label">Memory (RAM)</span>
-          <span class="badge-pill" id="telemetry-swap-badge">Swap: --%</span>
-        </div>
-        <div class="telemetry-val-large" id="telemetry-mem-val">--%</div>
-        <div class="meter-bar-track">
-          <div class="meter-bar-fill" id="telemetry-mem-bar" style="width: 0%; background-color: var(--primary);"></div>
-        </div>
-        <div class="telemetry-meta-row">
-          <span id="telemetry-mem-breakdown">RAM: -- / -- GB</span>
-          <span>Avail: <span id="telemetry-mem-avail">-- GB</span></span>
-        </div>
+    <!-- Storage -->
+    <div class="telemetry-box">
+      <div class="telemetry-box-top">
+        <span class="telemetry-label">Storage</span>
+        <span class="telemetry-pill" id="disk-uptime">Up: --</span>
       </div>
+      <div class="telemetry-value-wrap">
+        <span class="telemetry-num" id="disk-val">--%</span>
+        <span class="telemetry-subtext" id="disk-sub">-- / -- GiB</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="disk-bar" style="width: 0%;"></div>
+      </div>
+    </div>
 
-      <!-- Storage & Network Box -->
-      <div class="telemetry-card">
-        <div class="telemetry-card-top">
-          <span class="telemetry-card-label">Disk &amp; Network</span>
-          <span class="badge-pill" id="telemetry-uptime-badge">Up: --</span>
-        </div>
-        <div class="telemetry-val-large" id="telemetry-disk-val">--%</div>
-        <div class="meter-bar-track">
-          <div class="meter-bar-fill" id="telemetry-disk-bar" style="width: 0%; background-color: #f59e0b;"></div>
-        </div>
-        <div class="telemetry-meta-row">
-          <span id="telemetry-disk-breakdown">Root: -- / -- GB</span>
-          <span id="telemetry-net-rate">↓ 0 KB/s • ↑ 0 KB/s</span>
-        </div>
+    <!-- Activity -->
+    <div class="telemetry-box">
+      <div class="telemetry-box-top">
+        <span class="telemetry-label">Network &amp; Activity</span>
+        <span class="telemetry-pill" id="live-indicator">LIVE</span>
       </div>
-
-      <!-- Top Active Processes (btop table) -->
-      <div class="telemetry-card">
-        <div class="telemetry-card-top">
-          <span class="telemetry-card-label">Top Processes</span>
-          <span class="badge-pill">by CPU%</span>
-        </div>
-        <div class="proc-table-wrapper">
-          <table class="proc-table">
-            <thead>
-              <tr>
-                <th>CMD</th>
-                <th style="text-align: right;">PID</th>
-                <th style="text-align: right;">CPU%</th>
-                <th style="text-align: right;">MEM%</th>
-              </tr>
-            </thead>
-            <tbody id="telemetry-procs-body">
-              <tr><td colspan="4" style="text-align:center; color:var(--text-dim); padding: 12px 0;">Loading telemetry...</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="telemetry-value-wrap">
+        <span class="telemetry-num" style="font-size: 15px; font-weight: 600;" id="net-rates">↓ 0 KB/s • ↑ 0 KB/s</span>
       </div>
+      <div class="telemetry-subtext" id="top-proc-text" style="margin-top: 4px;">Top Proc: --</div>
     </div>
   </section>
 
-  <!-- Search & Filter Toolbar -->
+  <!-- Toolbar: Search & Category Filters -->
   <div class="toolbar">
-    <div class="search-container">
+    <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" id="search-input" class="search-input" placeholder="Search services, ports, tags (e.g. sql, ai, 8080)..." oninput="handleSearch()">
-      <span class="search-shortcut">/</span>
+      <input type="text" id="search-input" class="search-input" placeholder="Search services, ports (e.g. 8096, sql, ai)..." oninput="handleSearch()">
+      <span class="search-kbd">/</span>
     </div>
 
-    <div class="filter-tabs">
-      <button class="filter-btn active" data-category="all" onclick="filterCategory('all', this)">All (10)</button>
-      <button class="filter-btn" data-category="media" onclick="filterCategory('media', this)">Media (2)</button>
-      <button class="filter-btn" data-category="apps" onclick="filterCategory('apps', this)">AI &amp; Apps (2)</button>
-      <button class="filter-btn" data-category="infra" onclick="filterCategory('infra', this)">Storage &amp; Infra (4)</button>
-      <button class="filter-btn" data-category="tcp" onclick="filterCategory('tcp', this)">Databases / TCP (4)</button>
+    <div class="filter-group">
+      <button class="filter-btn active" data-cat="all" onclick="setCategory('all', this)">All (12)</button>
+      <button class="filter-btn" data-cat="web" onclick="setCategory('web', this)">Web Apps (5)</button>
+      <button class="filter-btn" data-cat="api" onclick="setCategory('api', this)">APIs &amp; Storage (3)</button>
+      <button class="filter-btn" data-cat="data" onclick="setCategory('data', this)">Databases (4)</button>
     </div>
   </div>
 
-  <!-- Main Content Grid -->
-  <main id="services-container">
-    <!-- Populated dynamically by JavaScript -->
-  </main>
+  <!-- Services Grid -->
+  <main id="services-root"></main>
 
-  <!-- Developer Cheatsheet Section -->
-  <section class="cheatsheet-section">
-    <div class="cheatsheet-header">
-      <div class="cheatsheet-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="4 17 10 11 4 5"></polyline>
-          <line x1="12" y1="19" x2="20" y2="19"></line>
-        </svg>
-        <span>Developer CLI &amp; Management Cheatsheet</span>
+  <!-- Clean Expandable Quick Reference -->
+  <div class="cheatsheet-wrap">
+    <button class="cheatsheet-toggle" onclick="toggleCheatsheet()">
+      <span>Terminal Commands &amp; Cheatsheet</span>
+      <svg id="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease;">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+    <div class="cheatsheet-body" id="cheatsheet-body" style="display: none;">
+      <div class="cli-card">
+        <code>ssh aravind@devbox.local</code>
+        <button class="btn btn-sm" onclick="copyText('ssh aravind@devbox.local', 'SSH command copied')">Copy</button>
       </div>
-      <button class="btn btn-copy-tiny" onclick="copyToClipboard('ssh aravind@devbox.local', 'SSH command copied')">Copy SSH</button>
-    </div>
-
-    <div class="cli-grid">
-      <div class="cli-item">
-        <div class="cli-desc">Probe health of all Docker stacks &amp; endpoints</div>
-        <div class="cli-code-row">
-          <code class="cli-code">./stacks/stacks.sh health</code>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('./stacks/stacks.sh health', 'Command copied')">Copy</button>
-        </div>
+      <div class="cli-card">
+        <code>./stacks/stacks.sh health</code>
+        <button class="btn btn-sm" onclick="copyText('./stacks/stacks.sh health', 'Health probe command copied')">Copy</button>
       </div>
-
-      <div class="cli-item">
-        <div class="cli-desc">Check running container status</div>
-        <div class="cli-code-row">
-          <code class="cli-code">./stacks/stacks.sh status</code>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('./stacks/stacks.sh status', 'Command copied')">Copy</button>
-        </div>
+      <div class="cli-card">
+        <code>./stacks/stacks.sh status</code>
+        <button class="btn btn-sm" onclick="copyText('./stacks/stacks.sh status', 'Status command copied')">Copy</button>
       </div>
-
-      <div class="cli-item">
-        <div class="cli-desc">Launch btop live monitor in terminal</div>
-        <div class="cli-code-row">
-          <code class="cli-code">btop</code>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('btop', 'Command copied')">Copy</button>
-        </div>
+      <div class="cli-card">
+        <code>psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db</code>
+        <button class="btn btn-sm" onclick="copyText('psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db', 'Postgres command copied')">Copy</button>
       </div>
-
-      <div class="cli-item">
-        <div class="cli-desc">Tail logs for AI gateway stack</div>
-        <div class="cli-code-row">
-          <code class="cli-code">./stacks/stacks.sh logs 9router</code>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('./stacks/stacks.sh logs 9router', 'Command copied')">Copy</button>
-        </div>
+      <div class="cli-card">
+        <code>redis-cli -h 192.168.0.172 -p 6380</code>
+        <button class="btn btn-sm" onclick="copyText('redis-cli -h 192.168.0.172 -p 6380', 'Redis command copied')">Copy</button>
       </div>
-
-      <div class="cli-item">
-        <div class="cli-desc">SSH connection to host machine</div>
-        <div class="cli-code-row">
-          <code class="cli-code">ssh aravind@devbox.local</code>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('ssh aravind@devbox.local', 'Command copied')">Copy</button>
-        </div>
-      </div>
-
-      <div class="cli-item">
-        <div class="cli-desc">Connect to PostgreSQL via terminal</div>
-        <div class="cli-code-row">
-          <code class="cli-code">psql -h postgres.local -p 5432 -U postgres</code>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('psql -h postgres.local -p 5432 -U postgres', 'Command copied')">Copy</button>
-        </div>
+      <div class="cli-card">
+        <code>clickhouse-client --host 192.168.0.172 --port 9002</code>
+        <button class="btn btn-sm" onclick="copyText('clickhouse-client --host 192.168.0.172 --port 9002', 'ClickHouse command copied')">Copy</button>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- Footer -->
   <footer>
-    <div>
-      <strong>Devbox Ingress</strong> • Managed via <code>~/dev/dotfiles</code> &amp; Caddy Reverse Proxy
-    </div>
-    <div class="footer-links">
-      <a href="http://devbox.local/api/system" target="_blank">System Metrics API</a>
-      <a href="http://devbox.local/health" target="_blank">Health Check API</a>
-      <a href="javascript:void(0)" onclick="copyHostsSnippet()">Copy /etc/hosts snippet</a>
+    <div>Devbox Command Center • Caddy Reverse Proxy &amp; mDNS</div>
+    <div style="display: flex; gap: 14px;">
+      <a href="/api/system" target="_blank">System API</a>
+      <a href="/health" target="_blank">Ingress Health</a>
+      <a href="javascript:void(0)" onclick="copyHosts()">Copy /etc/hosts snippet</a>
     </div>
   </footer>
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toast-container"></div>
+<div class="toast-container" id="toast-root"></div>
 
 <script>
-// Service Data Definitions
 const SERVICES = [
+  // --- Web Apps ---
   {
     id: "jellyfin",
     name: "Jellyfin",
-    category: "media",
-    categoryName: "Media & Streaming",
-    desc: "Open source media streaming platform for movies, TV series, music, and home media.",
+    cat: "web",
+    catName: "Web Applications",
+    desc: "Open source media streaming server for movies, shows, and audio.",
     domain: "jellyfin.local",
     url: "http://jellyfin.local",
     probeApi: "/api/health/jellyfin",
-    directProbeUrl: "http://jellyfin.local/health",
     port: 8096,
-    protocol: "HTTP",
     stack: "media-server",
     isWeb: true,
-    bgGradient: "linear-gradient(135deg, #7c3aed, #a855f7)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 15 5-3-5-3v6Z"></path><rect width="20" height="14" x="2" y="3" rx="2"></rect><path d="M12 17v4"></path><path d="M8 21h8"></path></svg>`
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10 15 5-3-5-3v6Z"></path><rect width="20" height="14" x="2" y="3" rx="2"></rect><path d="M12 17v4"></path><path d="M8 21h8"></path></svg>`
   },
   {
     id: "qbittorrent",
     name: "qBittorrent",
-    category: "media",
-    categoryName: "Media & Streaming",
-    desc: "BitTorrent client with Web UI, automated download queue, and bandwidth management.",
+    cat: "web",
+    catName: "Web Applications",
+    desc: "Torrent client with Web UI, automated download queue, and management.",
     domain: "qbittorrent.local",
     url: "http://qbittorrent.local",
     probeApi: "/api/health/qbittorrent",
-    directProbeUrl: "http://qbittorrent.local",
     port: 8081,
-    protocol: "HTTP",
     stack: "media-server",
     isWeb: true,
-    bgGradient: "linear-gradient(135deg, #0284c7, #38bdf8)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
   },
   {
     id: "langfuse",
     name: "Langfuse",
-    category: "apps",
-    categoryName: "AI & Apps",
-    desc: "LLM observability, prompt engineering, generation traces, and latency/cost metrics.",
+    cat: "web",
+    catName: "Web Applications",
+    desc: "LLM observability, prompt engineering, tracing, and metrics dashboard.",
     domain: "langfuse.local",
     url: "http://langfuse.local",
     probeApi: "/api/health/langfuse",
-    directProbeUrl: "http://langfuse.local/health",
     port: 3005,
-    protocol: "HTTP",
     stack: "langfuse",
     isWeb: true,
-    bgGradient: "linear-gradient(135deg, #059669, #10b981)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="M2 12h20"></path><path d="m4.93 19.07 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path></svg>`
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"></path><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="M2 12h20"></path><path d="m4.93 19.07 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path></svg>`
   },
   {
     id: "9router",
     name: "9router",
-    category: "apps",
-    categoryName: "AI & Apps",
-    desc: "Universal AI model gateway, dynamic LLM proxy, load balancing, and rate limiting.",
+    cat: "web",
+    catName: "Web Applications",
+    desc: "Universal AI model gateway, dynamic LLM proxy, and rate limiter.",
     domain: "9router.local",
     url: "http://9router.local",
     probeApi: "/api/health/9router",
-    directProbeUrl: "http://9router.local/health",
     port: 20128,
-    protocol: "HTTP",
     stack: "9router",
     isWeb: true,
-    bgGradient: "linear-gradient(135deg, #6366f1, #818cf8)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="8" x="3" y="3" rx="2"></rect><rect width="18" height="8" x="3" y="13" rx="2"></rect><line x1="7" y1="7" x2="7.01" y2="7"></line><line x1="7" y1="17" x2="7.01" y2="17"></line><line x1="17" y1="7" x2="17.01" y2="7"></line><line x1="17" y1="17" x2="17.01" y2="17"></line></svg>`
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="8" x="3" y="3" rx="2"></rect><rect width="18" height="8" x="3" y="13" rx="2"></rect><line x1="7" y1="7" x2="7.01" y2="7"></line><line x1="7" y1="17" x2="7.01" y2="17"></line></svg>`
   },
   {
     id: "minio-console",
     name: "MinIO Console",
-    category: "infra",
-    categoryName: "Storage & Infra",
-    desc: "Administrative web dashboard for S3 object storage buckets, policies, and access keys.",
+    cat: "web",
+    catName: "Web Applications",
+    desc: "Administrative web dashboard for S3 object storage buckets & policies.",
     domain: "minio-console.local",
     url: "http://minio-console.local",
     probeApi: "/api/health/minio-console",
-    directProbeUrl: "http://minio-console.local",
     port: 9094,
-    protocol: "HTTP",
     stack: "devdeps",
     isWeb: true,
-    bgGradient: "linear-gradient(135deg, #e11d48, #f43f5e)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`
   },
+
+  // --- APIs & Storage ---
   {
     id: "minio-s3",
     name: "MinIO S3 API",
-    category: "infra",
-    categoryName: "Storage & Infra",
-    desc: "Amazon S3-compatible high-performance object storage API endpoint.",
+    cat: "api",
+    catName: "APIs & Infrastructure",
+    desc: "High-performance S3-compatible object storage HTTP API endpoint.",
     domain: "minio.local",
-    url: "http://minio.local/minio/health/live",
+    url: "http://minio.local",
     probeApi: "/api/health/minio",
-    directProbeUrl: "http://minio.local/minio/health/live",
     port: 9092,
-    protocol: "S3 API",
     stack: "devdeps",
-    isWeb: true,
-    bgGradient: "linear-gradient(135deg, #dc2626, #ef4444)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`
+    isWeb: false,
+    cli: "http://minio.local:9092",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`
   },
   {
     id: "clickhouse-http",
     name: "ClickHouse HTTP",
-    category: "infra",
-    categoryName: "Storage & Infra",
-    desc: "Analytical columnar database HTTP interface and ping endpoint.",
+    cat: "api",
+    catName: "APIs & Infrastructure",
+    desc: "Analytical columnar database HTTP interface and ping query API.",
     domain: "clickhouse.local",
     url: "http://clickhouse.local/ping",
     probeApi: "/api/health/clickhouse",
-    directProbeUrl: "http://clickhouse.local/ping",
     port: 8124,
-    protocol: "HTTP",
     stack: "devdeps",
-    isWeb: true,
-    bgGradient: "linear-gradient(135deg, #d97706, #f59e0b)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`
+    isWeb: false,
+    cli: "curl http://clickhouse.local:8124/ping",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`
   },
   {
     id: "dgraph-http",
     name: "Dgraph HTTP",
-    category: "infra",
-    categoryName: "Storage & Infra",
+    cat: "api",
+    catName: "APIs & Infrastructure",
     desc: "Distributed GraphQL and graph database HTTP query and health service.",
     domain: "dgraph.local",
     url: "http://dgraph.local/health",
     probeApi: "/api/health/dgraph",
-    directProbeUrl: "http://dgraph.local/health",
     port: 8080,
-    protocol: "GraphQL",
     stack: "devdeps",
-    isWeb: true,
-    bgGradient: "linear-gradient(135deg, #0284c7, #0ea5e9)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>`
+    isWeb: false,
+    cli: "curl http://dgraph.local:8080/health",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>`
   },
+
+  // --- Databases & TCP ---
   {
     id: "postgres",
     name: "PostgreSQL",
-    category: "tcp",
-    categoryName: "Databases (TCP)",
-    desc: "Primary relational database instance (backing Langfuse and local microservices).",
+    cat: "data",
+    catName: "Databases & TCP",
+    desc: "Primary relational database instance (port 5432, backing Langfuse).",
     domain: "postgres.local:5432",
-    endpoint: "192.168.0.172:5432",
     port: 5432,
-    protocol: "TCP",
     stack: "devdeps",
     isWeb: false,
-    bgGradient: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>`,
-    connectionUri: "postgresql://postgres:postgres@postgres.local:5432/postgres",
-    cliCommand: "psql -h postgres.local -p 5432 -U postgres",
-    correlatedProbeId: "langfuse"
+    cli: "psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db",
+    correlatedProbeId: "langfuse",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>`
   },
   {
     id: "redis",
     name: "Redis",
-    category: "tcp",
-    categoryName: "Databases (TCP)",
-    desc: "High-throughput in-memory data store, cache, and pub/sub message broker.",
+    cat: "data",
+    catName: "Databases & TCP",
+    desc: "High-throughput in-memory data cache and pub/sub message broker.",
     domain: "redis.local:6380",
-    endpoint: "192.168.0.172:6380",
     port: 6380,
-    protocol: "TCP",
     stack: "devdeps",
     isWeb: false,
-    bgGradient: "linear-gradient(135deg, #b91c1c, #ef4444)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`,
-    connectionUri: "redis://redis.local:6380",
-    cliCommand: "redis-cli -h redis.local -p 6380",
-    correlatedProbeId: "langfuse"
+    cli: "redis-cli -h 192.168.0.172 -p 6380",
+    correlatedProbeId: "langfuse",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
   },
   {
     id: "clickhouse-native",
     name: "ClickHouse Native",
-    category: "tcp",
-    categoryName: "Databases (TCP)",
+    cat: "data",
+    catName: "Databases & TCP",
     desc: "Native binary protocol port for high-performance analytical ingestion.",
     domain: "clickhouse.local:9002",
-    endpoint: "192.168.0.172:9002",
     port: 9002,
-    protocol: "TCP",
     stack: "devdeps",
     isWeb: false,
-    bgGradient: "linear-gradient(135deg, #b45309, #f59e0b)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
-    cliCommand: "clickhouse-client --host clickhouse.local --port 9002",
-    correlatedProbeId: "clickhouse-http"
+    cli: "clickhouse-client --host 192.168.0.172 --port 9002",
+    correlatedProbeId: "clickhouse-http",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`
   },
   {
     id: "dgraph-grpc",
     name: "Dgraph gRPC",
-    category: "tcp",
-    categoryName: "Databases (TCP)",
-    desc: "Binary gRPC communication endpoint for high-speed Dgraph clients.",
+    cat: "data",
+    catName: "Databases & TCP",
+    desc: "High-speed binary gRPC communication endpoint for graph clients.",
     domain: "dgraph.local:9080",
-    endpoint: "192.168.0.172:9080",
     port: 9080,
-    protocol: "gRPC",
     stack: "devdeps",
     isWeb: false,
-    bgGradient: "linear-gradient(135deg, #0369a1, #0284c7)",
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
-    cliCommand: "grpcurl -plaintext dgraph.local:9080 list",
-    correlatedProbeId: "dgraph-http"
+    cli: "grpcurl -plaintext 192.168.0.172:9080 list",
+    correlatedProbeId: "dgraph-http",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`
   }
 ];
 
-let currentCategory = 'all';
-let searchQuery = '';
-const healthState = {};
-let telemetryTimer = null;
-let telemetryPaused = false;
+let currentCat = 'all';
+let searchFilter = '';
+const healthMap = {};
 
-// Render Cards
-function renderServices() {
-  const container = document.getElementById('services-container');
-  const filtered = SERVICES.filter(service => {
-    const matchCategory = currentCategory === 'all' || service.category === currentCategory;
-    const query = searchQuery.toLowerCase().trim();
-    const matchQuery = !query || 
-      service.name.toLowerCase().includes(query) ||
-      service.desc.toLowerCase().includes(query) ||
-      service.domain.toLowerCase().includes(query) ||
-      service.port.toString().includes(query) ||
-      service.protocol.toLowerCase().includes(query) ||
-      service.stack.toLowerCase().includes(query);
-    return matchCategory && matchQuery;
+function render() {
+  const root = document.getElementById('services-root');
+  const filtered = SERVICES.filter(s => {
+    const matchCat = currentCat === 'all' || s.cat === currentCat;
+    const q = searchFilter.toLowerCase().trim();
+    const matchQ = !q ||
+      s.name.toLowerCase().includes(q) ||
+      s.desc.toLowerCase().includes(q) ||
+      s.domain.toLowerCase().includes(q) ||
+      s.port.toString().includes(q) ||
+      s.stack.toLowerCase().includes(q);
+    return matchCat && matchQ;
   });
 
   if (filtered.length === 0) {
-    container.innerHTML = `
-      <div style="text-align: center; padding: 64px 20px; color: var(--text-dim);">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.5;">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <p style="font-size: 16px; font-weight: 500;">No services found matching "${searchQuery}"</p>
-        <p style="font-size: 13px; margin-top: 4px;">Try searching for a different port, name, or clear filters.</p>
+    root.innerHTML = `
+      <div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary);">
+        <p style="font-size: 14px; font-weight: 500;">No services match "${searchFilter}"</p>
       </div>
     `;
     return;
   }
 
-  // Group by category if "all" is selected
-  let html = '';
-  const categories = [
-    { id: 'media', name: 'Media & Streaming' },
-    { id: 'apps', name: 'AI & Developer Apps' },
-    { id: 'infra', name: 'Storage & Infrastructure' },
-    { id: 'tcp', name: 'Databases & TCP Endpoints' }
+  const sections = [
+    { id: 'web', title: 'Web Applications' },
+    { id: 'api', title: 'APIs & Infrastructure' },
+    { id: 'data', title: 'Databases & TCP' }
   ];
 
-  if (currentCategory === 'all' && !searchQuery) {
-    for (const cat of categories) {
-      const items = filtered.filter(s => s.category === cat.id);
+  let html = '';
+  if (currentCat === 'all' && !searchFilter) {
+    for (const sec of sections) {
+      const items = filtered.filter(s => s.cat === sec.id);
       if (items.length === 0) continue;
-      html += `<div class="section-title">${cat.name} (${items.length})</div>`;
-      html += `<div class="services-grid">${items.map(renderCard).join('')}</div>`;
+      html += `<div class="category-header">${sec.title} (${items.length})</div>`;
+      html += `<div class="cards-grid">${items.map(renderCard).join('')}</div>`;
     }
   } else {
-    html = `<div class="services-grid">${filtered.map(renderCard).join('')}</div>`;
+    html = `<div class="cards-grid">${filtered.map(renderCard).join('')}</div>`;
   }
 
-  container.innerHTML = html;
+  root.innerHTML = html;
 }
 
 function renderCard(s) {
-  const hs = healthState[s.id] || { status: 'checking', latency: null };
-  let badgeClass = 'checking';
-  let badgeText = 'Checking';
-  let latencyBadge = '';
+  const h = healthMap[s.id] || { status: 'checking' };
+  let statusClass = 'checking';
+  let statusText = 'Checking';
+  let latencyText = '';
 
-  if (hs.status === 'online') {
-    badgeClass = 'online';
-    badgeText = 'Online';
-    if (hs.latency) latencyBadge = `<span class="health-latency">• ${hs.latency}ms</span>`;
-  } else if (hs.status === 'offline') {
-    badgeClass = 'offline';
-    badgeText = 'Offline';
+  if (h.status === 'online') {
+    statusClass = 'online';
+    statusText = 'Online';
+    if (h.latency) latencyText = `<span class="health-latency">${h.latency}ms</span>`;
+  } else if (h.status === 'offline') {
+    statusClass = 'offline';
+    statusText = 'Offline';
   }
 
   return `
-    <div class="card" id="card-${s.id}">
-      <div class="card-top">
-        <div class="card-title-group">
-          <div class="service-icon" style="background: ${s.bgGradient}; color: white;">
-            ${s.iconSvg}
+    <div class="service-card" id="card-${s.id}">
+      <div>
+        <div class="card-top">
+          <div class="card-title-wrap">
+            <div class="card-icon">${s.icon}</div>
+            <div class="card-name-group">
+              <div class="card-name">
+                ${s.name}
+              </div>
+              <div class="card-stack">:${s.port} • ${s.stack}</div>
+            </div>
           </div>
-          <div>
-            <div class="service-name">${s.name}</div>
-            <div class="service-category-tag">${s.protocol} • stack: ${s.stack}</div>
+          <div class="health-tag ${statusClass}" id="health-${s.id}">
+            <span class="health-dot"></span>
+            <span>${statusText}</span>
+            ${latencyText}
           </div>
         </div>
 
-        <div class="health-badge ${badgeClass}" id="health-${s.id}">
-          <span class="health-dot"></span>
-          <span>${badgeText}</span>
-          ${latencyBadge}
-        </div>
+        <p class="card-desc" style="margin-top: 10px;">${s.desc}</p>
       </div>
 
-      <div class="card-desc">${s.desc}</div>
+      <div>
+        ${s.cli ? `
+          <div class="snippet-row" style="margin-bottom: 10px;">
+            <span class="snippet-code" title="${s.cli}">${s.cli}</span>
+            <button class="btn btn-sm" onclick="copyText('${s.cli.replace(/'/g, "\\'")}', 'CLI command copied')">Copy</button>
+          </div>
+        ` : ''}
 
-      <div class="card-details">
-        <span class="endpoint-text" title="${s.domain}">${s.domain}</span>
-        <span class="endpoint-port">:${s.port}</span>
+        <div class="card-footer">
+          <span class="endpoint-pill" onclick="copyText('${s.domain}', 'Host copied')" title="Click to copy host: ${s.domain}">
+            ${s.domain}
+          </span>
+          <div class="card-actions">
+            ${s.isWeb ? `
+              <button class="btn btn-sm" onclick="copyText('${s.url}', 'Link copied')" title="Copy URL">Copy</button>
+              <a href="${s.url}" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Open ↗</a>
+            ` : `
+              <button class="btn btn-sm" onclick="copyText('${s.domain}', 'Host copied')">Copy Host</button>
+            `}
+          </div>
+        </div>
       </div>
-
-      ${s.isWeb ? `
-        <div class="card-actions">
-          <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-            <span>Open Service</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-              <polyline points="15 3 21 3 21 9"></polyline>
-              <line x1="10" y1="14" x2="21" y2="3"></line>
-            </svg>
-          </a>
-          <button class="btn" onclick="copyToClipboard('${s.url}', '${s.name} URL copied')" title="Copy Link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span>Copy</span>
-          </button>
-        </div>
-      ` : `
-        <div class="snippet-box">
-          <span class="snippet-code" title="${s.cliCommand || s.connectionUri}">${s.cliCommand || s.connectionUri}</span>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('${(s.cliCommand || s.connectionUri).replace(/'/g, "\\'")}', 'CLI command copied')">Copy CLI</button>
-        </div>
-        <div class="card-actions">
-          ${s.connectionUri ? `
-            <button class="btn" onclick="copyToClipboard('${s.connectionUri.replace(/'/g, "\\'")}', 'Connection URI copied')">
-              <span>Copy URI</span>
-            </button>
-          ` : ''}
-          <button class="btn" onclick="copyToClipboard('${s.domain}', 'Host:Port copied')">
-            <span>Copy Host</span>
-          </button>
-        </div>
-      `}
     </div>
   `;
 }
 
-// Health Probing Engine
-async function probeService(service) {
-  if (service.isWeb) {
-    const t0 = performance.now();
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500);
+// Search & Filter
+function handleSearch() {
+  searchFilter = document.getElementById('search-input').value;
+  render();
+}
 
-    try {
-      if (service.probeApi) {
-        try {
-          const res = await fetch(service.probeApi, {
-            method: 'GET',
-            cache: 'no-store',
-            signal: controller.signal
-          });
-          if (res.ok || res.status === 200 || res.status === 204 || res.status === 403) {
-            clearTimeout(timeoutId);
-            return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
-          }
-        } catch (e) {}
-      }
+function setCategory(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
 
-      await fetch(service.directProbeUrl || service.url, {
-        method: 'GET',
-        mode: 'no-cors',
-        cache: 'no-store',
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-      const latency = Math.max(1, Math.round(performance.now() - t0));
-      return { status: 'online', latency };
-    } catch (err) {
-      clearTimeout(timeoutId);
-      return { status: 'offline', error: err.name === 'AbortError' ? 'Timeout' : 'Unreachable' };
-    }
+// Cheatsheet Collapse
+function toggleCheatsheet() {
+  const body = document.getElementById('cheatsheet-body');
+  const chevron = document.getElementById('chevron-icon');
+  if (body.style.display === 'none') {
+    body.style.display = 'grid';
+    chevron.style.transform = 'rotate(180deg)';
   } else {
-    if (service.correlatedProbeId) {
-      const parent = healthState[service.correlatedProbeId];
-      if (parent && parent.status === 'online') {
-        return { status: 'online', latency: parent.latency || 2 };
-      } else if (parent && parent.status === 'offline') {
-        return { status: 'offline' };
-      }
-    }
-    return { status: 'online', latency: 2 };
+    body.style.display = 'none';
+    chevron.style.transform = 'rotate(0deg)';
   }
 }
 
-async function probeAllHealth() {
-  const refreshIcon = document.getElementById('refresh-icon');
-  if (refreshIcon) refreshIcon.style.animation = 'spin 1s linear infinite';
+// Health Probing
+async function probeOne(service) {
+  if (service.probeApi) {
+    const t0 = performance.now();
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 2000);
 
-  SERVICES.forEach(s => {
-    if (!healthState[s.id]) healthState[s.id] = { status: 'checking' };
-  });
-  renderServices();
-
-  const httpServices = SERVICES.filter(s => s.isWeb);
-  const tcpServices = SERVICES.filter(s => !s.isWeb);
-
-  let onlineCount = 0;
-  let totalLatency = 0;
-  let latencySamples = 0;
-
-  await Promise.all(httpServices.map(async s => {
-    const result = await probeService(s);
-    healthState[s.id] = result;
-    if (result.status === 'online') {
-      onlineCount++;
-      if (result.latency) {
-        totalLatency += result.latency;
-        latencySamples++;
+    try {
+      const res = await fetch(service.probeApi, { method: 'GET', cache: 'no-store', signal: ctrl.signal });
+      clearTimeout(timeout);
+      if (res.ok || res.status === 200 || res.status === 204 || res.status === 403) {
+        return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
       }
+    } catch (e) {
+      clearTimeout(timeout);
     }
-    updateCardHealth(s.id, result);
-  }));
-
-  for (const s of tcpServices) {
-    const result = await probeService(s);
-    healthState[s.id] = result;
-    if (result.status === 'online') onlineCount++;
-    updateCardHealth(s.id, result);
   }
 
-  const total = SERVICES.length;
-  const avgLatency = latencySamples > 0 ? Math.round(totalLatency / latencySamples) : 3;
+  if (service.isWeb) {
+    const t0 = performance.now();
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 2000);
+    try {
+      await fetch(service.url, { method: 'GET', mode: 'no-cors', cache: 'no-store', signal: ctrl.signal });
+      clearTimeout(timeout);
+      return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
+    } catch (e) {
+      clearTimeout(timeout);
+      return { status: 'offline' };
+    }
+  }
+
+  if (service.correlatedProbeId) {
+    const parent = healthMap[service.correlatedProbeId];
+    if (parent && parent.status === 'online') return { status: 'online', latency: parent.latency || 2 };
+    if (parent && parent.status === 'offline') return { status: 'offline' };
+  }
+  return { status: 'online', latency: 2 };
+}
+
+async function probeAll() {
+  const refreshIcon = document.getElementById('refresh-icon');
+  if (refreshIcon) refreshIcon.style.animation = 'spin 0.8s linear infinite';
+
+  SERVICES.forEach(s => {
+    if (!healthMap[s.id]) healthMap[s.id] = { status: 'checking' };
+  });
+  render();
+
+  let onlineCount = 0;
+  const webAndApis = SERVICES.filter(s => s.probeApi || s.isWeb);
+  const others = SERVICES.filter(s => !s.probeApi && !s.isWeb);
+
+  await Promise.all(webAndApis.map(async s => {
+    const res = await probeOne(s);
+    healthMap[s.id] = res;
+    if (res.status === 'online') onlineCount++;
+    updateCardTag(s.id, res);
+  }));
+
+  for (const s of others) {
+    const res = await probeOne(s);
+    healthMap[s.id] = res;
+    if (res.status === 'online') onlineCount++;
+    updateCardTag(s.id, res);
+  }
+
   const statusPill = document.getElementById('overall-status-pill');
   const statusText = document.getElementById('overall-status-text');
-  const statsCount = document.getElementById('stats-online-count');
-  const statsLat = document.getElementById('stats-latency');
-
-  if (statsCount) statsCount.innerText = `${onlineCount} / ${total}`;
-  if (statsLat) statsLat.innerText = `~${avgLatency}ms`;
+  const total = SERVICES.length;
 
   if (statusPill && statusText) {
     if (onlineCount === total) {
       statusPill.className = 'status-pill';
-      statusText.innerText = 'All Systems Operational';
-    } else if (onlineCount > 0) {
-      statusPill.className = 'status-pill';
-      statusPill.style.color = 'var(--warning)';
-      statusPill.style.background = 'var(--warning-bg)';
-      statusText.innerText = `${onlineCount}/${total} Online`;
+      statusText.innerText = `All ${total} Services Online`;
     } else {
       statusPill.className = 'status-pill';
-      statusPill.style.color = 'var(--danger)';
-      statusPill.style.background = 'var(--danger-bg)';
-      statusText.innerText = 'Services Unreachable';
+      statusPill.style.color = 'var(--warning)';
+      statusPill.style.background = 'var(--warning-subtle)';
+      statusText.innerText = `${onlineCount}/${total} Online`;
     }
   }
 
-  if (refreshIcon) {
-    setTimeout(() => { refreshIcon.style.animation = ''; }, 500);
-  }
+  if (refreshIcon) setTimeout(() => { refreshIcon.style.animation = ''; }, 400);
 }
 
-function updateCardHealth(id, result) {
+function updateCardTag(id, res) {
   const el = document.getElementById(`health-${id}`);
   if (!el) return;
-
-  el.className = `health-badge ${result.status}`;
-  let html = `<span class="health-dot"></span><span>${result.status === 'online' ? 'Online' : 'Offline'}</span>`;
-  if (result.status === 'online' && result.latency) {
-    html += `<span class="health-latency">• ${result.latency}ms</span>`;
-  }
-  el.innerHTML = html;
+  el.className = `health-tag ${res.status}`;
+  let lat = res.status === 'online' && res.latency ? `<span class="health-latency">${res.latency}ms</span>` : '';
+  el.innerHTML = `<span class="health-dot"></span><span>${res.status === 'online' ? 'Online' : 'Offline'}</span>${lat}`;
 }
 
-// -------------------------------------------------------------
-// System Telemetry (btop Monitor)
-// -------------------------------------------------------------
-function formatBytes(bytes) {
-  if (!bytes || bytes <= 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+// Telemetry Polling
+function formatBytes(b) {
+  if (!b || b <= 0) return '0 B';
+  const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(b) / Math.log(k));
+  return parseFloat((b / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-function formatUptime(seconds) {
-  if (!seconds) return '--';
-  const d = Math.floor(seconds / (3600 * 24));
-  const h = Math.floor((seconds % (3600 * 24)) / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (d > 0) return `${d}d ${h}h`;
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
-}
-
-function getUsageColor(pct) {
-  if (pct >= 85) return 'var(--danger)';
-  if (pct >= 65) return 'var(--warning)';
-  return 'var(--success)';
-}
-
-async function fetchSystemTelemetry() {
-  if (telemetryPaused || document.visibilityState !== 'visible') return;
-
+async function fetchTelemetry() {
+  if (document.visibilityState !== 'visible') return;
   try {
     const res = await fetch('/api/system', { cache: 'no-store' });
     if (!res.ok) return;
-    const data = await res.json();
-    updateTelemetryUI(data);
-  } catch (err) {
-    // Graceful offline fallback
-    const liveText = document.getElementById('live-text');
-    if (liveText) liveText.innerText = 'OFFLINE';
-  }
+    const d = await res.json();
+    updateTelemetry(d);
+  } catch (e) {}
 }
 
-function updateTelemetryUI(data) {
-  if (!data) return;
-
-  // Header quick pills
-  const headerCpuPill = document.getElementById('header-cpu-pill');
-  const headerCpuVal = document.getElementById('header-cpu-val');
-  const headerMemPill = document.getElementById('header-mem-pill');
-  const headerMemVal = document.getElementById('header-mem-val');
-
-  if (headerCpuPill && headerCpuVal && data.cpu) {
-    headerCpuVal.innerText = `${data.cpu.percent}%`;
-    headerCpuPill.style.display = 'inline-flex';
-  }
-  if (headerMemPill && headerMemVal && data.memory) {
-    headerMemVal.innerText = `${data.memory.percent}%`;
-    headerMemPill.style.display = 'inline-flex';
-  }
+function updateTelemetry(d) {
+  if (!d) return;
 
   // CPU
-  const cpu = data.cpu || {};
-  const cpuVal = document.getElementById('telemetry-cpu-val');
-  const cpuBar = document.getElementById('telemetry-cpu-bar');
-  const cpuThreadsRow = document.getElementById('telemetry-cpu-threads-row');
-  const cpuName = document.getElementById('telemetry-cpu-name');
-  const tempBadge = document.getElementById('telemetry-temp-badge');
-  const loadVal = document.getElementById('telemetry-load-val');
-  const coresVal = document.getElementById('telemetry-cores-val');
+  if (d.cpu) {
+    const pct = d.cpu.percent || 0;
+    const elVal = document.getElementById('cpu-val');
+    const elBar = document.getElementById('cpu-bar');
+    const elTemp = document.getElementById('cpu-temp');
+    const elLoad = document.getElementById('cpu-load');
 
-  if (cpuVal) {
-    const pct = cpu.percent ?? 0;
-    cpuVal.innerText = `${pct.toFixed(1)}%`;
-    cpuVal.style.color = getUsageColor(pct);
-  }
-  if (cpuBar) {
-    const p = Math.min(100, Math.max(0, cpu.percent || 0));
-    cpuBar.style.width = `${p}%`;
-    cpuBar.style.backgroundColor = getUsageColor(p);
-  }
-  if (cpuThreadsRow && cpu.per_cpu && cpu.per_cpu.length > 0) {
-    cpuThreadsRow.innerHTML = cpu.per_cpu.map((tp, idx) => `
-      <div style="flex: 1; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden;" title="Thread ${idx}: ${tp}%">
-        <div style="height: 100%; width: ${tp}%; background: ${getUsageColor(tp)}; transition: width 0.4s ease;"></div>
-      </div>
-    `).join('');
-  }
-  if (cpuName && cpu.name) {
-    const coresText = cpu.physical_cores ? `${cpu.physical_cores} Cores / ${cpu.threads} Threads` : `${cpu.threads || 4} Threads`;
-    cpuName.innerText = `${cpu.name} • ${coresText}`;
-  }
-  if (tempBadge) {
-    if (cpu.temp) {
-      tempBadge.innerText = `${cpu.temp}°C`;
-      tempBadge.style.color = cpu.temp > 80 ? 'var(--danger)' : cpu.temp > 70 ? 'var(--warning)' : 'var(--success)';
-      tempBadge.style.display = 'inline-flex';
-    } else {
-      tempBadge.style.display = 'none';
+    if (elVal) elVal.innerText = `${pct.toFixed(1)}%`;
+    if (elBar) {
+      elBar.style.width = `${Math.min(100, pct)}%`;
+      elBar.style.backgroundColor = pct > 80 ? 'var(--danger)' : pct > 60 ? 'var(--warning)' : 'var(--accent)';
     }
-  }
-  if (loadVal && cpu.load) {
-    loadVal.innerText = cpu.load.map(l => l.toFixed(2)).join(' / ');
-  }
-  if (coresVal) {
-    coresVal.innerText = cpu.physical_cores ? `${cpu.physical_cores} Cores (${cpu.threads}T)` : `${cpu.threads || 4} Threads`;
+    if (elTemp && d.cpu.temp) elTemp.innerText = `${d.cpu.temp}°C`;
+    if (elLoad && d.cpu.load) elLoad.innerText = `Load: ${d.cpu.load.map(l => l.toFixed(1)).join(', ')}`;
   }
 
-  // Memory (GiB)
-  const mem = data.memory || {};
-  const memVal = document.getElementById('telemetry-mem-val');
-  const memBar = document.getElementById('telemetry-mem-bar');
-  const memBreakdown = document.getElementById('telemetry-mem-breakdown');
-  const memAvail = document.getElementById('telemetry-mem-avail');
-  const swapBadge = document.getElementById('telemetry-swap-badge');
-  const GiB = 1024 * 1024 * 1024;
+  // RAM
+  if (d.memory) {
+    const GiB = 1024 * 1024 * 1024;
+    const pct = d.memory.percent || 0;
+    const elVal = document.getElementById('ram-val');
+    const elBar = document.getElementById('ram-bar');
+    const elSub = document.getElementById('ram-sub');
+    const elSwap = document.getElementById('ram-swap');
 
-  if (memVal) {
-    const pct = mem.percent ?? 0;
-    memVal.innerText = `${pct.toFixed(1)}%`;
-    memVal.style.color = getUsageColor(pct);
+    if (elVal) elVal.innerText = `${pct.toFixed(1)}%`;
+    if (elBar) {
+      elBar.style.width = `${Math.min(100, pct)}%`;
+      elBar.style.backgroundColor = pct > 85 ? 'var(--danger)' : pct > 70 ? 'var(--warning)' : 'var(--accent)';
+    }
+    if (elSub && d.memory.total) {
+      elSub.innerText = `${(d.memory.used / GiB).toFixed(1)} / ${(d.memory.total / GiB).toFixed(1)} GiB`;
+    }
+    if (elSwap && d.memory.swap_percent !== undefined) elSwap.innerText = `Swap: ${d.memory.swap_percent}%`;
   }
-  if (memBar) {
-    const p = Math.min(100, Math.max(0, mem.percent || 0));
-    memBar.style.width = `${p}%`;
-    memBar.style.backgroundColor = getUsageColor(p);
-  }
-  if (memBreakdown && mem.total) {
-    const usedGib = (mem.used / GiB).toFixed(1);
-    const totGib = (mem.total / GiB).toFixed(1);
-    memBreakdown.innerText = `RAM: ${usedGib} / ${totGib} GiB`;
-  }
-  if (memAvail && mem.available) {
-    memAvail.innerText = `${(mem.available / GiB).toFixed(1)} GiB`;
-  }
-  if (swapBadge) {
-    if (mem.swap_total > 0) {
-      swapBadge.innerText = `Swap: ${mem.swap_percent}%`;
-      swapBadge.style.display = 'inline-flex';
-    } else {
-      swapBadge.style.display = 'none';
+
+  // Disk
+  if (d.disk) {
+    const GiB = 1024 * 1024 * 1024;
+    const pct = d.disk.percent || 0;
+    const elVal = document.getElementById('disk-val');
+    const elBar = document.getElementById('disk-bar');
+    const elSub = document.getElementById('disk-sub');
+    const elUp = document.getElementById('disk-uptime');
+
+    if (elVal) elVal.innerText = `${pct.toFixed(1)}%`;
+    if (elBar) elBar.style.width = `${Math.min(100, pct)}%`;
+    if (elSub && d.disk.total) {
+      elSub.innerText = `${(d.disk.used / GiB).toFixed(0)} / ${(d.disk.total / GiB).toFixed(0)} GiB`;
+    }
+    if (elUp && d.uptime_seconds) {
+      const h = Math.floor(d.uptime_seconds / 3600);
+      const m = Math.floor((d.uptime_seconds % 3600) / 60);
+      elUp.innerText = `Up: ${h}h ${m}m`;
     }
   }
 
-  // Disk & Network
-  const disk = data.disk || {};
-  const diskVal = document.getElementById('telemetry-disk-val');
-  const diskBar = document.getElementById('telemetry-disk-bar');
-  const diskBreakdown = document.getElementById('telemetry-disk-breakdown');
-  const uptimeBadge = document.getElementById('telemetry-uptime-badge');
-  const netRate = document.getElementById('telemetry-net-rate');
-
-  if (diskVal) {
-    const pct = disk.percent ?? 0;
-    diskVal.innerText = `${pct.toFixed(1)}%`;
-    diskVal.style.color = getUsageColor(pct);
+  // Activity / Network
+  if (d.network) {
+    const elNet = document.getElementById('net-rates');
+    if (elNet) elNet.innerText = `↓ ${formatBytes(d.network.rx_rate)}/s • ↑ ${formatBytes(d.network.tx_rate)}/s`;
   }
-  if (diskBar) {
-    const p = Math.min(100, Math.max(0, disk.percent || 0));
-    diskBar.style.width = `${p}%`;
-    diskBar.style.backgroundColor = getUsageColor(p);
-  }
-  if (diskBreakdown && disk.total) {
-    const usedGib = (disk.used / GiB).toFixed(0);
-    const totGib = (disk.total / GiB).toFixed(0);
-    diskBreakdown.innerText = `Root: ${usedGib} / ${totGib} GiB`;
-  }
-  if (uptimeBadge && data.uptime_seconds) {
-    uptimeBadge.innerText = `Up: ${formatUptime(data.uptime_seconds)}`;
-  }
-  if (netRate && data.network) {
-    const rx = formatBytes(data.network.rx_rate) + '/s';
-    const tx = formatBytes(data.network.tx_rate) + '/s';
-    netRate.innerText = `↓ ${rx} • ↑ ${tx}`;
-  }
-
-  // Processes (btop table)
-  const tbody = document.getElementById('telemetry-procs-body');
-  if (tbody && data.top_processes && data.top_processes.length > 0) {
-    tbody.innerHTML = data.top_processes.slice(0, 5).map(p => `
-      <tr>
-        <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${p.name}">${p.name}</td>
-        <td style="text-align: right; color: var(--text-dim);">${p.pid}</td>
-        <td style="text-align: right;"><span class="proc-cpu-badge" title="${p.raw_cpu ? p.raw_cpu.toFixed(1) + '% single-core' : ''}">${p.cpu.toFixed(1)}%</span></td>
-        <td style="text-align: right; color: var(--text-muted);">${p.mem.toFixed(1)}%</td>
-      </tr>
-    `).join('');
-  }
-
-  const liveText = document.getElementById('live-text');
-  if (liveText) liveText.innerText = 'LIVE 2s';
-}
-
-function toggleTelemetryCollapse() {
-  const grid = document.getElementById('telemetry-grid');
-  const btn = document.getElementById('btn-toggle-telemetry');
-  if (grid.style.display === 'none') {
-    grid.style.display = 'grid';
-    btn.innerText = 'Collapse';
-    localStorage.setItem('devbox_telemetry_collapsed', 'false');
-  } else {
-    grid.style.display = 'none';
-    btn.innerText = 'Expand';
-    localStorage.setItem('devbox_telemetry_collapsed', 'true');
+  if (d.top_processes && d.top_processes.length > 0) {
+    const elProc = document.getElementById('top-proc-text');
+    if (elProc) {
+      const p = d.top_processes[0];
+      elProc.innerText = `Top: ${p.name} (${p.cpu.toFixed(0)}% CPU, PID ${p.pid})`;
+    }
   }
 }
 
-function refreshAll() {
-  probeAllHealth();
-  fetchSystemTelemetry();
+// Helpers
+function copyText(text, msg) {
+  navigator.clipboard.writeText(text).then(() => showToast(msg || 'Copied to clipboard'));
 }
 
-// Search and Filter Handlers
-function handleSearch() {
-  searchQuery = document.getElementById('search-input').value;
-  renderServices();
-}
-
-function filterCategory(cat, btn) {
-  currentCategory = cat;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderServices();
-}
-
-// Clipboard with Toast
-function copyToClipboard(text, message = 'Copied to clipboard!') {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => showToast(message));
-  } else {
-    const input = document.createElement('textarea');
-    input.value = text;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-    showToast(message);
-  }
+function copyHosts() {
+  const snippet = `192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local minio.local minio-console.local clickhouse.local dgraph.local postgres.local redis.local`;
+  copyText(snippet, 'Hosts snippet copied');
 }
 
 function showToast(msg) {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-    <span>${msg}</span>
-  `;
-  container.appendChild(toast);
-  setTimeout(() => toast.classList.add('show'), 10);
+  const root = document.getElementById('toast-root');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><span>${msg}</span>`;
+  root.appendChild(t);
   setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 250);
+    t.style.animation = 'toastOut 0.2s forwards';
+    setTimeout(() => t.remove(), 200);
   }, 2200);
 }
 
-function copyHostsSnippet() {
-  const snippet = "192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local clickhouse.local minio.local minio-console.local dgraph.local postgres.local redis.local";
-  copyToClipboard(snippet, "/etc/hosts line copied");
-}
-
-// Theme Handling
 function toggleTheme() {
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('devbox_theme', next);
 }
 
-// Keyboard Shortcuts
-window.addEventListener('keydown', (e) => {
+function refreshAll() {
+  probeAll();
+  fetchTelemetry();
+}
+
+// Key shortcut '/' to focus search
+document.addEventListener('keydown', (e) => {
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
     e.preventDefault();
     document.getElementById('search-input').focus();
-  }
-  if (e.key === 'Escape') {
-    document.getElementById('search-input').blur();
-  }
-});
-
-// Tab visibility listener to save battery and network
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    fetchSystemTelemetry();
   }
 });
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('devbox_theme');
-  if (savedTheme) {
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  }
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
 
-  const isCollapsed = localStorage.getItem('devbox_telemetry_collapsed') === 'true';
-  if (isCollapsed) {
-    const grid = document.getElementById('telemetry-grid');
-    const btn = document.getElementById('btn-toggle-telemetry');
-    if (grid) grid.style.display = 'none';
-    if (btn) btn.innerText = 'Expand';
-  }
+  render();
+  probeAll();
+  fetchTelemetry();
 
-  renderServices();
-  probeAllHealth();
-  fetchSystemTelemetry();
-
-  // Periodic updates
-  setInterval(probeAllHealth, 30000);
-  telemetryTimer = setInterval(fetchSystemTelemetry, 2500);
+  setInterval(fetchTelemetry, 3000);
+  setInterval(probeAll, 30000);
 });
 </script>
-
-<style>
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-</style>
 </body>
 </html>
