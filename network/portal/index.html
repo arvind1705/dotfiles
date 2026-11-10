@@ -177,6 +177,22 @@ header {
   background: var(--success-subtle);
   color: var(--success);
   border: 1px solid rgba(16, 185, 129, 0.25);
+  transition: all 0.2s ease;
+}
+.status-pill.online {
+  background: var(--success-subtle);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.status-pill.warning {
+  background: var(--warning-subtle);
+  color: var(--warning);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.status-pill.offline {
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 .status-dot {
   width: 7px;
@@ -1289,14 +1305,16 @@ async function probeAll() {
   const total = SERVICES.length;
 
   if (statusPill && statusText) {
+    statusPill.removeAttribute('style');
     if (onlineCount === total) {
-      statusPill.className = 'status-pill';
+      statusPill.className = 'status-pill online';
       statusText.innerText = `All ${total} Services Online`;
-    } else {
-      statusPill.className = 'status-pill';
-      statusPill.style.color = 'var(--warning)';
-      statusPill.style.background = 'var(--warning-subtle)';
+    } else if (onlineCount > 0) {
+      statusPill.className = 'status-pill warning';
       statusText.innerText = `${onlineCount}/${total} Online`;
+    } else {
+      statusPill.className = 'status-pill offline';
+      statusText.innerText = `All Services Offline`;
     }
   }
 
