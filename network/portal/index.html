@@ -163,6 +163,11 @@ header {
   color: var(--warning);
   border-color: rgba(245, 158, 11, 0.3);
 }
+.stat-pill.offline {
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.25);
+}
 
 .dot {
   width: 6px;
@@ -666,6 +671,44 @@ let currentCat = 'all';
 let searchFilter = '';
 const healthMap = {};
 let latestTcpServices = {};
+let telemetryPromise = null;
+let isProbing = false;
+
+function updateOverallStatus() {
+  const pill = document.getElementById('status-pill');
+  const txt = document.getElementById('status-text');
+  if (!pill || !txt) return;
+
+  const total = SERVICES.length;
+  let onlineCount = 0;
+  let knownCount = 0;
+
+  for (const s of SERVICES) {
+    const h = healthMap[s.id];
+    if (h && (h.status === 'online' || h.status === 'offline')) {
+      knownCount++;
+      if (h.status === 'online') onlineCount++;
+    }
+  }
+
+  if (knownCount === 0) {
+    pill.className = 'stat-pill';
+    txt.innerText = 'Probing...';
+    return;
+  }
+
+  pill.removeAttribute('style');
+  if (onlineCount === total) {
+    pill.className = 'stat-pill online';
+    txt.innerText = `All ${total} Online`;
+  } else if (onlineCount > 0) {
+    pill.className = 'stat-pill warning';
+    txt.innerText = `${onlineCount}/${total} Online`;
+  } else {
+    pill.className = 'stat-pill offline';
+    txt.innerText = 'Offline';
+  }
+}
 
 function render() {
   const root = document.getElementById('services-root');
@@ -759,6 +802,20 @@ function setCategory(cat, btn) {
 
 // Probing & Health
 async function probeOne(service) {
+  // If this is a TCP service without an HTTP probeApi or web URL, await telemetry if pending
+  if (!service.probeApi && !service.isWeb) {
+    if (!latestTcpServices || latestTcpServices[service.id] === undefined) {
+      if (telemetryPromise) {
+        try {
+          await telemetryPromise;
+        } catch (e) {}
+      }
+    }
+    if (latestTcpServices && latestTcpServices[service.id] !== undefined) {
+      return { status: latestTcpServices[service.id] ? 'online' : 'offline', latency: 1 };
+    }
+  }
+
   if (latestTcpServices && latestTcpServices[service.id] !== undefined) {
     return { status: latestTcpServices[service.id] ? 'online' : 'offline', latency: 1 };
   }
@@ -802,34 +859,19 @@ async function probeOne(service) {
 async function probeAll() {
   const icon = document.getElementById('refresh-icon');
   if (icon) icon.style.animation = 'spin 0.8s linear infinite';
+  isProbing = true;
 
-  let onlineCount = 0;
-  const total = SERVICES.length;
-
-  await Promise.all(SERVICES.map(async s => {
-    const res = await probeOne(s);
-    healthMap[s.id] = res;
-    if (res.status === 'online') onlineCount++;
-    updateDot(s.id, res.status === 'online');
-  }));
-
-  const pill = document.getElementById('status-pill');
-  const txt = document.getElementById('status-text');
-  if (pill && txt) {
-    pill.removeAttribute('style');
-    if (onlineCount === total) {
-      pill.className = 'stat-pill online';
-      txt.innerText = `All ${total} Online`;
-    } else if (onlineCount > 0) {
-      pill.className = 'stat-pill warning';
-      txt.innerText = `${onlineCount}/${total} Online`;
-    } else {
-      pill.className = 'stat-pill';
-      txt.innerText = `Offline`;
-    }
+  try {
+    await Promise.all(SERVICES.map(async s => {
+      const res = await probeOne(s);
+      healthMap[s.id] = res;
+      updateDot(s.id, res.status === 'online');
+    }));
+  } finally {
+    isProbing = false;
+    updateOverallStatus();
+    if (icon) setTimeout(() => { icon.style.animation = ''; }, 400);
   }
-
-  if (icon) setTimeout(() => { icon.style.animation = ''; }, 400);
 }
 
 function updateDot(id, isOnline) {
@@ -848,8 +890,11 @@ async function fetchTelemetry() {
     if (d.tcp_services) {
       latestTcpServices = d.tcp_services;
       for (const [id, isUp] of Object.entries(d.tcp_services)) {
-        healthMap[id] = { status: isUp ? 'online' : 'offline' };
+        healthMap[id] = { status: isUp ? 'online' : 'offline', latency: 1 };
         updateDot(id, isUp);
+      }
+      if (!isProbing) {
+        updateOverallStatus();
       }
     }
 
@@ -871,9 +916,14 @@ async function fetchTelemetry() {
   } catch (e) {}
 }
 
+function loadTelemetry() {
+  telemetryPromise = fetchTelemetry();
+  return telemetryPromise;
+}
+
 function refreshAll() {
+  loadTelemetry();
   probeAll();
-  fetchTelemetry();
 }
 
 function toggleTheme() {
@@ -912,11 +962,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (saved) document.documentElement.setAttribute('data-theme', saved);
 
   render();
+  loadTelemetry();
   probeAll();
-  fetchTelemetry();
 
-  setInterval(fetchTelemetry, 3000);
-  setInterval(probeAll, 30000);
+  setInterval(loadTelemetry, 3000);
+  setInterval(probeAll, 15000);
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    refreshAll();
+  }
 });
 </script>
 </body>
