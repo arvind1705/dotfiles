@@ -12,6 +12,7 @@ import time
 import glob
 import json
 import shutil
+import socket
 import subprocess
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -100,6 +101,13 @@ class MetricsCollector:
         except Exception:
             pass
         return {"rx": rx, "tx": tx}
+
+    def _check_tcp(self, ip, port, timeout=0.3):
+        try:
+            with socket.create_connection((ip, port), timeout=timeout):
+                return True
+        except Exception:
+            return False
 
     def _read_temperature(self):
         """Find coretemp Package id 0 temperature, or fallback to CPU thermal zones."""
@@ -263,7 +271,7 @@ class MetricsCollector:
                 out = subprocess.check_output(
                     ["ps", "-eo", "pid,comm,%cpu,%mem", "--sort=-%cpu"],
                     text=True,
-                    timeout=1
+                    timeout=3
                 )
                 lines = out.strip().split("\n")[1:6]
                 for l in lines:
@@ -281,6 +289,15 @@ class MetricsCollector:
                         })
             except Exception:
                 pass
+
+            # Direct TCP health checks for non-HTTP backend ports
+            lan_ip = "192.168.0.172"
+            tcp_services = {
+                "postgres": self._check_tcp(lan_ip, 5432),
+                "redis": self._check_tcp(lan_ip, 6380),
+                "clickhouse-native": self._check_tcp(lan_ip, 9002),
+                "dgraph-grpc": self._check_tcp(lan_ip, 9080)
+            }
 
             self.cached_metrics = {
                 "cpu": {
@@ -308,6 +325,7 @@ class MetricsCollector:
                 },
                 "uptime_seconds": uptime_sec,
                 "top_processes": procs,
+                "tcp_services": tcp_services,
                 "timestamp": int(now)
             }
             self.last_sample_time = now

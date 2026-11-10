@@ -1029,7 +1029,6 @@ const SERVICES = [
     stack: "devdeps",
     isWeb: false,
     cli: "psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db",
-    correlatedProbeId: "langfuse",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>`
   },
   {
@@ -1043,7 +1042,6 @@ const SERVICES = [
     stack: "devdeps",
     isWeb: false,
     cli: "redis-cli -h 192.168.0.172 -p 6380",
-    correlatedProbeId: "langfuse",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
   },
   {
@@ -1057,7 +1055,6 @@ const SERVICES = [
     stack: "devdeps",
     isWeb: false,
     cli: "clickhouse-client --host 192.168.0.172 --port 9002",
-    correlatedProbeId: "clickhouse-http",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`
   },
   {
@@ -1071,7 +1068,6 @@ const SERVICES = [
     stack: "devdeps",
     isWeb: false,
     cli: "grpcurl -plaintext 192.168.0.172:9080 list",
-    correlatedProbeId: "dgraph-http",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`
   }
 ];
@@ -1215,11 +1211,18 @@ function toggleCheatsheet() {
 }
 
 // Health Probing
+let latestTcpServices = {};
+
 async function probeOne(service) {
+  if (latestTcpServices && latestTcpServices[service.id] !== undefined) {
+    const isUp = latestTcpServices[service.id];
+    return { status: isUp ? 'online' : 'offline', latency: 1 };
+  }
+
   if (service.probeApi) {
     const t0 = performance.now();
     const ctrl = new AbortController();
-    const timeout = setTimeout(() => ctrl.abort(), 2000);
+    const timeout = setTimeout(() => ctrl.abort(), 4000);
 
     try {
       const res = await fetch(service.probeApi, { method: 'GET', cache: 'no-store', signal: ctrl.signal });
@@ -1235,23 +1238,23 @@ async function probeOne(service) {
   if (service.isWeb) {
     const t0 = performance.now();
     const ctrl = new AbortController();
-    const timeout = setTimeout(() => ctrl.abort(), 2000);
+    const timeout = setTimeout(() => ctrl.abort(), 4000);
     try {
       await fetch(service.url, { method: 'GET', mode: 'no-cors', cache: 'no-store', signal: ctrl.signal });
       clearTimeout(timeout);
       return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
     } catch (e) {
       clearTimeout(timeout);
-      return { status: 'offline' };
     }
   }
 
-  if (service.correlatedProbeId) {
-    const parent = healthMap[service.correlatedProbeId];
-    if (parent && parent.status === 'online') return { status: 'online', latency: parent.latency || 2 };
-    if (parent && parent.status === 'offline') return { status: 'offline' };
+  // Soft hysteresis: if previously online, give 1 grace poll before marking offline
+  const prev = healthMap[service.id];
+  if (prev && prev.status === 'online' && !prev._failedOnce) {
+    return { status: 'online', latency: prev.latency || 20, _failedOnce: true };
   }
-  return { status: 'online', latency: 2 };
+
+  return { status: 'offline' };
 }
 
 async function probeAll() {
@@ -1322,6 +1325,14 @@ async function fetchTelemetry() {
     const res = await fetch('/api/system', { cache: 'no-store' });
     if (!res.ok) return;
     const d = await res.json();
+    if (d.tcp_services) {
+      latestTcpServices = d.tcp_services;
+      for (const [svcId, isUp] of Object.entries(d.tcp_services)) {
+        const update = { status: isUp ? 'online' : 'offline', latency: 1 };
+        healthMap[svcId] = update;
+        updateCardTag(svcId, update);
+      }
+    }
     updateTelemetry(d);
   } catch (e) {}
 }
