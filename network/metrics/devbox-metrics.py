@@ -30,6 +30,7 @@ class MetricsCollector:
         self.physical_cores, self.threads = self._detect_cores_and_threads()
         self.cached_metrics = None
         self.last_sample_time = 0
+        self.smoothed_temp = None
 
     def _get_cpu_name(self):
         try:
@@ -101,45 +102,61 @@ class MetricsCollector:
         return {"rx": rx, "tx": tx}
 
     def _read_temperature(self):
-        """Find coretemp Package id 0 temperature, or fallback to thermal zone."""
-        try:
-            for hw in glob.glob("/sys/class/hwmon/hwmon*"):
+        """Find coretemp Package id 0 temperature, or fallback to CPU thermal zones."""
+        # 1. Check hwmon coretemp / k10temp
+        for hw in sorted(glob.glob("/sys/class/hwmon/hwmon*")):
+            try:
                 name_file = f"{hw}/name"
                 if os.path.exists(name_file):
                     with open(name_file) as fn:
-                        if "coretemp" in fn.read():
-                            for tf in glob.glob(f"{hw}/temp*_input"):
-                                lbl_file = tf.replace("_input", "_label")
-                                lbl = ""
-                                if os.path.exists(lbl_file):
+                        name = fn.read().strip()
+                    if "coretemp" in name or "k10temp" in name:
+                        # Look for Package id 0 sensor first
+                        for tf in sorted(glob.glob(f"{hw}/temp*_input")):
+                            lbl_file = tf.replace("_input", "_label")
+                            lbl = ""
+                            if os.path.exists(lbl_file):
+                                try:
                                     with open(lbl_file) as fl:
                                         lbl = fl.read().strip()
-                                if "Package" in lbl:
-                                    with open(tf) as fv:
-                                        return round(int(fv.read().strip()) / 1000.0, 1)
-                            # If no Package label found, use temp1
-                            first_temp = f"{hw}/temp1_input"
-                            if os.path.exists(first_temp):
-                                with open(first_temp) as fv:
+                                except Exception:
+                                    pass
+                            if "Package" in lbl:
+                                with open(tf) as fv:
                                     return round(int(fv.read().strip()) / 1000.0, 1)
-        except Exception:
-            pass
 
-        # Fallback paths
-        sensor_paths = [
-            "/sys/class/thermal/thermal_zone0/temp",
-            "/sys/class/thermal/thermal_zone3/temp",
-            "/sys/class/hwmon/hwmon1/temp1_input",
-        ]
-        for p in sensor_paths:
-            if os.path.exists(p):
+                        # If no Package label found, take the highest core temperature
+                        core_temps = []
+                        for tf in sorted(glob.glob(f"{hw}/temp*_input")):
+                            try:
+                                with open(tf) as fv:
+                                    val = int(fv.read().strip())
+                                    if val > 0:
+                                        core_temps.append(val)
+                            except Exception:
+                                pass
+                        if core_temps:
+                            return round(max(core_temps) / 1000.0, 1)
+            except Exception:
+                continue
+
+        # 2. Fallback to CPU-specific thermal zones (x86_pkg_temp, coretemp, acpitz)
+        for priority_types in [("x86_pkg_temp", "coretemp"), ("cpu-thermal", "soc_thermal", "acpitz")]:
+            for tz in sorted(glob.glob("/sys/class/thermal/thermal_zone*")):
                 try:
-                    with open(p, "r") as f:
-                        val = int(f.read().strip())
-                        if val > 0:
-                            return round(val / 1000.0, 1)
+                    type_file = f"{tz}/type"
+                    if os.path.exists(type_file):
+                        with open(type_file) as ft:
+                            tz_type = ft.read().strip()
+                        if any(pt in tz_type for pt in priority_types):
+                            temp_file = f"{tz}/temp"
+                            if os.path.exists(temp_file):
+                                with open(temp_file) as fv:
+                                    val = int(fv.read().strip())
+                                    if val > 0:
+                                        return round(val / 1000.0, 1)
                 except Exception:
-                    pass
+                    continue
         return None
 
     def sample(self):
@@ -215,8 +232,14 @@ class MetricsCollector:
             except Exception:
                 disk_info = {"total": 0, "used": 0, "free": 0, "percent": 0.0}
 
-            # Temperature
-            temp = self._read_temperature()
+            # Temperature (with EMA smoothing to prevent raw DTS sensor jitter)
+            raw_temp = self._read_temperature()
+            if raw_temp is not None:
+                if self.smoothed_temp is None:
+                    self.smoothed_temp = raw_temp
+                else:
+                    self.smoothed_temp = round(self.smoothed_temp * 0.7 + raw_temp * 0.3, 1)
+            temp = self.smoothed_temp
 
             # Load averages
             loads = [0.0, 0.0, 0.0]
