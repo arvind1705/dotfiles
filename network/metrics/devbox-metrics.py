@@ -9,6 +9,7 @@ Listens on 127.0.0.1:9108 for Caddy reverse-proxying.
 import os
 import sys
 import time
+import glob
 import json
 import shutil
 import subprocess
@@ -22,11 +23,11 @@ class MetricsCollector:
     def __init__(self):
         self.lock = threading.Lock()
         self.last_cpu_time = 0
-        self.last_cpu_stat = self._read_cpu_stat()
+        self.last_cpu_stats = self._read_all_cpus()
         self.last_net_time = 0
         self.last_net_bytes = self._read_net_bytes()
         self.cpu_name = self._get_cpu_name()
-        self.cores = os.cpu_count() or 1
+        self.physical_cores, self.threads = self._detect_cores_and_threads()
         self.cached_metrics = None
         self.last_sample_time = 0
 
@@ -35,23 +36,52 @@ class MetricsCollector:
             with open("/proc/cpuinfo", "r") as f:
                 for line in f:
                     if "model name" in line:
-                        return line.split(":", 1)[1].strip()
+                        name = line.split(":", 1)[1].strip()
+                        # Clean up common redundant strings if desired
+                        return name
         except Exception:
             pass
-        return "Generic x86_64 CPU"
+        return "Intel Core Processor"
 
-    def _read_cpu_stat(self):
+    def _detect_cores_and_threads(self):
+        """Detect accurate physical cores vs logical threads (Hyper-Threading / SMT)."""
+        physical_cores = set()
+        threads = 0
+        try:
+            for p in sorted(glob.glob("/sys/devices/system/cpu/cpu[0-9]*")):
+                threads += 1
+                pkg, core = "0", "0"
+                pkg_file = f"{p}/topology/physical_package_id"
+                core_file = f"{p}/topology/core_id"
+                if os.path.exists(pkg_file):
+                    with open(pkg_file) as f:
+                        pkg = f.read().strip()
+                if os.path.exists(core_file):
+                    with open(core_file) as f:
+                        core = f.read().strip()
+                physical_cores.add((pkg, core))
+            return len(physical_cores) or 1, threads or 1
+        except Exception:
+            pass
+        logical = os.cpu_count() or 1
+        return max(1, logical // 2), logical
+
+    def _read_all_cpus(self):
+        """Read overall 'cpu' and per-thread 'cpu0', 'cpu1', ... from /proc/stat."""
+        stats = {}
         try:
             with open("/proc/stat", "r") as f:
                 for line in f:
-                    if line.startswith("cpu "):
-                        parts = [int(x) for x in line.split()[1:]]
-                        idle = parts[3] + (parts[4] if len(parts) > 4 else 0)
-                        total = sum(parts)
-                        return {"idle": idle, "total": total}
+                    if line.startswith("cpu"):
+                        parts = line.split()
+                        name = parts[0]
+                        vals = [int(x) for x in parts[1:]]
+                        idle = vals[3] + (vals[4] if len(vals) > 4 else 0)
+                        total = sum(vals)
+                        stats[name] = {"idle": idle, "total": total}
         except Exception:
             pass
-        return {"idle": 0, "total": 0}
+        return stats
 
     def _read_net_bytes(self):
         rx, tx = 0, 0
@@ -71,12 +101,35 @@ class MetricsCollector:
         return {"rx": rx, "tx": tx}
 
     def _read_temperature(self):
+        """Find coretemp Package id 0 temperature, or fallback to thermal zone."""
+        try:
+            for hw in glob.glob("/sys/class/hwmon/hwmon*"):
+                name_file = f"{hw}/name"
+                if os.path.exists(name_file):
+                    with open(name_file) as fn:
+                        if "coretemp" in fn.read():
+                            for tf in glob.glob(f"{hw}/temp*_input"):
+                                lbl_file = tf.replace("_input", "_label")
+                                lbl = ""
+                                if os.path.exists(lbl_file):
+                                    with open(lbl_file) as fl:
+                                        lbl = fl.read().strip()
+                                if "Package" in lbl:
+                                    with open(tf) as fv:
+                                        return round(int(fv.read().strip()) / 1000.0, 1)
+                            # If no Package label found, use temp1
+                            first_temp = f"{hw}/temp1_input"
+                            if os.path.exists(first_temp):
+                                with open(first_temp) as fv:
+                                    return round(int(fv.read().strip()) / 1000.0, 1)
+        except Exception:
+            pass
+
+        # Fallback paths
         sensor_paths = [
-            "/sys/class/hwmon/hwmon5/temp1_input",
             "/sys/class/thermal/thermal_zone0/temp",
             "/sys/class/thermal/thermal_zone3/temp",
             "/sys/class/hwmon/hwmon1/temp1_input",
-            "/sys/class/hwmon/hwmon4/temp1_input",
         ]
         for p in sensor_paths:
             if os.path.exists(p):
@@ -92,19 +145,30 @@ class MetricsCollector:
     def sample(self):
         with self.lock:
             now = time.time()
-            # Throttle samples to at most once per 0.5s to avoid duplicate expensive calls
             if self.cached_metrics and (now - self.last_sample_time < 0.5):
                 return self.cached_metrics
 
-            # CPU calculation
-            curr_cpu = self._read_cpu_stat()
-            diff_total = curr_cpu["total"] - self.last_cpu_stat["total"]
-            diff_idle = curr_cpu["idle"] - self.last_cpu_stat["idle"]
-            if diff_total > 0:
-                cpu_pct = round((1.0 - (diff_idle / diff_total)) * 100.0, 1)
-            else:
-                cpu_pct = 0.0
-            self.last_cpu_stat = curr_cpu
+            # CPU calculations (overall & per-core)
+            curr_cpus = self._read_all_cpus()
+            per_cpu_pcts = {}
+            for k, curr in curr_cpus.items():
+                prev = self.last_cpu_stats.get(k)
+                if prev:
+                    dt = curr["total"] - prev["total"]
+                    di = curr["idle"] - prev["idle"]
+                    pct = round((1.0 - (di / dt)) * 100.0, 1) if dt > 0 else 0.0
+                    per_cpu_pcts[k] = max(0.0, min(100.0, pct))
+                else:
+                    per_cpu_pcts[k] = 0.0
+
+            overall_cpu = per_cpu_pcts.get("cpu", 0.0)
+            per_core_list = [
+                per_cpu_pcts[f"cpu{i}"]
+                for i in range(self.threads)
+                if f"cpu{i}" in per_cpu_pcts
+            ]
+
+            self.last_cpu_stats = curr_cpus
             self.last_cpu_time = now
 
             # Network rate calculation
@@ -115,7 +179,7 @@ class MetricsCollector:
             self.last_net_bytes = curr_net
             self.last_net_time = now
 
-            # Memory information
+            # Memory information from /proc/meminfo
             mem = {}
             try:
                 with open("/proc/meminfo", "r") as f:
@@ -135,14 +199,18 @@ class MetricsCollector:
             swap_free = mem.get("SwapFree", 0)
             swap_used = max(0, swap_total - swap_free)
 
-            # Disk usage
+            # Disk usage via statvfs matching 'df -h'
             try:
-                du = shutil.disk_usage("/")
+                statv = os.statvfs("/")
+                disk_total = statv.f_blocks * statv.f_frsize
+                disk_free = statv.f_bavail * statv.f_frsize
+                disk_used = (statv.f_blocks - statv.f_bfree) * statv.f_frsize
+                disk_pct = round(disk_used / (disk_used + disk_free) * 100.0, 1) if (disk_used + disk_free) > 0 else 0.0
                 disk_info = {
-                    "total": du.total,
-                    "used": du.used,
-                    "free": du.free,
-                    "percent": round(du.used / du.total * 100.0, 1)
+                    "total": disk_total,
+                    "used": disk_used,
+                    "free": disk_free,
+                    "percent": disk_pct
                 }
             except Exception:
                 disk_info = {"total": 0, "used": 0, "free": 0, "percent": 0.0}
@@ -178,10 +246,14 @@ class MetricsCollector:
                 for l in lines:
                     parts = l.split(None, 3)
                     if len(parts) >= 4:
+                        raw_cpu = float(parts[2])
+                        # Normalize total CPU by number of threads so 100% = full machine
+                        total_cpu_pct = round(raw_cpu / self.threads, 1)
                         procs.append({
                             "pid": parts[0],
                             "name": parts[1],
-                            "cpu": float(parts[2]),
+                            "cpu": total_cpu_pct,
+                            "raw_cpu": raw_cpu,
                             "mem": float(parts[3])
                         })
             except Exception:
@@ -190,8 +262,10 @@ class MetricsCollector:
             self.cached_metrics = {
                 "cpu": {
                     "name": self.cpu_name,
-                    "cores": self.cores,
-                    "percent": cpu_pct,
+                    "physical_cores": self.physical_cores,
+                    "threads": self.threads,
+                    "percent": overall_cpu,
+                    "per_cpu": per_core_list,
                     "temp": temp,
                     "load": loads
                 },
@@ -241,11 +315,10 @@ class MetricsHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def log_message(self, format, *args):
-        # Silence access logs to keep systemd journal clean
         pass
 
 def background_sampler():
-    """Background thread to keep CPU counters fresh even if requests are sporadic."""
+    """Background thread to keep sampling fresh."""
     while True:
         try:
             collector.sample()
@@ -254,13 +327,11 @@ def background_sampler():
         time.sleep(2.0)
 
 def main():
-    # Warm up first sample
-    collector._read_cpu_stat()
+    collector._read_all_cpus()
     collector._read_net_bytes()
     time.sleep(0.2)
     collector.sample()
 
-    # Start background sampling thread
     t = threading.Thread(target=background_sampler, daemon=True)
     t.start()
 

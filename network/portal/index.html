@@ -1086,9 +1086,12 @@ footer {
         <div class="meter-bar-track">
           <div class="meter-bar-fill" id="telemetry-cpu-bar" style="width: 0%; background-color: var(--success);"></div>
         </div>
+        <div id="telemetry-cpu-threads-row" style="display: flex; gap: 4px; margin-top: -2px;">
+          <!-- Populated with per-thread bars -->
+        </div>
         <div class="telemetry-meta-row">
           <span>Load: <span id="telemetry-load-val">-- / -- / --</span></span>
-          <span><span id="telemetry-cores-val">4</span> Cores</span>
+          <span id="telemetry-cores-val">2 Cores / 4 Threads</span>
         </div>
       </div>
 
@@ -1797,6 +1800,7 @@ function updateTelemetryUI(data) {
   const cpu = data.cpu || {};
   const cpuVal = document.getElementById('telemetry-cpu-val');
   const cpuBar = document.getElementById('telemetry-cpu-bar');
+  const cpuThreadsRow = document.getElementById('telemetry-cpu-threads-row');
   const cpuName = document.getElementById('telemetry-cpu-name');
   const tempBadge = document.getElementById('telemetry-temp-badge');
   const loadVal = document.getElementById('telemetry-load-val');
@@ -1812,8 +1816,16 @@ function updateTelemetryUI(data) {
     cpuBar.style.width = `${p}%`;
     cpuBar.style.backgroundColor = getUsageColor(p);
   }
+  if (cpuThreadsRow && cpu.per_cpu && cpu.per_cpu.length > 0) {
+    cpuThreadsRow.innerHTML = cpu.per_cpu.map((tp, idx) => `
+      <div style="flex: 1; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden;" title="Thread ${idx}: ${tp}%">
+        <div style="height: 100%; width: ${tp}%; background: ${getUsageColor(tp)}; transition: width 0.4s ease;"></div>
+      </div>
+    `).join('');
+  }
   if (cpuName && cpu.name) {
-    cpuName.innerText = `${cpu.name} • ${cpu.cores || 4} Cores`;
+    const coresText = cpu.physical_cores ? `${cpu.physical_cores} Cores / ${cpu.threads} Threads` : `${cpu.threads || 4} Threads`;
+    cpuName.innerText = `${cpu.name} • ${coresText}`;
   }
   if (tempBadge) {
     if (cpu.temp) {
@@ -1827,17 +1839,18 @@ function updateTelemetryUI(data) {
   if (loadVal && cpu.load) {
     loadVal.innerText = cpu.load.map(l => l.toFixed(2)).join(' / ');
   }
-  if (coresVal && cpu.cores) {
-    coresVal.innerText = cpu.cores;
+  if (coresVal) {
+    coresVal.innerText = cpu.physical_cores ? `${cpu.physical_cores} Cores (${cpu.threads}T)` : `${cpu.threads || 4} Threads`;
   }
 
-  // Memory
+  // Memory (GiB)
   const mem = data.memory || {};
   const memVal = document.getElementById('telemetry-mem-val');
   const memBar = document.getElementById('telemetry-mem-bar');
   const memBreakdown = document.getElementById('telemetry-mem-breakdown');
   const memAvail = document.getElementById('telemetry-mem-avail');
   const swapBadge = document.getElementById('telemetry-swap-badge');
+  const GiB = 1024 * 1024 * 1024;
 
   if (memVal) {
     const pct = mem.percent ?? 0;
@@ -1850,12 +1863,12 @@ function updateTelemetryUI(data) {
     memBar.style.backgroundColor = getUsageColor(p);
   }
   if (memBreakdown && mem.total) {
-    const usedGb = (mem.used / 1e9).toFixed(1);
-    const totGb = (mem.total / 1e9).toFixed(1);
-    memBreakdown.innerText = `RAM: ${usedGb} / ${totGb} GB`;
+    const usedGib = (mem.used / GiB).toFixed(1);
+    const totGib = (mem.total / GiB).toFixed(1);
+    memBreakdown.innerText = `RAM: ${usedGib} / ${totGib} GiB`;
   }
   if (memAvail && mem.available) {
-    memAvail.innerText = `${(mem.available / 1e9).toFixed(1)} GB`;
+    memAvail.innerText = `${(mem.available / GiB).toFixed(1)} GiB`;
   }
   if (swapBadge) {
     if (mem.swap_total > 0) {
@@ -1885,9 +1898,9 @@ function updateTelemetryUI(data) {
     diskBar.style.backgroundColor = getUsageColor(p);
   }
   if (diskBreakdown && disk.total) {
-    const usedGb = (disk.used / 1e9).toFixed(0);
-    const totGb = (disk.total / 1e9).toFixed(0);
-    diskBreakdown.innerText = `Root: ${usedGb} / ${totGb} GB`;
+    const usedGib = (disk.used / GiB).toFixed(0);
+    const totGib = (disk.total / GiB).toFixed(0);
+    diskBreakdown.innerText = `Root: ${usedGib} / ${totGib} GiB`;
   }
   if (uptimeBadge && data.uptime_seconds) {
     uptimeBadge.innerText = `Up: ${formatUptime(data.uptime_seconds)}`;
@@ -1905,7 +1918,7 @@ function updateTelemetryUI(data) {
       <tr>
         <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${p.name}">${p.name}</td>
         <td style="text-align: right; color: var(--text-dim);">${p.pid}</td>
-        <td style="text-align: right;"><span class="proc-cpu-badge">${p.cpu.toFixed(1)}%</span></td>
+        <td style="text-align: right;"><span class="proc-cpu-badge" title="${p.raw_cpu ? p.raw_cpu.toFixed(1) + '% single-core' : ''}">${p.cpu.toFixed(1)}%</span></td>
         <td style="text-align: right; color: var(--text-muted);">${p.mem.toFixed(1)}%</td>
       </tr>
     `).join('');
