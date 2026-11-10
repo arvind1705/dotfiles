@@ -12,9 +12,7 @@ detect_ipv4() {
 }
 
 detect_ipv6() {
-  # Only publish global routable IPv6; ignore link-local fe80:: addresses
-  # which break macOS mDNS resolution when connected without scope IDs.
-  ip -6 addr show scope global 2>/dev/null \
+  ip -6 addr show dev "${LAN_IFACE:-wlp3s0}" scope link 2>/dev/null \
     | awk '/inet6/ {print $2; exit}' | cut -d/ -f1
 }
 
@@ -81,8 +79,9 @@ else
   sudo systemctl enable --now avahi-daemon || true
 fi
 
-# 3. Install and start unified devbox-mdns.service
+# 3. Install and start/restart unified devbox-mdns.service
 sudo cp "$DIR/devbox-mdns.service" /etc/systemd/system/devbox-mdns.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now devbox-mdns.service
+sudo systemctl enable devbox-mdns.service
+sudo systemctl restart devbox-mdns.service
 echo "    ✓ devbox-mdns.service active (broadcasting to LAN)"
