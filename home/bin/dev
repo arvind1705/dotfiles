@@ -1,0 +1,553 @@
+#!/usr/bin/env bash
+# =============================================================================
+# dev — Universal Development Environment Manager
+#
+# Primary commands:
+#   dev devbox [names|direct]
+#                   Switch active execution to remote Devbox infra. "names" (default)
+#                   addresses services as <service>.local; "direct" uses the original
+#                   IP and ports. An explicit choice is remembered.
+#   dev local       Switch active execution to native local computer (default)
+#   dev status [names|direct]
+#                   Show active runtime, connectivity, and container status
+#   dev doctor      Validate system prerequisites and connectivity
+#   dev run <cmd>   Run a command with active DEV_MODE environment loaded
+# =============================================================================
+set -euo pipefail
+
+# Configuration defaults
+CONFIG_FILE="$HOME/.config/dev/config"
+if [[ -f "$CONFIG_FILE" ]]; then
+  # shellcheck source=/dev/null
+  source "$CONFIG_FILE"
+fi
+
+# The devbox can be addressed two ways (see load_endpoints):
+#   names   <service>.$DEVBOX_DOMAIN, published over mDNS by the devbox. Web services
+#           sit behind its reverse proxy on port 80; raw TCP services keep their ports.
+#   direct  $DEVBOX_IP with the original per-service ports (still bound on the devbox).
+# SSH goes through the DEVBOX_SSH_HOST alias in ~/.ssh/config, so it needs neither.
+DEVBOX_DOMAIN="${DEVBOX_DOMAIN:-local}"
+# Configs from before addressing existed pinned the IP in DEVBOX_HOST; keep honoring it.
+ipv4_pattern='^[0-9]+(\.[0-9]+){3}$'
+if [[ -z "${DEVBOX_IP:-}" && "${DEVBOX_HOST:-}" =~ $ipv4_pattern ]]; then
+  DEVBOX_IP="$DEVBOX_HOST"
+fi
+DEVBOX_IP="${DEVBOX_IP:-192.168.0.172}"
+DEVBOX_HOST="${DEVBOX_HOST:-devbox.$DEVBOX_DOMAIN}"
+DEVBOX_SSH_HOST="${DEVBOX_SSH_HOST:-devbox}"
+DEVBOX_CONTEXT="${DEVBOX_CONTEXT:-devbox}"
+
+GLOBAL_STATE_DIR="$HOME/.config/dev/state"
+mkdir -p "$GLOBAL_STATE_DIR"
+GLOBAL_MODE_FILE="$GLOBAL_STATE_DIR/mode"
+GLOBAL_ADDRESSING_FILE="$GLOBAL_STATE_DIR/addressing"
+
+# Repository detection
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  REPO_ROOT="$(git rev-parse --show-toplevel)"
+  IS_GIT=1
+else
+  REPO_ROOT="$(pwd)"
+  IS_GIT=0
+fi
+REPO_NAME="$(basename "$REPO_ROOT")"
+
+LOCAL_MODE_FILE="$REPO_ROOT/.dev-mode"
+ENV_MODE_FILE="$REPO_ROOT/.env.mode"
+
+# Terminal styling
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+detect_local_context() {
+  if docker context inspect orbstack >/dev/null 2>&1; then
+    echo "orbstack"
+  elif docker context inspect desktop-linux >/dev/null 2>&1; then
+    echo "desktop-linux"
+  else
+    echo "default"
+  fi
+}
+
+get_mode() {
+  if [[ -f "$LOCAL_MODE_FILE" ]]; then
+    cat "$LOCAL_MODE_FILE" | tr -d '[:space:]'
+  elif [[ -f "$GLOBAL_MODE_FILE" ]]; then
+    cat "$GLOBAL_MODE_FILE" | tr -d '[:space:]'
+  else
+    echo "local"
+  fi
+}
+
+valid_addressing() { [[ "$1" == "names" || "$1" == "direct" ]]; }
+
+# How `dev devbox` addresses the devbox when given no argument:
+# DEVBOX_ADDRESSING (env or config) > the choice remembered by `dev devbox <how>` > names.
+default_addressing() {
+  local value="${DEVBOX_ADDRESSING:-}"
+  if [[ -z "$value" && -f "$GLOBAL_ADDRESSING_FILE" ]]; then
+    value="$(tr -d '[:space:]' < "$GLOBAL_ADDRESSING_FILE")"
+  fi
+  if [[ -z "$value" ]] || valid_addressing "$value"; then
+    echo "${value:-names}"
+  else
+    echo "dev: ignoring invalid addressing '$value' (use names or direct)" >&2
+    echo "names"
+  fi
+}
+
+# How this repo's .env.mode addresses the devbox; prints nothing without a file.
+# Files written before addressing existed hold only IP:port values, i.e. "direct".
+file_addressing() {
+  [[ -f "$ENV_MODE_FILE" ]] || return 0
+  local value
+  value="$(awk -F= '/^DEV_ADDRESSING=/ {print $2; exit}' "$ENV_MODE_FILE")"
+  echo "${value:-direct}"
+}
+
+# Per-service endpoints for a mode. One source for both .env.mode and `dev status`,
+# so status probes exactly what .env.mode points at.
+#
+# Devbox, names: every service has its own name. Web services are served by the devbox
+#   reverse proxy on port 80 (no port in the URL); raw TCP services cannot share a port
+#   by name, so they keep theirs. gRPC needs the system resolver for these mDNS names.
+# Devbox, direct: the endpoints the devbox has always exposed, and still does: one IP and
+#   a port per service. No name resolution is involved, so no resolver override either.
+# Local: everything on localhost, at the ports published by the pl-ai-infra-mcp-tools
+#   compose stack.
+load_endpoints() {
+  local mode="$1" addressing="${2:-names}" d="$DEVBOX_DOMAIN" ip="$DEVBOX_IP"
+  EP_GRPC_RESOLVER=""
+  if [[ "$mode" != "devbox" && "$mode" != "home" ]]; then
+    EP_ADDRESSING="local"
+    EP_ENV_HOST="localhost"
+    EP_PG_HOST="localhost";             EP_PG_PORT=5432
+    EP_REDIS_HOST="localhost";          EP_REDIS_PORT=6380
+    EP_DGRAPH_ADDR="localhost:9080";    EP_DGRAPH_HTTP="http://localhost:8080"
+    EP_CLICKHOUSE_HOST="localhost";     EP_CLICKHOUSE_HTTP="http://localhost:8124"
+    EP_CLICKHOUSE_HTTP_PORT=8124;       EP_CLICKHOUSE_NATIVE_PORT=9002
+    EP_MINIO="http://localhost:9092";   EP_MINIO_CONSOLE="http://localhost:9094"
+    EP_LANGFUSE="http://localhost:3005"
+    EP_NINEROUTER="http://localhost:20128"
+  elif [[ "$addressing" == "direct" ]]; then
+    EP_ADDRESSING="direct"
+    EP_ENV_HOST="$ip"
+    EP_PG_HOST="$ip";                   EP_PG_PORT=5432
+    EP_REDIS_HOST="$ip";                EP_REDIS_PORT=6380
+    EP_DGRAPH_ADDR="$ip:9080";          EP_DGRAPH_HTTP="http://$ip:8080"
+    EP_CLICKHOUSE_HOST="$ip";           EP_CLICKHOUSE_HTTP="http://$ip:8124"
+    EP_CLICKHOUSE_HTTP_PORT=8124;       EP_CLICKHOUSE_NATIVE_PORT=9002
+    EP_MINIO="http://$ip:9092";         EP_MINIO_CONSOLE="http://$ip:9094"
+    EP_LANGFUSE="http://$ip:3005"
+    EP_NINEROUTER="http://$ip:20128"
+  else
+    EP_ADDRESSING="names"
+    EP_ENV_HOST="$DEVBOX_HOST"
+    EP_PG_HOST="postgres.$d";           EP_PG_PORT=5432
+    EP_REDIS_HOST="redis.$d";           EP_REDIS_PORT=6380
+    EP_DGRAPH_ADDR="dgraph.$d:9080";    EP_DGRAPH_HTTP="http://dgraph.$d"
+    EP_CLICKHOUSE_HOST="clickhouse.$d"; EP_CLICKHOUSE_HTTP="http://clickhouse.$d"
+    EP_CLICKHOUSE_HTTP_PORT=80;         EP_CLICKHOUSE_NATIVE_PORT=9002
+    EP_MINIO="http://minio.$d";         EP_MINIO_CONSOLE="http://minio-console.$d"
+    EP_LANGFUSE="http://langfuse.$d"
+    EP_NINEROUTER="http://9router.$d"
+    EP_GRPC_RESOLVER="native"
+  fi
+}
+
+write_env_mode() {
+  local mode="$1"
+  if [[ ! -d "$REPO_ROOT" ]]; then return 0; fi
+
+  local local_ctx
+  local_ctx="$(detect_local_context)"
+  load_endpoints "$mode" "${ADDRESSING:-$(default_addressing)}"
+
+  cat << EOF > "$ENV_MODE_FILE"
+# Auto-generated by dev CLI for $mode mode
+DEV_MODE=$mode
+DEV_ADDRESSING=$EP_ADDRESSING
+DOCKER_CONTEXT=$local_ctx
+DEVBOX_HOST=$EP_ENV_HOST
+
+# Standard service endpoints mapped to active target
+DB_PRIMARY_HOST=$EP_PG_HOST
+DB_PRIMARY_PORT=$EP_PG_PORT
+DB_REPLICA_HOST=$EP_PG_HOST
+DB_REPLICA_PORT=$EP_PG_PORT
+ITSM_PGHOST=$EP_PG_HOST
+ITSM_PGPORT=$EP_PG_PORT
+ITSM_DB_URL=postgresql://kg_mcp:kg_mcp_pass@$EP_PG_HOST:$EP_PG_PORT/kg_mcp_db
+
+REDIS_HOST=$EP_REDIS_HOST
+REDIS_PORT=$EP_REDIS_PORT
+REDIS_URL=redis://$EP_REDIS_HOST:$EP_REDIS_PORT/0
+
+DGRAPH_ADDR=$EP_DGRAPH_ADDR
+DGRAPH_HOST=$EP_DGRAPH_ADDR
+SEMANTIC_DGRAPH_ADDR=$EP_DGRAPH_ADDR
+# Dgraph HTTP: DGRAPH_HTTP_URL is read by pl-ai-infra-agents/scripts/up_local.sh,
+# DGRAPH_HTTP by pl-ai-infra-mcp-tools/Makefile.
+DGRAPH_HTTP_URL=$EP_DGRAPH_HTTP
+DGRAPH_HTTP=$EP_DGRAPH_HTTP
+
+CLICKHOUSE_HOST=$EP_CLICKHOUSE_HOST
+CLICKHOUSE_HTTP_PORT=$EP_CLICKHOUSE_HTTP_PORT
+CLICKHOUSE_NATIVE_PORT=$EP_CLICKHOUSE_NATIVE_PORT
+
+# MinIO S3 API: path-style addressing only (no bucket subdomains).
+MINIO_ENDPOINT=$EP_MINIO
+LANGFUSE_HOST=$EP_LANGFUSE
+# 9router AI gateway: LLM_BASE_URL is this plus /v1/chat/completions (set in .env).
+NINEROUTER_URL=$EP_NINEROUTER
+MCP_SERVER_URL=http://localhost:8000/mcp/stream
+AGENT_URL=http://localhost:8010
+EOF
+
+  if [[ -n "$EP_GRPC_RESOLVER" ]]; then
+    cat << EOF >> "$ENV_MODE_FILE"
+
+# gRPC (pydgraph) cannot resolve mDNS *.local names with its default c-ares
+# resolver (UNAVAILABLE: "Domain name not found"); use the system resolver.
+# It is read at import time, so it must be exported, not loaded from a .env.
+GRPC_DNS_RESOLVER=$EP_GRPC_RESOLVER
+EOF
+  fi
+}
+
+set_mode_state() {
+  local mode="$1"
+  echo "$mode" > "$GLOBAL_MODE_FILE"
+  echo "$mode" > "$LOCAL_MODE_FILE" 2>/dev/null || true
+  write_env_mode "$mode"
+}
+
+cmd_devbox() {
+  local how="${1:-}"
+  if [[ -n "$how" ]] && ! valid_addressing "$how"; then
+    echo "Usage: dev devbox [names|direct]" >&2
+    exit 1
+  fi
+  # Read by write_env_mode. An explicit choice wins over DEVBOX_ADDRESSING and the
+  # remembered one.
+  ADDRESSING="${how:-$(default_addressing)}"
+  load_endpoints devbox "$ADDRESSING"
+
+  echo -e "${BOLD}Switching to DEVBOX infrastructure mode...${NC}"
+  echo -e "Target Services: Devbox at ${BLUE}$EP_ENV_HOST${NC} ($ADDRESSING addressing)"
+
+  if ! ssh -q -o BatchMode=yes -o ConnectTimeout=3 "$DEVBOX_SSH_HOST" true 2>/dev/null; then
+    echo -e "${RED}Error:${NC} Cannot connect to $DEVBOX_SSH_HOST ($EP_ENV_HOST)." >&2
+    echo "Check local LAN connectivity or verify SSH keys." >&2
+    exit 1
+  fi
+
+  local local_ctx
+  local_ctx="$(detect_local_context)"
+  # Remember an explicit choice so a later plain `dev devbox` keeps it.
+  [[ -z "$how" ]] || echo "$how" > "$GLOBAL_ADDRESSING_FILE"
+  set_mode_state "devbox"
+
+  echo -e "${GREEN}✓ Active mode: DEVBOX (Infra endpoints routed to $EP_ENV_HOST, $ADDRESSING addressing)${NC}"
+}
+
+cmd_local() {
+  echo -e "${BOLD}Switching to LOCAL execution mode (native local computer)...${NC}"
+  local local_ctx
+  local_ctx="$(detect_local_context)"
+
+  if ! docker --context "$local_ctx" info >/dev/null 2>&1; then
+    echo -e "${YELLOW}Warning:${NC} Local Docker daemon ($local_ctx) is not running."
+  fi
+
+  docker context use "$local_ctx" >/dev/null 2>&1 || true
+  set_mode_state "local"
+
+  echo -e "${GREEN}✓ Active mode: LOCAL (Infra endpoints routed to localhost)${NC}"
+}
+
+check_port() {
+  local host="$1"
+  local port="$2"
+  nc -zv -w 2 "$host" "$port" >/dev/null 2>&1
+}
+
+# Hostname of a URL (scheme, port and path stripped).
+url_host() {
+  local rest="${1#*://}"
+  printf '%s' "${rest%%[:/]*}"
+}
+
+# Resolve a name through the system resolver (which covers mDNS for *.local) and
+# print its address; print nothing when it does not resolve. Always succeeds.
+resolve_host() {
+  local name="$1" ip=""
+  if [[ "$name" == "localhost" || "$name" =~ ^[0-9.]+$ ]]; then
+    printf '%s' "$name"
+    return 0
+  fi
+  if command -v dscacheutil >/dev/null 2>&1; then
+    # dscacheutil lists the IPv6 link-local address first; prefer the IPv4 one.
+    ip="$(dscacheutil -q host -a name "$name" 2>/dev/null | awk '/^ip_address:/ && !v4 {v4=$2} /^ipv6_address:/ && !v6 {v6=$2} END {print (v4 != "" ? v4 : v6)}' || true)"
+  elif command -v getent >/dev/null 2>&1; then
+    ip="$(getent hosts "$name" 2>/dev/null | awk '{print $1; exit}' || true)"
+  fi
+  printf '%s' "$ip"
+}
+
+# Status rows for the active endpoints: label|kind|display|probe.
+# Web services share port 80 behind the devbox proxy, so a TCP check on the port
+# would say ONLINE for every one of them whenever the proxy is up. Probe each
+# vhost's health path over HTTP instead; the proxy answers 502 when a backend is down.
+service_rows() {
+  cat << EOF
+PostgreSQL|tcp|$EP_PG_HOST:$EP_PG_PORT|$EP_PG_HOST:$EP_PG_PORT
+Redis|tcp|$EP_REDIS_HOST:$EP_REDIS_PORT|$EP_REDIS_HOST:$EP_REDIS_PORT
+Dgraph gRPC|tcp|$EP_DGRAPH_ADDR|$EP_DGRAPH_ADDR
+Dgraph HTTP|http|$EP_DGRAPH_HTTP|$EP_DGRAPH_HTTP/health
+ClickHouse HTTP|http|$EP_CLICKHOUSE_HTTP|$EP_CLICKHOUSE_HTTP/ping
+ClickHouse native|tcp|$EP_CLICKHOUSE_HOST:$EP_CLICKHOUSE_NATIVE_PORT|$EP_CLICKHOUSE_HOST:$EP_CLICKHOUSE_NATIVE_PORT
+MinIO S3|http|$EP_MINIO|$EP_MINIO/minio/health/live
+MinIO console|http|$EP_MINIO_CONSOLE|$EP_MINIO_CONSOLE/
+Langfuse|http|$EP_LANGFUSE|$EP_LANGFUSE/api/public/health
+9router|http|$EP_NINEROUTER|$EP_NINEROUTER/api/health
+EOF
+  # These services are published through Caddy; direct ports are not configured.
+  if [[ "$EP_ADDRESSING" == "names" ]]; then
+    cat << EOF
+Devbox landing|http|http://devbox.$DEVBOX_DOMAIN|http://devbox.$DEVBOX_DOMAIN/health
+Jellyfin|http|http://jellyfin.$DEVBOX_DOMAIN|http://jellyfin.$DEVBOX_DOMAIN/health
+qBittorrent|http|http://qbittorrent.$DEVBOX_DOMAIN|http://qbittorrent.$DEVBOX_DOMAIN/
+EOF
+  fi
+}
+
+# Hostnames behind the active endpoints, one per line.
+service_hosts() {
+  printf '%s\n' "$EP_PG_HOST" "$EP_REDIS_HOST" "${EP_DGRAPH_ADDR%:*}" "$EP_CLICKHOUSE_HOST" \
+    "$(url_host "$EP_MINIO")" "$(url_host "$EP_MINIO_CONSOLE")" "$(url_host "$EP_LANGFUSE")" \
+    "$(url_host "$EP_NINEROUTER")"
+  if [[ "$EP_ADDRESSING" == "names" ]]; then
+    printf '%s\n' "devbox.$DEVBOX_DOMAIN" "jellyfin.$DEVBOX_DOMAIN" "qbittorrent.$DEVBOX_DOMAIN"
+  fi
+}
+
+# probe_service <kind> <target> -> ONLINE | OFFLINE | NO-DNS
+probe_service() {
+  local kind="$1" target="$2" host
+  if [[ "$kind" == "tcp" ]]; then host="${target%:*}"; else host="$(url_host "$target")"; fi
+  if [[ -z "$(resolve_host "$host")" ]]; then
+    echo "NO-DNS"
+    return 0
+  fi
+  if [[ "$kind" == "tcp" ]]; then
+    if check_port "$host" "${target##*:}"; then echo "ONLINE"; else echo "OFFLINE"; fi
+  elif curl -fsSL -o /dev/null --max-time 3 "$target" >/dev/null 2>&1; then
+    echo "ONLINE"
+  else
+    echo "OFFLINE"
+  fi
+}
+
+cmd_status() {
+  local mode addressing="${1:-}"
+  mode="$(get_mode)"
+  if [[ -n "$addressing" ]] && ! valid_addressing "$addressing"; then
+    echo "Usage: dev status [names|direct]" >&2
+    exit 1
+  fi
+  # Probe what this repo's .env.mode actually points at, unless told otherwise.
+  if [[ -z "$addressing" ]]; then
+    addressing="$(file_addressing)"
+    valid_addressing "$addressing" || addressing="$(default_addressing)"
+  fi
+  load_endpoints "$mode" "$addressing"
+
+  echo -e "
+${BOLD}=== Development Environment Status ===${NC}"
+  echo -e "Repository:      ${BOLD}$REPO_NAME${NC} ($REPO_ROOT)"
+  echo -e "Active Mode:     ${GREEN}$mode${NC}"
+  case "$EP_ADDRESSING" in
+    names)  echo -e "Addressing:      ${GREEN}names${NC} (*.$DEVBOX_DOMAIN; web services via the proxy on :80)" ;;
+    direct) echo -e "Addressing:      ${GREEN}direct${NC} ($DEVBOX_IP; original ports)" ;;
+    *)      echo -e "Addressing:      ${GREEN}local${NC} (localhost)" ;;
+  esac
+  if [[ "$EP_ADDRESSING" != "local" && -f "$ENV_MODE_FILE" ]]; then
+    local in_file
+    in_file="$(file_addressing)"
+    if [[ "$in_file" != "$EP_ADDRESSING" ]]; then
+      echo -e "Note:            .env.mode uses '$in_file' addressing; this probes '$EP_ADDRESSING'."
+    elif [[ -z "${1:-}" && "$in_file" != "$(default_addressing)" ]]; then
+      echo -e "Note:            new .env.mode files use '$(default_addressing)'; run 'dev devbox' to regenerate."
+    fi
+  fi
+
+  local devbox_reachable="No"
+  if ssh -q -o BatchMode=yes -o ConnectTimeout=2 "$DEVBOX_SSH_HOST" true 2>/dev/null; then
+    devbox_reachable="Yes ($DEVBOX_SSH_HOST)"
+  fi
+  echo -e "Devbox SSH:      $devbox_reachable"
+
+  echo -e "
+${BOLD}Infrastructure Services (${mode} target):${NC}"
+
+  local tmp label kind display probe status i=0
+  tmp="$(mktemp -d "${TMPDIR:-/tmp}/dev-status.XXXXXX")"
+
+  # Probe in parallel: a cold *.local (mDNS) lookup takes about a second, so
+  # serial probes would crawl. Results are printed in table order below.
+  while IFS='|' read -r label kind display probe; do
+    i=$((i + 1))
+    ( probe_service "$kind" "$probe" > "$tmp/$i" ) < /dev/null &
+  done < <(service_rows)
+  wait
+
+  i=0
+  while IFS='|' read -r label kind display probe; do
+    i=$((i + 1))
+    status="$(cat "$tmp/$i")"
+    printf "  %-18s %-30s " "$label" "$display"
+    case "$status" in
+      ONLINE) echo -e "${GREEN}ONLINE${NC}" ;;
+      NO-DNS) echo -e "${YELLOW}NO DNS${NC}" ;;
+      *)      echo -e "${RED}OFFLINE${NC}" ;;
+    esac
+  done < <(service_rows)
+  rm -rf "$tmp"
+  echo ""
+}
+
+cmd_infra_up() {
+  echo -e "${BOLD}Starting remote Devbox infrastructure...${NC}"
+  ssh "$DEVBOX_SSH_HOST" "~/dev/dotfiles/stacks/stacks.sh up"
+}
+
+cmd_infra_down() {
+  echo -e "${BOLD}Stopping remote Devbox infrastructure...${NC}"
+  ssh "$DEVBOX_SSH_HOST" "~/dev/dotfiles/stacks/stacks.sh down"
+}
+
+cmd_infra_restart() {
+  echo -e "${BOLD}Restarting remote Devbox infrastructure...${NC}"
+  ssh "$DEVBOX_SSH_HOST" "~/dev/dotfiles/stacks/stacks.sh restart"
+}
+
+cmd_doctor() {
+  echo -e "
+${BOLD}=== Universal Dev Doctor: Environment Validation ===${NC}"
+  local errors=0
+
+  echo -e "
+${BOLD}[1] Local Tools:${NC}"
+  for tool in docker git python3 uv; do
+    if command -v "$tool" >/dev/null 2>&1; then
+      printf "  %-12s %s
+" "$tool:" "$("$tool" --version 2>&1 | head -n 1)"
+    else
+      echo -e "  ${RED}✗ $tool is missing!${NC}"
+      ((errors++))
+    fi
+  done
+
+  echo -e "
+${BOLD}[2] Devbox Connectivity & Security:${NC}"
+  if ssh -q -o BatchMode=yes -o ConnectTimeout=3 "$DEVBOX_SSH_HOST" true 2>/dev/null; then
+    echo -e "  ${GREEN}✓${NC} SSH to $DEVBOX_SSH_HOST ($DEVBOX_HOST) succeeded"
+    local devbox_docker
+    devbox_docker="$(ssh "$DEVBOX_SSH_HOST" 'docker --version' 2>/dev/null || echo 'Docker error')"
+    echo "  Devbox Docker: $devbox_docker"
+  else
+    echo -e "  ${YELLOW}!${NC} Devbox is currently unreachable over SSH"
+  fi
+
+  local aws_check
+  aws_check="$(ssh "$DEVBOX_SSH_HOST" 'test -d ~/.aws && echo "Found" || echo "None"' 2>/dev/null || echo 'None')"
+  if [[ "$aws_check" == "None" ]]; then
+    echo -e "  ${GREEN}✓${NC} Devbox isolation verified: zero AWS credentials present on Devbox"
+  else
+    echo -e "  ${RED}✗ Security warning: AWS credentials found on Devbox!${NC}"
+    ((errors++))
+  fi
+
+  echo -e "
+${BOLD}[3] Devbox Service Names (*.$DEVBOX_DOMAIN):${NC}"
+  load_endpoints devbox names
+  local tmp name ip i=0
+  tmp="$(mktemp -d "${TMPDIR:-/tmp}/dev-doctor.XXXXXX")"
+  while read -r name; do
+    i=$((i + 1))
+    ( resolve_host "$name" > "$tmp/$i" ) < /dev/null &
+  done < <(service_hosts)
+  wait
+  i=0
+  while read -r name; do
+    i=$((i + 1))
+    ip="$(cat "$tmp/$i")"
+    if [[ -n "$ip" ]]; then
+      printf "  ${GREEN}✓${NC} %-22s %s\n" "$name" "$ip"
+    else
+      echo -e "  ${YELLOW}!${NC} $name does not resolve (off the devbox LAN, or mDNS blocked?)"
+    fi
+  done < <(service_hosts)
+  rm -rf "$tmp"
+
+  if [[ $IS_GIT -eq 1 ]]; then
+    echo -e "
+${BOLD}[4] Current Git Repository ($REPO_NAME):${NC}"
+    git remote -v
+  fi
+
+  if [[ $errors -eq 0 ]]; then
+    echo -e "
+${GREEN}✓ Doctor check completed: Environment is healthy!${NC}
+"
+  else
+    echo -e "
+${RED}✗ Doctor check found $errors issue(s).${NC}
+"
+    return 1
+  fi
+}
+
+cmd_run() {
+  # Base config first; the mode file goes last so the active mode's endpoints win,
+  # the same precedence scripts/up_local.sh uses.
+  if [[ -f "$REPO_ROOT/.env" ]]; then
+    set -a
+    # shellcheck source=/dev/null
+    source "$REPO_ROOT/.env"
+    set +a
+  fi
+
+  if [[ -f "$ENV_MODE_FILE" ]]; then
+    set -a
+    # shellcheck source=/dev/null
+    source "$ENV_MODE_FILE"
+    set +a
+  fi
+
+  exec "$@"
+}
+
+COMMAND="${1:-status}"
+shift || true
+
+case "$COMMAND" in
+  devbox|home) cmd_devbox "$@" ;;
+  infra-up)    cmd_infra_up "$@" ;;
+  infra-down)  cmd_infra_down "$@" ;;
+  infra-restart) cmd_infra_restart "$@" ;;
+  local)       cmd_local "$@" ;;
+  status)      cmd_status "$@" ;;
+  doctor)      cmd_doctor "$@" ;;
+  run)         cmd_run "$@" ;;
+  *)
+    echo "Usage: dev <devbox [names|direct]|local|status [names|direct]|doctor|infra-up|infra-down|infra-restart|run <cmd>>"
+    exit 1
+    ;;
+esac

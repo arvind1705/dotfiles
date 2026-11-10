@@ -43,6 +43,10 @@ install_dotfiles() {
     cp "$REPO_DIR/home/zsh/.zsh/secrets.zsh.example" "$HOME/.zsh/secrets.zsh.example"
   fi
 
+  echo "==> Deploying user commands to ~/.local/bin"
+  mkdir -p "$HOME/.local/bin"
+  cp "$REPO_DIR/home/bin/dev" "$HOME/.local/bin/dev"
+
   # Config directories (~/.config)
   echo "==> Deploying ~/.config configurations"
   mkdir -p "$HOME/.config"

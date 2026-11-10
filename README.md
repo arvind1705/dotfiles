@@ -40,6 +40,7 @@ Or install specific components selectively:
 ├── install.sh                  # Master orchestrator for system setup
 ├── home/                       # User-level dotfiles (cleanly linkable to ~)
 │   ├── zsh/                    # .zshenv, .zprofile, .zshrc, modules in .zsh/
+│   ├── bin/dev                 # Development environment and Devbox status CLI
 │   ├── config/                 # starship.toml, ghostty, opencode, git ignore
 │   ├── git/                    # ignore-global, sanitized config templates
 │   ├── vscode/                 # settings.json, keybindings.json
