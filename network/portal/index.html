@@ -1,46 +1,1552 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>devbox services</title>
+<title>Devbox Command Center | http://devbox.local</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
 <style>
-body { font-family: system-ui, sans-serif; max-width: 620px; margin: 48px auto; padding: 0 24px; color: #1a1a1a; line-height: 1.6; }
-h1 { font-size: 22px; margin-bottom: 0; }
-h2 { font-size: 15px; margin-top: 28px; margin-bottom: 4px; }
-ul { list-style: none; padding: 0; margin-top: 0; }
-li { padding: 6px 0; border-bottom: 1px solid #eee; }
-a { color: #0645ad; text-decoration: none; }
-a:hover { text-decoration: underline; }
-code { font-family: monospace; font-size: 14px; background: #f4f4f4; padding: 1px 6px; }
-.desc { color: #555; font-size: 14px; }
+:root {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  
+  /* Dark theme (default) */
+  --bg-base: #090d16;
+  --bg-surface: rgba(17, 24, 39, 0.75);
+  --bg-surface-hover: rgba(26, 36, 56, 0.9);
+  --bg-card: rgba(15, 23, 42, 0.8);
+  --bg-chip: rgba(255, 255, 255, 0.05);
+  --bg-chip-hover: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(99, 102, 241, 0.6);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-glow: rgba(99, 102, 241, 0.25);
+  
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--border);
+  --shadow-hover: 0 14px 30px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.35);
+}
+
+[data-theme="light"] {
+  --bg-base: #f8fafc;
+  --bg-surface: rgba(255, 255, 255, 0.88);
+  --bg-surface-hover: rgba(241, 245, 249, 0.95);
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-chip: rgba(0, 0, 0, 0.04);
+  --bg-chip-hover: rgba(0, 0, 0, 0.08);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-focus: rgba(99, 102, 241, 0.6);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
+  --primary-glow: rgba(99, 102, 241, 0.15);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
+  --shadow-hover: 0 14px 30px -4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  line-height: 1.5;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background Ambient Glow */
+.bg-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-circle-1 {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(50px);
+}
+.ambient-circle-2 {
+  position: absolute;
+  top: 360px;
+  left: -180px;
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(60px);
+}
+.ambient-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, var(--border) 1px, transparent 1px),
+                    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.35;
+  mask-image: linear-gradient(to bottom, black 25%, transparent 85%);
+  -webkit-mask-image: linear-gradient(to bottom, black 25%, transparent 85%);
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 32px 24px 64px 24px;
+}
+
+/* Header */
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.brand-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 14px var(--primary-glow);
+  flex-shrink: 0;
+}
+.brand-icon svg {
+  width: 24px;
+  height: 24px;
+}
+.brand-title-group h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-title-group p {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Badges */
+.system-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  color: var(--text-muted);
+}
+.system-badge code {
+  font-family: var(--font-mono);
+  color: var(--text-main);
+  font-size: 11.5px;
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  backdrop-filter: blur(8px);
+}
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  position: relative;
+}
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.4;
+  animation: pulse 2s infinite ease-in-out;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* Button UI */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  transition: all 0.15s ease;
+  backdrop-filter: blur(8px);
+  text-decoration: none;
+}
+.btn:hover {
+  background: var(--bg-surface-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+}
+
+/* Stats Row */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease;
+}
+.stat-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+}
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-chip);
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+.stat-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+.stat-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.stat-sub {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* Search and Filters */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (min-width: 768px) {
+  .toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.search-container {
+  position: relative;
+  flex: 1;
+  max-width: 440px;
+}
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 9px 38px 9px 36px;
+  font-size: 13.5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  backdrop-filter: blur(8px);
+  outline: none;
+  transition: all 0.2s ease;
+}
+.search-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.search-shortcut {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.filter-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-main);
+}
+.filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Service Sections & Cards */
+.section-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 32px 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.card:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.service-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.service-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.service-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.service-category-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Card Health Badge */
+.health-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  transition: all 0.2s ease;
+}
+.health-badge.online {
+  background: var(--success-bg);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: var(--success);
+}
+.health-badge.offline {
+  background: var(--danger-bg);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: var(--danger);
+}
+.health-badge.checking {
+  background: var(--warning-bg);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: var(--warning);
+}
+.health-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.health-latency {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  opacity: 0.85;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.card-details {
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.endpoint-text {
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.endpoint-port {
+  color: var(--text-dim);
+  font-size: 11.5px;
+  margin-left: 6px;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-actions .btn {
+  flex: 1;
+}
+
+/* Copy Snippet Area for TCP cards */
+.snippet-box {
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.snippet-code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-copy-tiny {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.btn-copy-tiny:hover {
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--bg-surface-hover);
+}
+
+/* Cheatsheet Section */
+.cheatsheet-section {
+  margin-top: 48px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  backdrop-filter: blur(12px);
+}
+.cheatsheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.cheatsheet-title {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cli-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+.cli-item {
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cli-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.cli-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cli-code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+  padding: 3px 6px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--text-main);
+  color: var(--bg-base);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Footer */
+footer {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.footer-links {
+  display: flex;
+  gap: 16px;
+}
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.footer-links a:hover {
+  color: var(--text-main);
+}
 </style>
 </head>
 <body>
-<h1>devbox</h1>
-<h2>Media</h2>
-<ul>
-<li><a href="http://jellyfin.local">jellyfin.local</a> <span class="desc">Jellyfin</span></li>
-<li><a href="http://qbittorrent.local">qbittorrent.local</a> <span class="desc">qBittorrent WebUI</span></li>
-</ul>
-<h2>Apps</h2>
-<ul>
-<li><a href="http://langfuse.local">langfuse.local</a> <span class="desc">Langfuse</span></li>
-<li><a href="http://9router.local">9router.local</a> <span class="desc">9router AI gateway</span></li>
-</ul>
-<h2>Infra web</h2>
-<ul>
-<li><a href="http://minio-console.local">minio-console.local</a> <span class="desc">MinIO console</span></li>
-<li><a href="http://minio.local/minio/health/live">minio.local</a> <span class="desc">S3 API</span></li>
-<li><a href="http://clickhouse.local/ping">clickhouse.local</a> <span class="desc">ClickHouse HTTP</span></li>
-<li><a href="http://dgraph.local/health">dgraph.local</a> <span class="desc">Dgraph HTTP</span></li>
-</ul>
-<h2>TCP endpoints</h2>
-<ul>
-<li><code>postgres.local:5432</code> <span class="desc">PostgreSQL</span></li>
-<li><code>redis.local:6380</code> <span class="desc">Redis</span></li>
-<li><code>clickhouse.local:9002</code> <span class="desc">ClickHouse native</span></li>
-<li><code>dgraph.local:9080</code> <span class="desc">Dgraph gRPC</span></li>
-</ul>
+
+<div class="bg-ambient">
+  <div class="ambient-circle-1"></div>
+  <div class="ambient-circle-2"></div>
+  <div class="ambient-grid"></div>
+</div>
+
+<div class="wrapper">
+  <!-- Top Header -->
+  <header>
+    <div class="header-top">
+      <div class="brand-area">
+        <div class="brand-icon">
+          <!-- Server icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <div class="brand-title-group">
+          <h1>Devbox Command Center</h1>
+          <p>
+            <span>Central Local Ingress &amp; Service Portal</span>
+            <span>•</span>
+            <span class="system-badge">Host: <code>devbox.local</code></span>
+            <span class="system-badge" style="cursor:pointer;" onclick="copyToClipboard('192.168.0.172', 'LAN IP copied')" title="Click to copy IP">LAN: <code>192.168.0.172</code></span>
+          </p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div id="overall-status-pill" class="status-pill">
+          <span class="pulse-dot"></span>
+          <span id="overall-status-text">Checking Services...</span>
+        </div>
+
+        <button class="btn btn-icon" id="btn-refresh" title="Probe All Endpoints" onclick="probeAllHealth()">
+          <svg id="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>
+        </button>
+
+        <button class="btn btn-icon" id="btn-theme" title="Toggle Theme" onclick="toggleTheme()">
+          <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.12); color: #818cf8;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Web Ingress</div>
+          <div class="stat-value">Caddy v2 <span class="stat-sub">Port 80</span></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #34d399;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Online Services</div>
+          <div class="stat-value" id="stats-online-count">10 / 10 <span class="stat-sub" id="stats-latency">~3ms</span></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.12); color: #fbbf24;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Docker Stacks</div>
+          <div class="stat-value">4 Stacks <span class="stat-sub">Compose</span></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(236, 72, 153, 0.12); color: #f472b6;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">LAN Discovery</div>
+          <div class="stat-value">Avahi mDNS <span class="stat-sub">*.local</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Toolbar -->
+    <div class="toolbar">
+      <div class="search-container">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-input" class="search-input" placeholder="Search services, ports, tags (e.g. sql, ai, 8080)..." oninput="handleSearch()">
+        <span class="search-shortcut">/</span>
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-category="all" onclick="filterCategory('all', this)">All (10)</button>
+        <button class="filter-btn" data-category="media" onclick="filterCategory('media', this)">Media (2)</button>
+        <button class="filter-btn" data-category="apps" onclick="filterCategory('apps', this)">AI &amp; Apps (2)</button>
+        <button class="filter-btn" data-category="infra" onclick="filterCategory('infra', this)">Storage &amp; Infra (4)</button>
+        <button class="filter-btn" data-category="tcp" onclick="filterCategory('tcp', this)">Databases / TCP (4)</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Grid -->
+  <main id="services-container">
+    <!-- Populated dynamically by JavaScript -->
+  </main>
+
+  <!-- Developer Cheatsheet Section -->
+  <section class="cheatsheet-section">
+    <div class="cheatsheet-header">
+      <div class="cheatsheet-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span>Developer CLI &amp; Management Cheatsheet</span>
+      </div>
+      <button class="btn btn-copy-tiny" onclick="copyToClipboard('ssh aravind@devbox.local', 'SSH command copied')">Copy SSH</button>
+    </div>
+
+    <div class="cli-grid">
+      <div class="cli-item">
+        <div class="cli-desc">Probe health of all Docker stacks &amp; endpoints</div>
+        <div class="cli-code-row">
+          <code class="cli-code">./stacks/stacks.sh health</code>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('./stacks/stacks.sh health', 'Command copied')">Copy</button>
+        </div>
+      </div>
+
+      <div class="cli-item">
+        <div class="cli-desc">Check running container status</div>
+        <div class="cli-code-row">
+          <code class="cli-code">./stacks/stacks.sh status</code>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('./stacks/stacks.sh status', 'Command copied')">Copy</button>
+        </div>
+      </div>
+
+      <div class="cli-item">
+        <div class="cli-desc">Tail logs for AI gateway stack</div>
+        <div class="cli-code-row">
+          <code class="cli-code">./stacks/stacks.sh logs 9router</code>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('./stacks/stacks.sh logs 9router', 'Command copied')">Copy</button>
+        </div>
+      </div>
+
+      <div class="cli-item">
+        <div class="cli-desc">SSH connection to host machine</div>
+        <div class="cli-code-row">
+          <code class="cli-code">ssh aravind@devbox.local</code>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('ssh aravind@devbox.local', 'Command copied')">Copy</button>
+        </div>
+      </div>
+
+      <div class="cli-item">
+        <div class="cli-desc">Connect to PostgreSQL via terminal</div>
+        <div class="cli-code-row">
+          <code class="cli-code">psql -h postgres.local -p 5432 -U postgres</code>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('psql -h postgres.local -p 5432 -U postgres', 'Command copied')">Copy</button>
+        </div>
+      </div>
+
+      <div class="cli-item">
+        <div class="cli-desc">Connect to Redis CLI</div>
+        <div class="cli-code-row">
+          <code class="cli-code">redis-cli -h redis.local -p 6380</code>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('redis-cli -h redis.local -p 6380', 'Command copied')">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      <strong>Devbox Ingress</strong> • Managed via <code>~/dev/dotfiles</code> &amp; Caddy Reverse Proxy
+    </div>
+    <div class="footer-links">
+      <a href="http://devbox.local/health" target="_blank">Health Check API</a>
+      <a href="javascript:void(0)" onclick="copyHostsSnippet()">Copy /etc/hosts snippet</a>
+    </div>
+  </footer>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// Service Data Definitions
+const SERVICES = [
+  {
+    id: "jellyfin",
+    name: "Jellyfin",
+    category: "media",
+    categoryName: "Media & Streaming",
+    desc: "Open source media streaming platform for movies, TV series, music, and home media.",
+    domain: "jellyfin.local",
+    url: "http://jellyfin.local",
+    probeApi: "/api/health/jellyfin",
+    directProbeUrl: "http://jellyfin.local/health",
+    port: 8096,
+    protocol: "HTTP",
+    stack: "media-server",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #7c3aed, #a855f7)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 15 5-3-5-3v6Z"></path><rect width="20" height="14" x="2" y="3" rx="2"></rect><path d="M12 17v4"></path><path d="M8 21h8"></path></svg>`
+  },
+  {
+    id: "qbittorrent",
+    name: "qBittorrent",
+    category: "media",
+    categoryName: "Media & Streaming",
+    desc: "BitTorrent client with Web UI, automated download queue, and bandwidth management.",
+    domain: "qbittorrent.local",
+    url: "http://qbittorrent.local",
+    probeApi: "/api/health/qbittorrent",
+    directProbeUrl: "http://qbittorrent.local",
+    port: 8081,
+    protocol: "HTTP",
+    stack: "media-server",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #0284c7, #38bdf8)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
+  },
+  {
+    id: "langfuse",
+    name: "Langfuse",
+    category: "apps",
+    categoryName: "AI & Apps",
+    desc: "LLM observability, prompt engineering, generation traces, and latency/cost metrics.",
+    domain: "langfuse.local",
+    url: "http://langfuse.local",
+    probeApi: "/api/health/langfuse",
+    directProbeUrl: "http://langfuse.local/health",
+    port: 3005,
+    protocol: "HTTP",
+    stack: "langfuse",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #059669, #10b981)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="M2 12h20"></path><path d="m4.93 19.07 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path></svg>`
+  },
+  {
+    id: "9router",
+    name: "9router",
+    category: "apps",
+    categoryName: "AI & Apps",
+    desc: "Universal AI model gateway, dynamic LLM proxy, load balancing, and rate limiting.",
+    domain: "9router.local",
+    url: "http://9router.local",
+    probeApi: "/api/health/9router",
+    directProbeUrl: "http://9router.local/health",
+    port: 20128,
+    protocol: "HTTP",
+    stack: "9router",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #6366f1, #818cf8)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="8" x="3" y="3" rx="2"></rect><rect width="18" height="8" x="3" y="13" rx="2"></rect><line x1="7" y1="7" x2="7.01" y2="7"></line><line x1="7" y1="17" x2="7.01" y2="17"></line><line x1="17" y1="7" x2="17.01" y2="7"></line><line x1="17" y1="17" x2="17.01" y2="17"></line></svg>`
+  },
+  {
+    id: "minio-console",
+    name: "MinIO Console",
+    category: "infra",
+    categoryName: "Storage & Infra",
+    desc: "Administrative web dashboard for S3 object storage buckets, policies, and access keys.",
+    domain: "minio-console.local",
+    url: "http://minio-console.local",
+    probeApi: "/api/health/minio-console",
+    directProbeUrl: "http://minio-console.local",
+    port: 9094,
+    protocol: "HTTP",
+    stack: "devdeps",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #e11d48, #f43f5e)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`
+  },
+  {
+    id: "minio-s3",
+    name: "MinIO S3 API",
+    category: "infra",
+    categoryName: "Storage & Infra",
+    desc: "Amazon S3-compatible high-performance object storage API endpoint.",
+    domain: "minio.local",
+    url: "http://minio.local/minio/health/live",
+    probeApi: "/api/health/minio",
+    directProbeUrl: "http://minio.local/minio/health/live",
+    port: 9092,
+    protocol: "S3 API",
+    stack: "devdeps",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #dc2626, #ef4444)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`
+  },
+  {
+    id: "clickhouse-http",
+    name: "ClickHouse HTTP",
+    category: "infra",
+    categoryName: "Storage & Infra",
+    desc: "Analytical columnar database HTTP interface and ping endpoint.",
+    domain: "clickhouse.local",
+    url: "http://clickhouse.local/ping",
+    probeApi: "/api/health/clickhouse",
+    directProbeUrl: "http://clickhouse.local/ping",
+    port: 8124,
+    protocol: "HTTP",
+    stack: "devdeps",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #d97706, #f59e0b)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`
+  },
+  {
+    id: "dgraph-http",
+    name: "Dgraph HTTP",
+    category: "infra",
+    categoryName: "Storage & Infra",
+    desc: "Distributed GraphQL and graph database HTTP query and health service.",
+    domain: "dgraph.local",
+    url: "http://dgraph.local/health",
+    probeApi: "/api/health/dgraph",
+    directProbeUrl: "http://dgraph.local/health",
+    port: 8080,
+    protocol: "GraphQL",
+    stack: "devdeps",
+    isWeb: true,
+    bgGradient: "linear-gradient(135deg, #0284c7, #0ea5e9)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>`
+  },
+  {
+    id: "postgres",
+    name: "PostgreSQL",
+    category: "tcp",
+    categoryName: "Databases (TCP)",
+    desc: "Primary relational database instance (backing Langfuse and local microservices).",
+    domain: "postgres.local:5432",
+    endpoint: "192.168.0.172:5432",
+    port: 5432,
+    protocol: "TCP",
+    stack: "devdeps",
+    isWeb: false,
+    bgGradient: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>`,
+    connectionUri: "postgresql://postgres:postgres@postgres.local:5432/postgres",
+    cliCommand: "psql -h postgres.local -p 5432 -U postgres",
+    correlatedProbeId: "langfuse"
+  },
+  {
+    id: "redis",
+    name: "Redis",
+    category: "tcp",
+    categoryName: "Databases (TCP)",
+    desc: "High-throughput in-memory data store, cache, and pub/sub message broker.",
+    domain: "redis.local:6380",
+    endpoint: "192.168.0.172:6380",
+    port: 6380,
+    protocol: "TCP",
+    stack: "devdeps",
+    isWeb: false,
+    bgGradient: "linear-gradient(135deg, #b91c1c, #ef4444)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`,
+    connectionUri: "redis://redis.local:6380",
+    cliCommand: "redis-cli -h redis.local -p 6380",
+    correlatedProbeId: "langfuse"
+  },
+  {
+    id: "clickhouse-native",
+    name: "ClickHouse Native",
+    category: "tcp",
+    categoryName: "Databases (TCP)",
+    desc: "Native binary protocol port for high-performance analytical ingestion.",
+    domain: "clickhouse.local:9002",
+    endpoint: "192.168.0.172:9002",
+    port: 9002,
+    protocol: "TCP",
+    stack: "devdeps",
+    isWeb: false,
+    bgGradient: "linear-gradient(135deg, #b45309, #f59e0b)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
+    cliCommand: "clickhouse-client --host clickhouse.local --port 9002",
+    correlatedProbeId: "clickhouse-http"
+  },
+  {
+    id: "dgraph-grpc",
+    name: "Dgraph gRPC",
+    category: "tcp",
+    categoryName: "Databases (TCP)",
+    desc: "Binary gRPC communication endpoint for high-speed Dgraph clients.",
+    domain: "dgraph.local:9080",
+    endpoint: "192.168.0.172:9080",
+    port: 9080,
+    protocol: "gRPC",
+    stack: "devdeps",
+    isWeb: false,
+    bgGradient: "linear-gradient(135deg, #0369a1, #0284c7)",
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+    cliCommand: "grpcurl -plaintext dgraph.local:9080 list",
+    correlatedProbeId: "dgraph-http"
+  }
+];
+
+let currentCategory = 'all';
+let searchQuery = '';
+const healthState = {};
+
+// Render Cards
+function renderServices() {
+  const container = document.getElementById('services-container');
+  const filtered = SERVICES.filter(service => {
+    const matchCategory = currentCategory === 'all' || service.category === currentCategory;
+    const query = searchQuery.toLowerCase().trim();
+    const matchQuery = !query || 
+      service.name.toLowerCase().includes(query) ||
+      service.desc.toLowerCase().includes(query) ||
+      service.domain.toLowerCase().includes(query) ||
+      service.port.toString().includes(query) ||
+      service.protocol.toLowerCase().includes(query) ||
+      service.stack.toLowerCase().includes(query);
+    return matchCategory && matchQuery;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 64px 20px; color: var(--text-dim);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.5;">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <p style="font-size: 16px; font-weight: 500;">No services found matching "${searchQuery}"</p>
+        <p style="font-size: 13px; margin-top: 4px;">Try searching for a different port, name, or clear filters.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Group by category if "all" is selected
+  let html = '';
+  const categories = [
+    { id: 'media', name: 'Media & Streaming' },
+    { id: 'apps', name: 'AI & Developer Apps' },
+    { id: 'infra', name: 'Storage & Infrastructure' },
+    { id: 'tcp', name: 'Databases & TCP Endpoints' }
+  ];
+
+  if (currentCategory === 'all' && !searchQuery) {
+    for (const cat of categories) {
+      const items = filtered.filter(s => s.category === cat.id);
+      if (items.length === 0) continue;
+      html += `<div class="section-title">${cat.name} (${items.length})</div>`;
+      html += `<div class="services-grid">${items.map(renderCard).join('')}</div>`;
+    }
+  } else {
+    html = `<div class="services-grid">${filtered.map(renderCard).join('')}</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function renderCard(s) {
+  const hs = healthState[s.id] || { status: 'checking', latency: null };
+  let badgeClass = 'checking';
+  let badgeText = 'Checking';
+  let latencyBadge = '';
+
+  if (hs.status === 'online') {
+    badgeClass = 'online';
+    badgeText = 'Online';
+    if (hs.latency) latencyBadge = `<span class="health-latency">• ${hs.latency}ms</span>`;
+  } else if (hs.status === 'offline') {
+    badgeClass = 'offline';
+    badgeText = 'Offline';
+  }
+
+  return `
+    <div class="card" id="card-${s.id}">
+      <div class="card-top">
+        <div class="card-title-group">
+          <div class="service-icon" style="background: ${s.bgGradient}; color: white;">
+            ${s.iconSvg}
+          </div>
+          <div>
+            <div class="service-name">${s.name}</div>
+            <div class="service-category-tag">${s.protocol} • stack: ${s.stack}</div>
+          </div>
+        </div>
+
+        <div class="health-badge ${badgeClass}" id="health-${s.id}">
+          <span class="health-dot"></span>
+          <span>${badgeText}</span>
+          ${latencyBadge}
+        </div>
+      </div>
+
+      <div class="card-desc">${s.desc}</div>
+
+      <div class="card-details">
+        <span class="endpoint-text" title="${s.domain}">${s.domain}</span>
+        <span class="endpoint-port">:${s.port}</span>
+      </div>
+
+      ${s.isWeb ? `
+        <div class="card-actions">
+          <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            <span>Open Service</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </a>
+          <button class="btn" onclick="copyToClipboard('${s.url}', '${s.name} URL copied')" title="Copy Link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+      ` : `
+        <div class="snippet-box">
+          <span class="snippet-code" title="${s.cliCommand || s.connectionUri}">${s.cliCommand || s.connectionUri}</span>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('${(s.cliCommand || s.connectionUri).replace(/'/g, "\\'")}', 'CLI command copied')">Copy CLI</button>
+        </div>
+        <div class="card-actions">
+          ${s.connectionUri ? `
+            <button class="btn" onclick="copyToClipboard('${s.connectionUri.replace(/'/g, "\\'")}', 'Connection URI copied')">
+              <span>Copy URI</span>
+            </button>
+          ` : ''}
+          <button class="btn" onclick="copyToClipboard('${s.domain}', 'Host:Port copied')">
+            <span>Copy Host</span>
+          </button>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// Health Probing Engine
+async function probeService(service) {
+  if (service.isWeb) {
+    const t0 = performance.now();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+    try {
+      // 1. Try same-origin /api/health/<service> first (instant & reliable)
+      if (service.probeApi) {
+        try {
+          const res = await fetch(service.probeApi, {
+            method: 'GET',
+            cache: 'no-store',
+            signal: controller.signal
+          });
+          if (res.ok || res.status === 200 || res.status === 204 || res.status === 403) {
+            clearTimeout(timeoutId);
+            return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
+          }
+        } catch (e) {
+          // If relative fetch fails (e.g. running from file://), fall through to direct probe
+        }
+      }
+
+      // 2. Direct probe fallback (mode: 'no-cors' resolves on any responding HTTP server)
+      await fetch(service.directProbeUrl || service.url, {
+        method: 'GET',
+        mode: 'no-cors',
+        cache: 'no-store',
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+      const latency = Math.max(1, Math.round(performance.now() - t0));
+      return { status: 'online', latency };
+    } catch (err) {
+      clearTimeout(timeoutId);
+      return { status: 'offline', error: err.name === 'AbortError' ? 'Timeout' : 'Unreachable' };
+    }
+  } else {
+    // For TCP endpoints: correlate with companion service
+    if (service.correlatedProbeId) {
+      const parent = healthState[service.correlatedProbeId];
+      if (parent && parent.status === 'online') {
+        return { status: 'online', latency: parent.latency || 2 };
+      } else if (parent && parent.status === 'offline') {
+        return { status: 'offline' };
+      }
+    }
+    return { status: 'online', latency: 2 };
+  }
+}
+
+async function probeAllHealth() {
+  const refreshIcon = document.getElementById('refresh-icon');
+  refreshIcon.style.animation = 'spin 1s linear infinite';
+
+  // Mark all checking
+  SERVICES.forEach(s => {
+    if (!healthState[s.id]) healthState[s.id] = { status: 'checking' };
+  });
+  renderServices();
+
+  // Run probes
+  const httpServices = SERVICES.filter(s => s.isWeb);
+  const tcpServices = SERVICES.filter(s => !s.isWeb);
+
+  let onlineCount = 0;
+  let totalLatency = 0;
+  let latencySamples = 0;
+
+  // Probe HTTP services first
+  await Promise.all(httpServices.map(async s => {
+    const result = await probeService(s);
+    healthState[s.id] = result;
+    if (result.status === 'online') {
+      onlineCount++;
+      if (result.latency) {
+        totalLatency += result.latency;
+        latencySamples++;
+      }
+    }
+    updateCardHealth(s.id, result);
+  }));
+
+  // Correlate TCP services
+  for (const s of tcpServices) {
+    const result = await probeService(s);
+    healthState[s.id] = result;
+    if (result.status === 'online') onlineCount++;
+    updateCardHealth(s.id, result);
+  }
+
+  // Update overall header status
+  const total = SERVICES.length;
+  const avgLatency = latencySamples > 0 ? Math.round(totalLatency / latencySamples) : 3;
+  const statusPill = document.getElementById('overall-status-pill');
+  const statusText = document.getElementById('overall-status-text');
+  const statsCount = document.getElementById('stats-online-count');
+  const statsLat = document.getElementById('stats-latency');
+
+  if (statsCount) statsCount.innerText = `${onlineCount} / ${total}`;
+  if (statsLat) statsLat.innerText = `~${avgLatency}ms`;
+
+  if (statusPill && statusText) {
+    if (onlineCount === total) {
+      statusPill.className = 'status-pill';
+      statusText.innerText = 'All Systems Operational';
+    } else if (onlineCount > 0) {
+      statusPill.className = 'status-pill';
+      statusPill.style.color = 'var(--warning)';
+      statusPill.style.background = 'var(--warning-bg)';
+      statusText.innerText = `${onlineCount}/${total} Online`;
+    } else {
+      statusPill.className = 'status-pill';
+      statusPill.style.color = 'var(--danger)';
+      statusPill.style.background = 'var(--danger-bg)';
+      statusText.innerText = 'Services Unreachable';
+    }
+  }
+
+  setTimeout(() => {
+    refreshIcon.style.animation = '';
+  }, 500);
+}
+
+function updateCardHealth(id, result) {
+  const el = document.getElementById(`health-${id}`);
+  if (!el) return;
+
+  el.className = `health-badge ${result.status}`;
+  let html = `<span class="health-dot"></span><span>${result.status === 'online' ? 'Online' : 'Offline'}</span>`;
+  if (result.status === 'online' && result.latency) {
+    html += `<span class="health-latency">• ${result.latency}ms</span>`;
+  }
+  el.innerHTML = html;
+}
+
+// Search and Filter Handlers
+function handleSearch() {
+  searchQuery = document.getElementById('search-input').value;
+  renderServices();
+}
+
+function filterCategory(cat, btn) {
+  currentCategory = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderServices();
+}
+
+// Clipboard with Toast
+function copyToClipboard(text, message = 'Copied to clipboard!') {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast(message));
+  } else {
+    const input = document.createElement('textarea');
+    input.value = text;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    showToast(message);
+  }
+}
+
+function showToast(msg) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span>${msg}</span>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 250);
+  }, 2200);
+}
+
+function copyHostsSnippet() {
+  const snippet = "192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local clickhouse.local minio.local minio-console.local dgraph.local postgres.local redis.local";
+  copyToClipboard(snippet, "/etc/hosts line copied");
+}
+
+// Theme Handling
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('devbox_theme', next);
+}
+
+// Keyboard Shortcuts
+window.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    document.getElementById('search-input').focus();
+  }
+  if (e.key === 'Escape') {
+    document.getElementById('search-input').blur();
+  }
+});
+
+// Initialization
+document.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('devbox_theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }
+  renderServices();
+  probeAllHealth();
+  // Auto-refresh every 30s
+  setInterval(probeAllHealth, 30000);
+});
+</script>
+
+<style>
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
 </body>
 </html>

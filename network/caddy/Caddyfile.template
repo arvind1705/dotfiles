@@ -23,8 +23,42 @@ http://minio-console.local {
 http://dgraph.local {
 	reverse_proxy __LAN_IP__:8080
 }
-http://devbox.local {
+http://devbox.local, http://__LAN_IP__, http://localhost, http://127.0.0.1 {
 	respond /health "OK" 200
+
+	handle /api/health/jellyfin* {
+		rewrite * /health
+		reverse_proxy __LAN_IP__:8096
+	}
+	handle /api/health/qbittorrent* {
+		rewrite * /
+		reverse_proxy __LAN_IP__:8081
+	}
+	handle /api/health/langfuse* {
+		rewrite * /api/public/health
+		reverse_proxy __LAN_IP__:3005
+	}
+	handle /api/health/9router* {
+		rewrite * /api/health
+		reverse_proxy __LAN_IP__:20128
+	}
+	handle /api/health/minio-console* {
+		rewrite * /
+		reverse_proxy __LAN_IP__:9094
+	}
+	handle /api/health/minio* {
+		rewrite * /minio/health/live
+		reverse_proxy __LAN_IP__:9092
+	}
+	handle /api/health/clickhouse* {
+		rewrite * /ping
+		reverse_proxy __LAN_IP__:8124
+	}
+	handle /api/health/dgraph* {
+		rewrite * /health
+		reverse_proxy __LAN_IP__:8080
+	}
+
 	root * /srv/devbox-index
 	file_server
 }
