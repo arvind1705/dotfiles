@@ -1,33 +1,26 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Devbox Portal | http://devbox.local</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devbox</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
 <style>
 :root {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-
-  /* Dark Theme (Default) */
   --bg-app: #0b0f17;
-  --bg-card: #111726;
-  --bg-card-hover: #151d30;
+  --bg-card: #131926;
+  --bg-card-hover: #1a2234;
   --bg-subtle: rgba(255, 255, 255, 0.04);
   --bg-subtle-hover: rgba(255, 255, 255, 0.08);
   --border: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --border-hover: rgba(99, 102, 241, 0.45);
+  --border-hover: rgba(99, 102, 241, 0.5);
 
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-tertiary: #64748b;
 
   --accent: #6366f1;
-  --accent-hover: #4f46e5;
   --accent-subtle: rgba(99, 102, 241, 0.12);
-
   --success: #10b981;
   --success-subtle: rgba(16, 185, 129, 0.12);
   --warning: #f59e0b;
@@ -37,10 +30,9 @@
 
   --radius-sm: 6px;
   --radius: 10px;
-  --radius-lg: 14px;
-
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
-  --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  --radius-pill: 9999px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 [data-theme="light"] {
@@ -50,16 +42,11 @@
   --bg-subtle: rgba(0, 0, 0, 0.03);
   --bg-subtle-hover: rgba(0, 0, 0, 0.06);
   --border: rgba(0, 0, 0, 0.08);
-  --border-subtle: rgba(0, 0, 0, 0.04);
   --border-hover: rgba(99, 102, 241, 0.5);
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-tertiary: #94a3b8;
-
-  --accent-subtle: rgba(99, 102, 241, 0.08);
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 10px 25px -4px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -69,19 +56,24 @@
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font);
   background-color: var(--bg-app);
   color: var(--text-primary);
-  line-height: 1.5;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+  transition: background-color 0.2s ease, color 0.2s ease;
   -webkit-font-smoothing: antialiased;
-  padding-bottom: 48px;
 }
 
 .container {
-  max-width: 1180px;
+  max-width: 980px;
+  width: 100%;
   margin: 0 auto;
-  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* Header */
@@ -90,10 +82,9 @@ header {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 16px;
-  padding-bottom: 24px;
+  gap: 12px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 24px;
 }
 
 .brand {
@@ -103,366 +94,222 @@ header {
 }
 
 .brand-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
   background: var(--accent);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-}
-.brand-icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.brand-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 .brand-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
-.brand-meta {
-  font-size: 12px;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.badge-tag {
+.ip-badge {
   font-family: var(--font-mono);
   font-size: 11px;
-  padding: 1px 7px;
-  border-radius: 4px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
   background: var(--bg-subtle);
-  border: 1px solid var(--border);
   color: var(--text-secondary);
+  border: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.badge-tag:hover {
-  color: var(--text-primary);
+.ip-badge:hover {
   background: var(--bg-subtle-hover);
-  border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 
-.header-controls {
+.header-right {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Status Pill */
-.status-pill {
+/* Compact Telemetry Micro-Bar */
+.stats-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stat-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
-  border-radius: 9999px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 500;
-  background: var(--success-subtle);
-  color: var(--success);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  transition: all 0.2s ease;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
 }
-.status-pill.online {
+
+.stat-pill.online {
   background: var(--success-subtle);
   color: var(--success);
   border-color: rgba(16, 185, 129, 0.25);
 }
-.status-pill.warning {
+.stat-pill.warning {
   background: var(--warning-subtle);
   color: var(--warning);
   border-color: rgba(245, 158, 11, 0.3);
 }
-.status-pill.offline {
-  background: var(--danger-subtle);
-  color: var(--danger);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-.status-dot {
-  width: 7px;
-  height: 7px;
+
+.dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: currentColor;
 }
 
-/* Button */
-.btn {
-  display: inline-flex;
+/* Icon Buttons */
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 6px 12px;
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
-  font-weight: 500;
-  cursor: pointer;
   border: 1px solid var(--border);
   background: var(--bg-card);
-  color: var(--text-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
   transition: all 0.15s ease;
-  text-decoration: none;
 }
-.btn:hover {
-  background: var(--bg-subtle-hover);
+.btn-icon:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
   border-color: var(--border-hover);
 }
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-}
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-.btn-primary:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
 
-/* Telemetry Section */
-.telemetry-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.telemetry-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.telemetry-box-top {
+/* Search Bar */
+.search-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.telemetry-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-}
-
-.telemetry-pill {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--bg-subtle);
-  color: var(--text-secondary);
-}
-
-.telemetry-value-wrap {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.telemetry-num {
-  font-size: 22px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  line-height: 1;
-}
-
-.telemetry-subtext {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bar-track {
-  width: 100%;
-  height: 4px;
-  background: var(--bg-subtle);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 9999px;
-  background: var(--accent);
-  transition: width 0.4s ease, background-color 0.3s ease;
-}
-
-/* Search and Filters */
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 20px;
 }
 
 .search-wrap {
   position: relative;
   flex: 1;
-  min-width: 240px;
-  max-width: 380px;
 }
 
-.search-icon {
+.search-wrap svg {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
   color: var(--text-tertiary);
-  pointer-events: none;
 }
 
 .search-input {
   width: 100%;
-  background: var(--bg-card);
+  padding: 8px 36px 8px 34px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 7px 32px 7px 32px;
-  font-size: 13px;
+  background: var(--bg-card);
   color: var(--text-primary);
+  font-size: 13px;
   outline: none;
   transition: border-color 0.15s ease;
 }
 .search-input:focus {
   border-color: var(--accent);
 }
-.search-input::placeholder {
-  color: var(--text-tertiary);
-}
 
 .search-kbd {
   position: absolute;
-  right: 8px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   font-family: var(--font-mono);
   font-size: 10px;
-  padding: 1px 5px;
+  padding: 2px 5px;
+  border-radius: 4px;
   background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  border-radius: 3px;
   color: var(--text-tertiary);
-  pointer-events: none;
+  border: 1px solid var(--border);
 }
 
-.filter-group {
+.filter-pills {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .filter-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 .filter-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-subtle);
 }
 .filter-btn.active {
-  color: var(--text-primary);
-  background: var(--bg-card);
-  border-color: var(--border);
-  font-weight: 600;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
-/* Category Section Header */
-.category-header {
-  font-size: 13px;
+/* Category Sections */
+.section-title {
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-tertiary);
-  margin: 28px 0 12px 0;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+/* Service Grid & Cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.card {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-.category-header:first-of-type {
-  margin-top: 8px;
-}
-.category-header::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* Cards Grid */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 12px;
-}
-
-.service-card {
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: var(--radius);
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 12px;
-  box-shadow: var(--shadow-card);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  text-align: left;
 }
-.service-card:hover {
+
+.card:hover {
   border-color: var(--border-hover);
-  box-shadow: var(--shadow-hover);
+  background: var(--bg-card-hover);
   transform: translateY(-1px);
 }
 
-.card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.card-title-wrap {
+.card-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .card-icon {
@@ -470,7 +317,6 @@ header {
   height: 32px;
   border-radius: var(--radius-sm);
   background: var(--bg-subtle);
-  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -482,243 +328,96 @@ header {
   height: 17px;
 }
 
-.card-name-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+.card-text {
+  min-width: 0;
 }
 
 .card-name {
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.card-right {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.card-stack {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
-}
-
-/* Service Status Badge */
-.health-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 7px;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 500;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  color: var(--text-tertiary);
+  gap: 8px;
   flex-shrink: 0;
+  margin-left: 8px;
 }
-.health-tag.online {
-  background: var(--success-subtle);
-  color: var(--success);
-  border-color: rgba(16, 185, 129, 0.25);
-}
-.health-tag.offline {
-  background: var(--danger-subtle);
-  color: var(--danger);
-  border-color: rgba(239, 68, 68, 0.25);
-}
-.health-tag.checking {
-  background: var(--warning-subtle);
-  color: var(--warning);
-  border-color: rgba(245, 158, 11, 0.25);
-}
-.health-dot {
-  width: 5px;
-  height: 5px;
+
+.card-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: currentColor;
+  background-color: var(--text-tertiary);
+  transition: background-color 0.2s ease;
 }
-.health-latency {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  opacity: 0.85;
+.card-dot.online {
+  background-color: var(--success);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
 }
-
-.card-desc {
-  font-size: 12.5px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.card-dot.offline {
+  background-color: var(--danger);
 }
 
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.endpoint-pill {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-secondary);
-  background: var(--bg-subtle);
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 200px;
-  cursor: pointer;
-}
-.endpoint-pill:hover {
-  color: var(--text-primary);
-  border-color: var(--border-hover);
-}
-
-.card-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-sm {
-  padding: 4px 9px;
-  font-size: 11.5px;
-  border-radius: var(--radius-sm);
-}
-
-/* Snippet row for TCP/CLI */
-.snippet-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 5px 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-.snippet-code {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text-secondary);
-}
-
-/* Collapsible Cheatsheet */
-.cheatsheet-wrap {
-  margin-top: 36px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-card);
-  overflow: hidden;
-}
-.cheatsheet-toggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-}
-.cheatsheet-toggle:hover {
-  background: var(--bg-subtle);
-}
-.cheatsheet-body {
-  padding: 0 16px 14px 16px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 8px;
-  border-top: 1px solid var(--border);
-}
-
-.cli-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+.card-action {
   font-size: 12px;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
-.cli-card code {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.card:hover .card-action {
+  opacity: 1;
+  color: var(--accent);
+  transform: translateX(1px);
 }
 
 /* Toast */
 .toast-container {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
 }
 .toast {
   background: #1e293b;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-  padding: 8px 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  padding: 7px 14px;
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0;
-  transform: translateY(10px);
-  animation: toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: toastAnim 0.2s ease forwards;
 }
-[data-theme="light"] .toast {
-  background: #0f172a;
-}
-@keyframes toastIn {
+@keyframes toastAnim {
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
-}
-@keyframes toastOut {
-  to { opacity: 0; transform: translateY(8px); }
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
 }
 
 /* Footer */
 footer {
-  margin-top: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 12px;
-  color: var(--text-tertiary);
+  margin-top: auto;
   padding-top: 18px;
   border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  color: var(--text-tertiary);
 }
 footer a {
   color: var(--text-secondary);
@@ -727,46 +426,51 @@ footer a {
 footer a:hover {
   color: var(--accent);
 }
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
 </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Clean Minimal Header -->
+  <!-- Minimal Header -->
   <header>
     <div class="brand">
       <div class="brand-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+          <rect x="2" y="14" width="20" height="8" rx="2"></rect>
           <line x1="6" y1="6" x2="6.01" y2="6"></line>
           <line x1="6" y1="18" x2="6.01" y2="18"></line>
         </svg>
       </div>
-      <div class="brand-info">
-        <div class="brand-title">Devbox Portal</div>
-        <div class="brand-meta">
-          <span>Host: <code>devbox.local</code></span>
-          <span>•</span>
-          <span class="badge-tag" onclick="copyText('192.168.0.172', 'LAN IP copied')" title="Click to copy IP">LAN: 192.168.0.172</span>
-        </div>
+      <div>
+        <div class="brand-title">Devbox</div>
       </div>
+      <span class="ip-badge" onclick="copy('192.168.0.172', 'LAN IP copied')" title="Click to copy IP">192.168.0.172</span>
     </div>
 
-    <div class="header-controls">
-      <div id="overall-status-pill" class="status-pill">
-        <span class="status-dot"></span>
-        <span id="overall-status-text">Probing services...</span>
+    <div class="header-right">
+      <div class="stats-bar">
+        <div id="status-pill" class="stat-pill">
+          <span class="dot"></span>
+          <span id="status-text">Probing...</span>
+        </div>
+        <div class="stat-pill" id="cpu-pill" title="CPU Load">CPU: --%</div>
+        <div class="stat-pill" id="ram-pill" title="RAM Usage">RAM: -- GiB</div>
+        <div class="stat-pill" id="disk-pill" title="Storage Used">Disk: --%</div>
       </div>
 
-      <button class="btn btn-icon" id="btn-refresh" title="Probe All Endpoints &amp; Refresh" onclick="refreshAll()">
-        <svg id="refresh-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="btn-icon" id="btn-refresh" title="Probe Endpoints" onclick="refreshAll()">
+        <svg id="refresh-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
         </svg>
       </button>
 
-      <button class="btn btn-icon" id="btn-theme" title="Toggle Theme" onclick="toggleTheme()">
-        <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="btn-icon" title="Toggle Theme" onclick="toggleTheme()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
           <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -774,138 +478,40 @@ footer a:hover {
           <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
           <line x1="1" y1="12" x2="3" y2="12"></line>
           <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
         </svg>
       </button>
     </div>
   </header>
 
-  <!-- Clean Minimal Telemetry Bar -->
-  <section class="telemetry-row" id="telemetry-row">
-    <!-- CPU -->
-    <div class="telemetry-box">
-      <div class="telemetry-box-top">
-        <span class="telemetry-label">CPU Load</span>
-        <span class="telemetry-pill" id="cpu-temp">--°C</span>
-      </div>
-      <div class="telemetry-value-wrap">
-        <span class="telemetry-num" id="cpu-val">--%</span>
-        <span class="telemetry-subtext" id="cpu-load">Load: --</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" id="cpu-bar" style="width: 0%;"></div>
-      </div>
-    </div>
-
-    <!-- RAM -->
-    <div class="telemetry-box">
-      <div class="telemetry-box-top">
-        <span class="telemetry-label">Memory</span>
-        <span class="telemetry-pill" id="ram-swap">Swap: --%</span>
-      </div>
-      <div class="telemetry-value-wrap">
-        <span class="telemetry-num" id="ram-val">--%</span>
-        <span class="telemetry-subtext" id="ram-sub">-- / -- GiB</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" id="ram-bar" style="width: 0%;"></div>
-      </div>
-    </div>
-
-    <!-- Storage -->
-    <div class="telemetry-box">
-      <div class="telemetry-box-top">
-        <span class="telemetry-label">Storage</span>
-        <span class="telemetry-pill" id="disk-uptime">Up: --</span>
-      </div>
-      <div class="telemetry-value-wrap">
-        <span class="telemetry-num" id="disk-val">--%</span>
-        <span class="telemetry-subtext" id="disk-sub">-- / -- GiB</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" id="disk-bar" style="width: 0%;"></div>
-      </div>
-    </div>
-
-    <!-- Activity -->
-    <div class="telemetry-box">
-      <div class="telemetry-box-top">
-        <span class="telemetry-label">Network &amp; Activity</span>
-        <span class="telemetry-pill" id="live-indicator">LIVE</span>
-      </div>
-      <div class="telemetry-value-wrap">
-        <span class="telemetry-num" style="font-size: 15px; font-weight: 600;" id="net-rates">↓ 0 KB/s • ↑ 0 KB/s</span>
-      </div>
-      <div class="telemetry-subtext" id="top-proc-text" style="margin-top: 4px;">Top Proc: --</div>
-    </div>
-  </section>
-
-  <!-- Toolbar: Search & Category Filters -->
-  <div class="toolbar">
+  <!-- Search & Category Filters -->
+  <div class="search-row">
     <div class="search-wrap">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" id="search-input" class="search-input" placeholder="Search services, ports (e.g. 8096, sql, ai)..." oninput="handleSearch()">
+      <input type="text" id="search-input" class="search-input" placeholder="Search services..." oninput="handleSearch()">
       <span class="search-kbd">/</span>
     </div>
 
-    <div class="filter-group">
-      <button class="filter-btn active" data-cat="all" onclick="setCategory('all', this)">All (12)</button>
-      <button class="filter-btn" data-cat="web" onclick="setCategory('web', this)">Web Apps (5)</button>
-      <button class="filter-btn" data-cat="api" onclick="setCategory('api', this)">APIs &amp; Storage (3)</button>
-      <button class="filter-btn" data-cat="data" onclick="setCategory('data', this)">Databases (4)</button>
+    <div class="filter-pills">
+      <button class="filter-btn active" data-cat="all" onclick="setCategory('all', this)">All</button>
+      <button class="filter-btn" data-cat="web" onclick="setCategory('web', this)">Web</button>
+      <button class="filter-btn" data-cat="api" onclick="setCategory('api', this)">API</button>
+      <button class="filter-btn" data-cat="data" onclick="setCategory('data', this)">Data</button>
     </div>
   </div>
 
-  <!-- Services Grid -->
+  <!-- Service List -->
   <main id="services-root"></main>
-
-  <!-- Clean Expandable Quick Reference -->
-  <div class="cheatsheet-wrap">
-    <button class="cheatsheet-toggle" onclick="toggleCheatsheet()">
-      <span>Terminal Commands &amp; Cheatsheet</span>
-      <svg id="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease;">
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-    </button>
-    <div class="cheatsheet-body" id="cheatsheet-body" style="display: none;">
-      <div class="cli-card">
-        <code>ssh aravind@devbox.local</code>
-        <button class="btn btn-sm" onclick="copyText('ssh aravind@devbox.local', 'SSH command copied')">Copy</button>
-      </div>
-      <div class="cli-card">
-        <code>./stacks/stacks.sh health</code>
-        <button class="btn btn-sm" onclick="copyText('./stacks/stacks.sh health', 'Health probe command copied')">Copy</button>
-      </div>
-      <div class="cli-card">
-        <code>./stacks/stacks.sh status</code>
-        <button class="btn btn-sm" onclick="copyText('./stacks/stacks.sh status', 'Status command copied')">Copy</button>
-      </div>
-      <div class="cli-card">
-        <code>psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db</code>
-        <button class="btn btn-sm" onclick="copyText('psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db', 'Postgres command copied')">Copy</button>
-      </div>
-      <div class="cli-card">
-        <code>redis-cli -h 192.168.0.172 -p 6380</code>
-        <button class="btn btn-sm" onclick="copyText('redis-cli -h 192.168.0.172 -p 6380', 'Redis command copied')">Copy</button>
-      </div>
-      <div class="cli-card">
-        <code>clickhouse-client --host 192.168.0.172 --port 9002</code>
-        <button class="btn btn-sm" onclick="copyText('clickhouse-client --host 192.168.0.172 --port 9002', 'ClickHouse command copied')">Copy</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer>
-    <div>Devbox Command Center • Caddy Reverse Proxy &amp; mDNS</div>
-    <div style="display: flex; gap: 14px;">
-      <a href="/api/system" target="_blank">System API</a>
-      <a href="/health" target="_blank">Ingress Health</a>
-      <a href="javascript:void(0)" onclick="copyHosts()">Copy /etc/hosts snippet</a>
+    <div>Devbox • Caddy &amp; mDNS Ingress</div>
+    <div style="display: flex; gap: 12px;">
+      <a href="/api/system" target="_blank">Telemetry API</a>
+      <a href="/health" target="_blank">Health</a>
+      <a href="javascript:void(0)" onclick="copy('192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local minio.local minio-console.local clickhouse.local dgraph.local postgres.local redis.local', 'Hosts snippet copied')">Hosts Snippet</a>
     </div>
   </footer>
 </div>
@@ -919,13 +525,10 @@ const SERVICES = [
     id: "jellyfin",
     name: "Jellyfin",
     cat: "web",
-    catName: "Web Applications",
-    desc: "Open source media streaming server for movies, shows, and audio.",
-    domain: "jellyfin.local",
+    port: 8096,
+    meta: "jellyfin.local:8096",
     url: "http://jellyfin.local",
     probeApi: "/api/health/jellyfin",
-    port: 8096,
-    stack: "media-server",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10 15 5-3-5-3v6Z"></path><rect width="20" height="14" x="2" y="3" rx="2"></rect><path d="M12 17v4"></path><path d="M8 21h8"></path></svg>`
   },
@@ -933,13 +536,10 @@ const SERVICES = [
     id: "qbittorrent",
     name: "qBittorrent",
     cat: "web",
-    catName: "Web Applications",
-    desc: "Torrent client with Web UI, automated download queue, and management.",
-    domain: "qbittorrent.local",
+    port: 8081,
+    meta: "qbittorrent.local:8081",
     url: "http://qbittorrent.local",
     probeApi: "/api/health/qbittorrent",
-    port: 8081,
-    stack: "media-server",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
   },
@@ -947,13 +547,10 @@ const SERVICES = [
     id: "langfuse",
     name: "Langfuse",
     cat: "web",
-    catName: "Web Applications",
-    desc: "LLM observability, prompt engineering, tracing, and metrics dashboard.",
-    domain: "langfuse.local",
+    port: 3005,
+    meta: "langfuse.local:3005",
     url: "http://langfuse.local",
     probeApi: "/api/health/langfuse",
-    port: 3005,
-    stack: "langfuse",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"></path><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="M2 12h20"></path><path d="m4.93 19.07 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path></svg>`
   },
@@ -961,13 +558,10 @@ const SERVICES = [
     id: "9router",
     name: "9router",
     cat: "web",
-    catName: "Web Applications",
-    desc: "Universal AI model gateway, dynamic LLM proxy, and rate limiter.",
-    domain: "9router.local",
+    port: 20128,
+    meta: "9router.local:20128",
     url: "http://9router.local",
     probeApi: "/api/health/9router",
-    port: 20128,
-    stack: "9router",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="8" x="3" y="3" rx="2"></rect><rect width="18" height="8" x="3" y="13" rx="2"></rect><line x1="7" y1="7" x2="7.01" y2="7"></line><line x1="7" y1="17" x2="7.01" y2="17"></line></svg>`
   },
@@ -975,13 +569,10 @@ const SERVICES = [
     id: "minio-console",
     name: "MinIO Console",
     cat: "web",
-    catName: "Web Applications",
-    desc: "Administrative web dashboard for S3 object storage buckets & policies.",
-    domain: "minio-console.local",
+    port: 9094,
+    meta: "minio-console.local:9094",
     url: "http://minio-console.local",
     probeApi: "/api/health/minio-console",
-    port: 9094,
-    stack: "devdeps",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`
   },
@@ -989,47 +580,38 @@ const SERVICES = [
   // --- APIs & Storage ---
   {
     id: "minio-s3",
-    name: "MinIO S3 API",
+    name: "MinIO S3",
     cat: "api",
-    catName: "APIs & Infrastructure",
-    desc: "High-performance S3-compatible object storage HTTP API endpoint.",
-    domain: "minio.local",
-    url: "http://minio.local",
-    probeApi: "/api/health/minio",
     port: 9092,
-    stack: "devdeps",
+    meta: "minio.local:9092",
+    probeApi: "/api/health/minio",
     isWeb: false,
-    cli: "http://minio.local:9092",
+    copyVal: "http://minio.local:9092",
+    copyMsg: "MinIO S3 URL copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`
   },
   {
     id: "clickhouse-http",
     name: "ClickHouse HTTP",
     cat: "api",
-    catName: "APIs & Infrastructure",
-    desc: "Analytical columnar database HTTP interface and ping query API.",
-    domain: "clickhouse.local",
-    url: "http://clickhouse.local/ping",
-    probeApi: "/api/health/clickhouse",
     port: 8124,
-    stack: "devdeps",
+    meta: "clickhouse.local:8124",
+    probeApi: "/api/health/clickhouse",
     isWeb: false,
-    cli: "curl http://clickhouse.local:8124/ping",
+    copyVal: "curl http://clickhouse.local:8124/ping",
+    copyMsg: "ClickHouse ping command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`
   },
   {
     id: "dgraph-http",
     name: "Dgraph HTTP",
     cat: "api",
-    catName: "APIs & Infrastructure",
-    desc: "Distributed GraphQL and graph database HTTP query and health service.",
-    domain: "dgraph.local",
-    url: "http://dgraph.local/health",
-    probeApi: "/api/health/dgraph",
     port: 8080,
-    stack: "devdeps",
+    meta: "dgraph.local:8080",
+    probeApi: "/api/health/dgraph",
     isWeb: false,
-    cli: "curl http://dgraph.local:8080/health",
+    copyVal: "curl http://dgraph.local:8080/health",
+    copyMsg: "Dgraph health command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>`
   },
 
@@ -1038,52 +620,44 @@ const SERVICES = [
     id: "postgres",
     name: "PostgreSQL",
     cat: "data",
-    catName: "Databases & TCP",
-    desc: "Primary relational database instance (port 5432, backing Langfuse).",
-    domain: "postgres.local:5432",
     port: 5432,
-    stack: "devdeps",
+    meta: "postgres.local:5432",
     isWeb: false,
-    cli: "psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db",
+    copyVal: "psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db",
+    copyMsg: "psql command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>`
   },
   {
     id: "redis",
     name: "Redis",
     cat: "data",
-    catName: "Databases & TCP",
-    desc: "High-throughput in-memory data cache and pub/sub message broker.",
-    domain: "redis.local:6380",
     port: 6380,
-    stack: "devdeps",
+    meta: "redis.local:6380",
     isWeb: false,
-    cli: "redis-cli -h 192.168.0.172 -p 6380",
+    copyVal: "redis-cli -h 192.168.0.172 -p 6380",
+    copyMsg: "redis-cli command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
   },
   {
     id: "clickhouse-native",
     name: "ClickHouse Native",
     cat: "data",
-    catName: "Databases & TCP",
-    desc: "Native binary protocol port for high-performance analytical ingestion.",
-    domain: "clickhouse.local:9002",
     port: 9002,
-    stack: "devdeps",
+    meta: "clickhouse.local:9002",
     isWeb: false,
-    cli: "clickhouse-client --host 192.168.0.172 --port 9002",
+    copyVal: "clickhouse-client --host 192.168.0.172 --port 9002",
+    copyMsg: "clickhouse-client command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`
   },
   {
     id: "dgraph-grpc",
     name: "Dgraph gRPC",
     cat: "data",
-    catName: "Databases & TCP",
-    desc: "High-speed binary gRPC communication endpoint for graph clients.",
-    domain: "dgraph.local:9080",
     port: 9080,
-    stack: "devdeps",
+    meta: "dgraph.local:9080",
     isWeb: false,
-    cli: "grpcurl -plaintext 192.168.0.172:9080 list",
+    copyVal: "grpcurl -plaintext 192.168.0.172:9080 list",
+    copyMsg: "grpcurl command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`
   }
 ];
@@ -1091,33 +665,25 @@ const SERVICES = [
 let currentCat = 'all';
 let searchFilter = '';
 const healthMap = {};
+let latestTcpServices = {};
 
 function render() {
   const root = document.getElementById('services-root');
   const filtered = SERVICES.filter(s => {
     const matchCat = currentCat === 'all' || s.cat === currentCat;
     const q = searchFilter.toLowerCase().trim();
-    const matchQ = !q ||
-      s.name.toLowerCase().includes(q) ||
-      s.desc.toLowerCase().includes(q) ||
-      s.domain.toLowerCase().includes(q) ||
-      s.port.toString().includes(q) ||
-      s.stack.toLowerCase().includes(q);
+    const matchQ = !q || s.name.toLowerCase().includes(q) || s.meta.toLowerCase().includes(q);
     return matchCat && matchQ;
   });
 
   if (filtered.length === 0) {
-    root.innerHTML = `
-      <div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary);">
-        <p style="font-size: 14px; font-weight: 500;">No services match "${searchFilter}"</p>
-      </div>
-    `;
+    root.innerHTML = `<div style="text-align:center; padding:32px 0; color:var(--text-tertiary); font-size:13px;">No services found</div>`;
     return;
   }
 
   const sections = [
     { id: 'web', title: 'Web Applications' },
-    { id: 'api', title: 'APIs & Infrastructure' },
+    { id: 'api', title: 'APIs & Storage' },
     { id: 'data', title: 'Databases & TCP' }
   ];
 
@@ -1126,11 +692,11 @@ function render() {
     for (const sec of sections) {
       const items = filtered.filter(s => s.cat === sec.id);
       if (items.length === 0) continue;
-      html += `<div class="category-header">${sec.title} (${items.length})</div>`;
-      html += `<div class="cards-grid">${items.map(renderCard).join('')}</div>`;
+      html += `<div class="section-title">${sec.title}</div>`;
+      html += `<div class="grid">${items.map(renderCard).join('')}</div>`;
     }
   } else {
-    html = `<div class="cards-grid">${filtered.map(renderCard).join('')}</div>`;
+    html = `<div class="grid">${filtered.map(renderCard).join('')}</div>`;
   }
 
   root.innerHTML = html;
@@ -1138,69 +704,47 @@ function render() {
 
 function renderCard(s) {
   const h = healthMap[s.id] || { status: 'checking' };
-  let statusClass = 'checking';
-  let statusText = 'Checking';
-  let latencyText = '';
+  const isOnline = h.status === 'online';
+  const dotClass = isOnline ? 'online' : (h.status === 'offline' ? 'offline' : '');
 
-  if (h.status === 'online') {
-    statusClass = 'online';
-    statusText = 'Online';
-    if (h.latency) latencyText = `<span class="health-latency">${h.latency}ms</span>`;
-  } else if (h.status === 'offline') {
-    statusClass = 'offline';
-    statusText = 'Offline';
+  if (s.isWeb) {
+    return `
+      <a href="${s.url}" target="_blank" rel="noopener" class="card" id="card-${s.id}">
+        <div class="card-left">
+          <div class="card-icon">${s.icon}</div>
+          <div class="card-text">
+            <div class="card-name">${s.name}</div>
+            <div class="card-meta">${s.meta}</div>
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${isOnline ? 'Online' : 'Checking'}"></span>
+          <span class="card-action">↗</span>
+        </div>
+      </a>
+    `;
+  } else {
+    const val = (s.copyVal || s.meta).replace(/'/g, "\\'");
+    const msg = (s.copyMsg || 'Copied').replace(/'/g, "\\'");
+    return `
+      <div class="card" id="card-${s.id}" onclick="copy('${val}', '${msg}')" title="Click to copy connection command">
+        <div class="card-left">
+          <div class="card-icon">${s.icon}</div>
+          <div class="card-text">
+            <div class="card-name">${s.name}</div>
+            <div class="card-meta">${s.meta}</div>
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${isOnline ? 'Online' : 'Checking'}"></span>
+          <span class="card-action">📋</span>
+        </div>
+      </div>
+    `;
   }
-
-  return `
-    <div class="service-card" id="card-${s.id}">
-      <div>
-        <div class="card-top">
-          <div class="card-title-wrap">
-            <div class="card-icon">${s.icon}</div>
-            <div class="card-name-group">
-              <div class="card-name">
-                ${s.name}
-              </div>
-              <div class="card-stack">:${s.port} • ${s.stack}</div>
-            </div>
-          </div>
-          <div class="health-tag ${statusClass}" id="health-${s.id}">
-            <span class="health-dot"></span>
-            <span>${statusText}</span>
-            ${latencyText}
-          </div>
-        </div>
-
-        <p class="card-desc" style="margin-top: 10px;">${s.desc}</p>
-      </div>
-
-      <div>
-        ${s.cli ? `
-          <div class="snippet-row" style="margin-bottom: 10px;">
-            <span class="snippet-code" title="${s.cli}">${s.cli}</span>
-            <button class="btn btn-sm" onclick="copyText('${s.cli.replace(/'/g, "\\'")}', 'CLI command copied')">Copy</button>
-          </div>
-        ` : ''}
-
-        <div class="card-footer">
-          <span class="endpoint-pill" onclick="copyText('${s.domain}', 'Host copied')" title="Click to copy host: ${s.domain}">
-            ${s.domain}
-          </span>
-          <div class="card-actions">
-            ${s.isWeb ? `
-              <button class="btn btn-sm" onclick="copyText('${s.url}', 'Link copied')" title="Copy URL">Copy</button>
-              <a href="${s.url}" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Open ↗</a>
-            ` : `
-              <button class="btn btn-sm" onclick="copyText('${s.domain}', 'Host copied')">Copy Host</button>
-            `}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
 }
 
-// Search & Filter
+// Search & Category Filters
 function handleSearch() {
   searchFilter = document.getElementById('search-input').value;
   render();
@@ -1213,33 +757,16 @@ function setCategory(cat, btn) {
   render();
 }
 
-// Cheatsheet Collapse
-function toggleCheatsheet() {
-  const body = document.getElementById('cheatsheet-body');
-  const chevron = document.getElementById('chevron-icon');
-  if (body.style.display === 'none') {
-    body.style.display = 'grid';
-    chevron.style.transform = 'rotate(180deg)';
-  } else {
-    body.style.display = 'none';
-    chevron.style.transform = 'rotate(0deg)';
-  }
-}
-
-// Health Probing
-let latestTcpServices = {};
-
+// Probing & Health
 async function probeOne(service) {
   if (latestTcpServices && latestTcpServices[service.id] !== undefined) {
-    const isUp = latestTcpServices[service.id];
-    return { status: isUp ? 'online' : 'offline', latency: 1 };
+    return { status: latestTcpServices[service.id] ? 'online' : 'offline', latency: 1 };
   }
 
   if (service.probeApi) {
     const t0 = performance.now();
     const ctrl = new AbortController();
     const timeout = setTimeout(() => ctrl.abort(), 4000);
-
     try {
       const res = await fetch(service.probeApi, { method: 'GET', cache: 'no-store', signal: ctrl.signal });
       clearTimeout(timeout);
@@ -1264,7 +791,6 @@ async function probeOne(service) {
     }
   }
 
-  // Soft hysteresis: if previously online, give 1 grace poll before marking offline
   const prev = healthMap[service.id];
   if (prev && prev.status === 'online' && !prev._failedOnce) {
     return { status: 'online', latency: prev.latency || 20, _failedOnce: true };
@@ -1274,69 +800,45 @@ async function probeOne(service) {
 }
 
 async function probeAll() {
-  const refreshIcon = document.getElementById('refresh-icon');
-  if (refreshIcon) refreshIcon.style.animation = 'spin 0.8s linear infinite';
-
-  SERVICES.forEach(s => {
-    if (!healthMap[s.id]) healthMap[s.id] = { status: 'checking' };
-  });
-  render();
+  const icon = document.getElementById('refresh-icon');
+  if (icon) icon.style.animation = 'spin 0.8s linear infinite';
 
   let onlineCount = 0;
-  const webAndApis = SERVICES.filter(s => s.probeApi || s.isWeb);
-  const others = SERVICES.filter(s => !s.probeApi && !s.isWeb);
-
-  await Promise.all(webAndApis.map(async s => {
-    const res = await probeOne(s);
-    healthMap[s.id] = res;
-    if (res.status === 'online') onlineCount++;
-    updateCardTag(s.id, res);
-  }));
-
-  for (const s of others) {
-    const res = await probeOne(s);
-    healthMap[s.id] = res;
-    if (res.status === 'online') onlineCount++;
-    updateCardTag(s.id, res);
-  }
-
-  const statusPill = document.getElementById('overall-status-pill');
-  const statusText = document.getElementById('overall-status-text');
   const total = SERVICES.length;
 
-  if (statusPill && statusText) {
-    statusPill.removeAttribute('style');
+  await Promise.all(SERVICES.map(async s => {
+    const res = await probeOne(s);
+    healthMap[s.id] = res;
+    if (res.status === 'online') onlineCount++;
+    updateDot(s.id, res.status === 'online');
+  }));
+
+  const pill = document.getElementById('status-pill');
+  const txt = document.getElementById('status-text');
+  if (pill && txt) {
+    pill.removeAttribute('style');
     if (onlineCount === total) {
-      statusPill.className = 'status-pill online';
-      statusText.innerText = `All ${total} Services Online`;
+      pill.className = 'stat-pill online';
+      txt.innerText = `All ${total} Online`;
     } else if (onlineCount > 0) {
-      statusPill.className = 'status-pill warning';
-      statusText.innerText = `${onlineCount}/${total} Online`;
+      pill.className = 'stat-pill warning';
+      txt.innerText = `${onlineCount}/${total} Online`;
     } else {
-      statusPill.className = 'status-pill offline';
-      statusText.innerText = `All Services Offline`;
+      pill.className = 'stat-pill';
+      txt.innerText = `Offline`;
     }
   }
 
-  if (refreshIcon) setTimeout(() => { refreshIcon.style.animation = ''; }, 400);
+  if (icon) setTimeout(() => { icon.style.animation = ''; }, 400);
 }
 
-function updateCardTag(id, res) {
-  const el = document.getElementById(`health-${id}`);
-  if (!el) return;
-  el.className = `health-tag ${res.status}`;
-  let lat = res.status === 'online' && res.latency ? `<span class="health-latency">${res.latency}ms</span>` : '';
-  el.innerHTML = `<span class="health-dot"></span><span>${res.status === 'online' ? 'Online' : 'Offline'}</span>${lat}`;
+function updateDot(id, isOnline) {
+  const dot = document.getElementById(`dot-${id}`);
+  if (!dot) return;
+  dot.className = `card-dot ${isOnline ? 'online' : 'offline'}`;
 }
 
 // Telemetry Polling
-function formatBytes(b) {
-  if (!b || b <= 0) return '0 B';
-  const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(b) / Math.log(k));
-  return parseFloat((b / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-}
-
 async function fetchTelemetry() {
   if (document.visibilityState !== 'visible') return;
   try {
@@ -1345,118 +847,28 @@ async function fetchTelemetry() {
     const d = await res.json();
     if (d.tcp_services) {
       latestTcpServices = d.tcp_services;
-      for (const [svcId, isUp] of Object.entries(d.tcp_services)) {
-        const update = { status: isUp ? 'online' : 'offline', latency: 1 };
-        healthMap[svcId] = update;
-        updateCardTag(svcId, update);
+      for (const [id, isUp] of Object.entries(d.tcp_services)) {
+        healthMap[id] = { status: isUp ? 'online' : 'offline' };
+        updateDot(id, isUp);
       }
     }
-    updateTelemetry(d);
+
+    if (d.cpu) {
+      const el = document.getElementById('cpu-pill');
+      if (el) el.innerText = `CPU: ${d.cpu.percent ? d.cpu.percent.toFixed(0) : 0}%`;
+    }
+    if (d.memory) {
+      const el = document.getElementById('ram-pill');
+      const gib = 1024 * 1024 * 1024;
+      if (el && d.memory.used) {
+        el.innerText = `RAM: ${(d.memory.used / gib).toFixed(1)}G`;
+      }
+    }
+    if (d.disk) {
+      const el = document.getElementById('disk-pill');
+      if (el && d.disk.percent !== undefined) el.innerText = `Disk: ${d.disk.percent.toFixed(0)}%`;
+    }
   } catch (e) {}
-}
-
-function updateTelemetry(d) {
-  if (!d) return;
-
-  // CPU
-  if (d.cpu) {
-    const pct = d.cpu.percent || 0;
-    const elVal = document.getElementById('cpu-val');
-    const elBar = document.getElementById('cpu-bar');
-    const elTemp = document.getElementById('cpu-temp');
-    const elLoad = document.getElementById('cpu-load');
-
-    if (elVal) elVal.innerText = `${pct.toFixed(1)}%`;
-    if (elBar) {
-      elBar.style.width = `${Math.min(100, pct)}%`;
-      elBar.style.backgroundColor = pct > 80 ? 'var(--danger)' : pct > 60 ? 'var(--warning)' : 'var(--accent)';
-    }
-    if (elTemp && d.cpu.temp) elTemp.innerText = `${d.cpu.temp}°C`;
-    if (elLoad && d.cpu.load) elLoad.innerText = `Load: ${d.cpu.load.map(l => l.toFixed(1)).join(', ')}`;
-  }
-
-  // RAM
-  if (d.memory) {
-    const GiB = 1024 * 1024 * 1024;
-    const pct = d.memory.percent || 0;
-    const elVal = document.getElementById('ram-val');
-    const elBar = document.getElementById('ram-bar');
-    const elSub = document.getElementById('ram-sub');
-    const elSwap = document.getElementById('ram-swap');
-
-    if (elVal) elVal.innerText = `${pct.toFixed(1)}%`;
-    if (elBar) {
-      elBar.style.width = `${Math.min(100, pct)}%`;
-      elBar.style.backgroundColor = pct > 85 ? 'var(--danger)' : pct > 70 ? 'var(--warning)' : 'var(--accent)';
-    }
-    if (elSub && d.memory.total) {
-      elSub.innerText = `${(d.memory.used / GiB).toFixed(1)} / ${(d.memory.total / GiB).toFixed(1)} GiB`;
-    }
-    if (elSwap && d.memory.swap_percent !== undefined) elSwap.innerText = `Swap: ${d.memory.swap_percent}%`;
-  }
-
-  // Disk
-  if (d.disk) {
-    const GiB = 1024 * 1024 * 1024;
-    const pct = d.disk.percent || 0;
-    const elVal = document.getElementById('disk-val');
-    const elBar = document.getElementById('disk-bar');
-    const elSub = document.getElementById('disk-sub');
-    const elUp = document.getElementById('disk-uptime');
-
-    if (elVal) elVal.innerText = `${pct.toFixed(1)}%`;
-    if (elBar) elBar.style.width = `${Math.min(100, pct)}%`;
-    if (elSub && d.disk.total) {
-      elSub.innerText = `${(d.disk.used / GiB).toFixed(0)} / ${(d.disk.total / GiB).toFixed(0)} GiB`;
-    }
-    if (elUp && d.uptime_seconds) {
-      const h = Math.floor(d.uptime_seconds / 3600);
-      const m = Math.floor((d.uptime_seconds % 3600) / 60);
-      elUp.innerText = `Up: ${h}h ${m}m`;
-    }
-  }
-
-  // Activity / Network
-  if (d.network) {
-    const elNet = document.getElementById('net-rates');
-    if (elNet) elNet.innerText = `↓ ${formatBytes(d.network.rx_rate)}/s • ↑ ${formatBytes(d.network.tx_rate)}/s`;
-  }
-  if (d.top_processes && d.top_processes.length > 0) {
-    const elProc = document.getElementById('top-proc-text');
-    if (elProc) {
-      const p = d.top_processes[0];
-      elProc.innerText = `Top: ${p.name} (${p.cpu.toFixed(0)}% CPU, PID ${p.pid})`;
-    }
-  }
-}
-
-// Helpers
-function copyText(text, msg) {
-  navigator.clipboard.writeText(text).then(() => showToast(msg || 'Copied to clipboard'));
-}
-
-function copyHosts() {
-  const snippet = `192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local minio.local minio-console.local clickhouse.local dgraph.local postgres.local redis.local`;
-  copyText(snippet, 'Hosts snippet copied');
-}
-
-function showToast(msg) {
-  const root = document.getElementById('toast-root');
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><span>${msg}</span>`;
-  root.appendChild(t);
-  setTimeout(() => {
-    t.style.animation = 'toastOut 0.2s forwards';
-    setTimeout(() => t.remove(), 200);
-  }, 2200);
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'light' ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('devbox_theme', next);
 }
 
 function refreshAll() {
@@ -1464,7 +876,30 @@ function refreshAll() {
   fetchTelemetry();
 }
 
-// Key shortcut '/' to focus search
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('devbox_theme', next);
+}
+
+function copy(text, msg) {
+  navigator.clipboard.writeText(text).then(() => showToast(msg || 'Copied'));
+}
+
+function showToast(msg) {
+  const root = document.getElementById('toast-root');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerText = msg;
+  root.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transition = 'opacity 0.2s ease';
+    setTimeout(() => t.remove(), 200);
+  }, 1800);
+}
+
 document.addEventListener('keydown', (e) => {
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
     e.preventDefault();
@@ -1472,10 +907,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Initialization
 document.addEventListener('DOMContentLoaded', () => {
-  const savedTheme = localStorage.getItem('devbox_theme');
-  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  const saved = localStorage.getItem('devbox_theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
 
   render();
   probeAll();
