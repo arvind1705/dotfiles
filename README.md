@@ -58,6 +58,7 @@ Or install specific components selectively:
 │   ├── setup-network.sh        # Ingress installer & legacy mDNS cleanup
 │   ├── caddy/Caddyfile.template# Reverse proxy for all *.local endpoints
 │   ├── mdns/update-mdns.sh     # Dynamic IP detection & /etc/avahi/hosts updater
+│   ├── metrics/                # Lightweight btop-style system telemetry daemon
 │   └── portal/index.html       # Landing page dashboard at http://devbox.local
 │
 └── stacks/                     # Docker Compose infrastructure

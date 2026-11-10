@@ -128,7 +128,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .header-top {
   display: flex;
@@ -214,6 +214,15 @@ header {
   border: 1px solid rgba(16, 185, 129, 0.25);
   backdrop-filter: blur(8px);
 }
+.badge-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
 .pulse-dot {
   width: 8px;
   height: 8px;
@@ -281,7 +290,7 @@ header {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 .stat-card {
   background: var(--bg-card);
@@ -336,6 +345,176 @@ header {
   font-size: 11.5px;
   color: var(--text-dim);
   font-weight: 400;
+}
+
+/* System Telemetry Section (btop style) */
+.telemetry-section {
+  margin-bottom: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+}
+.telemetry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.telemetry-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.telemetry-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.telemetry-icon-box svg {
+  width: 20px;
+  height: 20px;
+}
+.telemetry-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.telemetry-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  font-weight: 600;
+}
+.telemetry-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  margin-top: 1px;
+}
+.telemetry-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.telemetry-card {
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.telemetry-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.telemetry-card-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.telemetry-val-large {
+  font-size: 26px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.meter-bar-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+[data-theme="light"] .meter-bar-track {
+  background: rgba(0, 0, 0, 0.07);
+}
+.meter-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease, background-color 0.3s ease;
+}
+.telemetry-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+.proc-table-wrapper {
+  overflow-x: auto;
+  max-height: 130px;
+}
+.proc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+.proc-table th {
+  text-align: left;
+  color: var(--text-dim);
+  font-weight: 600;
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 10.5px;
+}
+.proc-table td {
+  padding: 4px 6px;
+  color: var(--text-main);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.proc-cpu-badge {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary);
+  font-weight: 600;
 }
 
 /* Search and Filters */
@@ -776,6 +955,8 @@ footer {
             <span>•</span>
             <span class="system-badge">Host: <code>devbox.local</code></span>
             <span class="system-badge" style="cursor:pointer;" onclick="copyToClipboard('192.168.0.172', 'LAN IP copied')" title="Click to copy IP">LAN: <code>192.168.0.172</code></span>
+            <span class="system-badge" id="header-cpu-pill" style="display:none;">CPU: <code id="header-cpu-val">--%</code></span>
+            <span class="system-badge" id="header-mem-pill" style="display:none;">RAM: <code id="header-mem-val">--%</code></span>
           </p>
         </div>
       </div>
@@ -786,7 +967,7 @@ footer {
           <span id="overall-status-text">Checking Services...</span>
         </div>
 
-        <button class="btn btn-icon" id="btn-refresh" title="Probe All Endpoints" onclick="probeAllHealth()">
+        <button class="btn btn-icon" id="btn-refresh" title="Probe All Endpoints &amp; Refresh" onclick="refreshAll()">
           <svg id="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
           </svg>
@@ -865,27 +1046,128 @@ footer {
         </div>
       </div>
     </div>
+  </header>
 
-    <!-- Search & Filter Toolbar -->
-    <div class="toolbar">
-      <div class="search-container">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" id="search-input" class="search-input" placeholder="Search services, ports, tags (e.g. sql, ai, 8080)..." oninput="handleSearch()">
-        <span class="search-shortcut">/</span>
+  <!-- System Telemetry Section (btop style) -->
+  <section class="telemetry-section" id="telemetry-section">
+    <div class="telemetry-header">
+      <div class="telemetry-title-group">
+        <div class="telemetry-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="telemetry-title">
+            <span>Hardware &amp; System Telemetry</span>
+            <span class="telemetry-badge">btop live</span>
+          </div>
+          <div class="telemetry-sub" id="telemetry-cpu-name">Intel Core i7 • Linux x86_64</div>
+        </div>
       </div>
 
-      <div class="filter-tabs">
-        <button class="filter-btn active" data-category="all" onclick="filterCategory('all', this)">All (10)</button>
-        <button class="filter-btn" data-category="media" onclick="filterCategory('media', this)">Media (2)</button>
-        <button class="filter-btn" data-category="apps" onclick="filterCategory('apps', this)">AI &amp; Apps (2)</button>
-        <button class="filter-btn" data-category="infra" onclick="filterCategory('infra', this)">Storage &amp; Infra (4)</button>
-        <button class="filter-btn" data-category="tcp" onclick="filterCategory('tcp', this)">Databases / TCP (4)</button>
+      <div class="telemetry-controls">
+        <div class="live-pill" id="live-indicator">
+          <span class="pulse-dot"></span>
+          <span id="live-text">LIVE 2s</span>
+        </div>
+        <button class="btn-copy-tiny" id="btn-toggle-telemetry" onclick="toggleTelemetryCollapse()">Collapse</button>
       </div>
     </div>
-  </header>
+
+    <div class="telemetry-grid" id="telemetry-grid">
+      <!-- CPU Box -->
+      <div class="telemetry-card">
+        <div class="telemetry-card-top">
+          <span class="telemetry-card-label">CPU Utilization</span>
+          <span class="badge-pill" id="telemetry-temp-badge">--°C</span>
+        </div>
+        <div class="telemetry-val-large" id="telemetry-cpu-val">--%</div>
+        <div class="meter-bar-track">
+          <div class="meter-bar-fill" id="telemetry-cpu-bar" style="width: 0%; background-color: var(--success);"></div>
+        </div>
+        <div class="telemetry-meta-row">
+          <span>Load: <span id="telemetry-load-val">-- / -- / --</span></span>
+          <span><span id="telemetry-cores-val">4</span> Cores</span>
+        </div>
+      </div>
+
+      <!-- Memory Box -->
+      <div class="telemetry-card">
+        <div class="telemetry-card-top">
+          <span class="telemetry-card-label">Memory (RAM)</span>
+          <span class="badge-pill" id="telemetry-swap-badge">Swap: --%</span>
+        </div>
+        <div class="telemetry-val-large" id="telemetry-mem-val">--%</div>
+        <div class="meter-bar-track">
+          <div class="meter-bar-fill" id="telemetry-mem-bar" style="width: 0%; background-color: var(--primary);"></div>
+        </div>
+        <div class="telemetry-meta-row">
+          <span id="telemetry-mem-breakdown">RAM: -- / -- GB</span>
+          <span>Avail: <span id="telemetry-mem-avail">-- GB</span></span>
+        </div>
+      </div>
+
+      <!-- Storage & Network Box -->
+      <div class="telemetry-card">
+        <div class="telemetry-card-top">
+          <span class="telemetry-card-label">Disk &amp; Network</span>
+          <span class="badge-pill" id="telemetry-uptime-badge">Up: --</span>
+        </div>
+        <div class="telemetry-val-large" id="telemetry-disk-val">--%</div>
+        <div class="meter-bar-track">
+          <div class="meter-bar-fill" id="telemetry-disk-bar" style="width: 0%; background-color: #f59e0b;"></div>
+        </div>
+        <div class="telemetry-meta-row">
+          <span id="telemetry-disk-breakdown">Root: -- / -- GB</span>
+          <span id="telemetry-net-rate">↓ 0 KB/s • ↑ 0 KB/s</span>
+        </div>
+      </div>
+
+      <!-- Top Active Processes (btop table) -->
+      <div class="telemetry-card">
+        <div class="telemetry-card-top">
+          <span class="telemetry-card-label">Top Processes</span>
+          <span class="badge-pill">by CPU%</span>
+        </div>
+        <div class="proc-table-wrapper">
+          <table class="proc-table">
+            <thead>
+              <tr>
+                <th>CMD</th>
+                <th style="text-align: right;">PID</th>
+                <th style="text-align: right;">CPU%</th>
+                <th style="text-align: right;">MEM%</th>
+              </tr>
+            </thead>
+            <tbody id="telemetry-procs-body">
+              <tr><td colspan="4" style="text-align:center; color:var(--text-dim); padding: 12px 0;">Loading telemetry...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Filter Toolbar -->
+  <div class="toolbar">
+    <div class="search-container">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="search-input" class="search-input" placeholder="Search services, ports, tags (e.g. sql, ai, 8080)..." oninput="handleSearch()">
+      <span class="search-shortcut">/</span>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="filter-btn active" data-category="all" onclick="filterCategory('all', this)">All (10)</button>
+      <button class="filter-btn" data-category="media" onclick="filterCategory('media', this)">Media (2)</button>
+      <button class="filter-btn" data-category="apps" onclick="filterCategory('apps', this)">AI &amp; Apps (2)</button>
+      <button class="filter-btn" data-category="infra" onclick="filterCategory('infra', this)">Storage &amp; Infra (4)</button>
+      <button class="filter-btn" data-category="tcp" onclick="filterCategory('tcp', this)">Databases / TCP (4)</button>
+    </div>
+  </div>
 
   <!-- Main Content Grid -->
   <main id="services-container">
@@ -923,6 +1205,14 @@ footer {
       </div>
 
       <div class="cli-item">
+        <div class="cli-desc">Launch btop live monitor in terminal</div>
+        <div class="cli-code-row">
+          <code class="cli-code">btop</code>
+          <button class="btn-copy-tiny" onclick="copyToClipboard('btop', 'Command copied')">Copy</button>
+        </div>
+      </div>
+
+      <div class="cli-item">
         <div class="cli-desc">Tail logs for AI gateway stack</div>
         <div class="cli-code-row">
           <code class="cli-code">./stacks/stacks.sh logs 9router</code>
@@ -945,14 +1235,6 @@ footer {
           <button class="btn-copy-tiny" onclick="copyToClipboard('psql -h postgres.local -p 5432 -U postgres', 'Command copied')">Copy</button>
         </div>
       </div>
-
-      <div class="cli-item">
-        <div class="cli-desc">Connect to Redis CLI</div>
-        <div class="cli-code-row">
-          <code class="cli-code">redis-cli -h redis.local -p 6380</code>
-          <button class="btn-copy-tiny" onclick="copyToClipboard('redis-cli -h redis.local -p 6380', 'Command copied')">Copy</button>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -962,6 +1244,7 @@ footer {
       <strong>Devbox Ingress</strong> • Managed via <code>~/dev/dotfiles</code> &amp; Caddy Reverse Proxy
     </div>
     <div class="footer-links">
+      <a href="http://devbox.local/api/system" target="_blank">System Metrics API</a>
       <a href="http://devbox.local/health" target="_blank">Health Check API</a>
       <a href="javascript:void(0)" onclick="copyHostsSnippet()">Copy /etc/hosts snippet</a>
     </div>
@@ -1185,6 +1468,8 @@ const SERVICES = [
 let currentCategory = 'all';
 let searchQuery = '';
 const healthState = {};
+let telemetryTimer = null;
+let telemetryPaused = false;
 
 // Render Cards
 function renderServices() {
@@ -1327,7 +1612,6 @@ async function probeService(service) {
     const timeoutId = setTimeout(() => controller.abort(), 2500);
 
     try {
-      // 1. Try same-origin /api/health/<service> first (instant & reliable)
       if (service.probeApi) {
         try {
           const res = await fetch(service.probeApi, {
@@ -1339,12 +1623,9 @@ async function probeService(service) {
             clearTimeout(timeoutId);
             return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
           }
-        } catch (e) {
-          // If relative fetch fails (e.g. running from file://), fall through to direct probe
-        }
+        } catch (e) {}
       }
 
-      // 2. Direct probe fallback (mode: 'no-cors' resolves on any responding HTTP server)
       await fetch(service.directProbeUrl || service.url, {
         method: 'GET',
         mode: 'no-cors',
@@ -1360,7 +1641,6 @@ async function probeService(service) {
       return { status: 'offline', error: err.name === 'AbortError' ? 'Timeout' : 'Unreachable' };
     }
   } else {
-    // For TCP endpoints: correlate with companion service
     if (service.correlatedProbeId) {
       const parent = healthState[service.correlatedProbeId];
       if (parent && parent.status === 'online') {
@@ -1375,15 +1655,13 @@ async function probeService(service) {
 
 async function probeAllHealth() {
   const refreshIcon = document.getElementById('refresh-icon');
-  refreshIcon.style.animation = 'spin 1s linear infinite';
+  if (refreshIcon) refreshIcon.style.animation = 'spin 1s linear infinite';
 
-  // Mark all checking
   SERVICES.forEach(s => {
     if (!healthState[s.id]) healthState[s.id] = { status: 'checking' };
   });
   renderServices();
 
-  // Run probes
   const httpServices = SERVICES.filter(s => s.isWeb);
   const tcpServices = SERVICES.filter(s => !s.isWeb);
 
@@ -1391,7 +1669,6 @@ async function probeAllHealth() {
   let totalLatency = 0;
   let latencySamples = 0;
 
-  // Probe HTTP services first
   await Promise.all(httpServices.map(async s => {
     const result = await probeService(s);
     healthState[s.id] = result;
@@ -1405,7 +1682,6 @@ async function probeAllHealth() {
     updateCardHealth(s.id, result);
   }));
 
-  // Correlate TCP services
   for (const s of tcpServices) {
     const result = await probeService(s);
     healthState[s.id] = result;
@@ -1413,7 +1689,6 @@ async function probeAllHealth() {
     updateCardHealth(s.id, result);
   }
 
-  // Update overall header status
   const total = SERVICES.length;
   const avgLatency = latencySamples > 0 ? Math.round(totalLatency / latencySamples) : 3;
   const statusPill = document.getElementById('overall-status-pill');
@@ -1441,9 +1716,9 @@ async function probeAllHealth() {
     }
   }
 
-  setTimeout(() => {
-    refreshIcon.style.animation = '';
-  }, 500);
+  if (refreshIcon) {
+    setTimeout(() => { refreshIcon.style.animation = ''; }, 500);
+  }
 }
 
 function updateCardHealth(id, result) {
@@ -1456,6 +1731,207 @@ function updateCardHealth(id, result) {
     html += `<span class="health-latency">• ${result.latency}ms</span>`;
   }
   el.innerHTML = html;
+}
+
+// -------------------------------------------------------------
+// System Telemetry (btop Monitor)
+// -------------------------------------------------------------
+function formatBytes(bytes) {
+  if (!bytes || bytes <= 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function formatUptime(seconds) {
+  if (!seconds) return '--';
+  const d = Math.floor(seconds / (3600 * 24));
+  const h = Math.floor((seconds % (3600 * 24)) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function getUsageColor(pct) {
+  if (pct >= 85) return 'var(--danger)';
+  if (pct >= 65) return 'var(--warning)';
+  return 'var(--success)';
+}
+
+async function fetchSystemTelemetry() {
+  if (telemetryPaused || document.visibilityState !== 'visible') return;
+
+  try {
+    const res = await fetch('/api/system', { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    updateTelemetryUI(data);
+  } catch (err) {
+    // Graceful offline fallback
+    const liveText = document.getElementById('live-text');
+    if (liveText) liveText.innerText = 'OFFLINE';
+  }
+}
+
+function updateTelemetryUI(data) {
+  if (!data) return;
+
+  // Header quick pills
+  const headerCpuPill = document.getElementById('header-cpu-pill');
+  const headerCpuVal = document.getElementById('header-cpu-val');
+  const headerMemPill = document.getElementById('header-mem-pill');
+  const headerMemVal = document.getElementById('header-mem-val');
+
+  if (headerCpuPill && headerCpuVal && data.cpu) {
+    headerCpuVal.innerText = `${data.cpu.percent}%`;
+    headerCpuPill.style.display = 'inline-flex';
+  }
+  if (headerMemPill && headerMemVal && data.memory) {
+    headerMemVal.innerText = `${data.memory.percent}%`;
+    headerMemPill.style.display = 'inline-flex';
+  }
+
+  // CPU
+  const cpu = data.cpu || {};
+  const cpuVal = document.getElementById('telemetry-cpu-val');
+  const cpuBar = document.getElementById('telemetry-cpu-bar');
+  const cpuName = document.getElementById('telemetry-cpu-name');
+  const tempBadge = document.getElementById('telemetry-temp-badge');
+  const loadVal = document.getElementById('telemetry-load-val');
+  const coresVal = document.getElementById('telemetry-cores-val');
+
+  if (cpuVal) {
+    const pct = cpu.percent ?? 0;
+    cpuVal.innerText = `${pct.toFixed(1)}%`;
+    cpuVal.style.color = getUsageColor(pct);
+  }
+  if (cpuBar) {
+    const p = Math.min(100, Math.max(0, cpu.percent || 0));
+    cpuBar.style.width = `${p}%`;
+    cpuBar.style.backgroundColor = getUsageColor(p);
+  }
+  if (cpuName && cpu.name) {
+    cpuName.innerText = `${cpu.name} • ${cpu.cores || 4} Cores`;
+  }
+  if (tempBadge) {
+    if (cpu.temp) {
+      tempBadge.innerText = `${cpu.temp}°C`;
+      tempBadge.style.color = cpu.temp > 80 ? 'var(--danger)' : cpu.temp > 70 ? 'var(--warning)' : 'var(--success)';
+      tempBadge.style.display = 'inline-flex';
+    } else {
+      tempBadge.style.display = 'none';
+    }
+  }
+  if (loadVal && cpu.load) {
+    loadVal.innerText = cpu.load.map(l => l.toFixed(2)).join(' / ');
+  }
+  if (coresVal && cpu.cores) {
+    coresVal.innerText = cpu.cores;
+  }
+
+  // Memory
+  const mem = data.memory || {};
+  const memVal = document.getElementById('telemetry-mem-val');
+  const memBar = document.getElementById('telemetry-mem-bar');
+  const memBreakdown = document.getElementById('telemetry-mem-breakdown');
+  const memAvail = document.getElementById('telemetry-mem-avail');
+  const swapBadge = document.getElementById('telemetry-swap-badge');
+
+  if (memVal) {
+    const pct = mem.percent ?? 0;
+    memVal.innerText = `${pct.toFixed(1)}%`;
+    memVal.style.color = getUsageColor(pct);
+  }
+  if (memBar) {
+    const p = Math.min(100, Math.max(0, mem.percent || 0));
+    memBar.style.width = `${p}%`;
+    memBar.style.backgroundColor = getUsageColor(p);
+  }
+  if (memBreakdown && mem.total) {
+    const usedGb = (mem.used / 1e9).toFixed(1);
+    const totGb = (mem.total / 1e9).toFixed(1);
+    memBreakdown.innerText = `RAM: ${usedGb} / ${totGb} GB`;
+  }
+  if (memAvail && mem.available) {
+    memAvail.innerText = `${(mem.available / 1e9).toFixed(1)} GB`;
+  }
+  if (swapBadge) {
+    if (mem.swap_total > 0) {
+      swapBadge.innerText = `Swap: ${mem.swap_percent}%`;
+      swapBadge.style.display = 'inline-flex';
+    } else {
+      swapBadge.style.display = 'none';
+    }
+  }
+
+  // Disk & Network
+  const disk = data.disk || {};
+  const diskVal = document.getElementById('telemetry-disk-val');
+  const diskBar = document.getElementById('telemetry-disk-bar');
+  const diskBreakdown = document.getElementById('telemetry-disk-breakdown');
+  const uptimeBadge = document.getElementById('telemetry-uptime-badge');
+  const netRate = document.getElementById('telemetry-net-rate');
+
+  if (diskVal) {
+    const pct = disk.percent ?? 0;
+    diskVal.innerText = `${pct.toFixed(1)}%`;
+    diskVal.style.color = getUsageColor(pct);
+  }
+  if (diskBar) {
+    const p = Math.min(100, Math.max(0, disk.percent || 0));
+    diskBar.style.width = `${p}%`;
+    diskBar.style.backgroundColor = getUsageColor(p);
+  }
+  if (diskBreakdown && disk.total) {
+    const usedGb = (disk.used / 1e9).toFixed(0);
+    const totGb = (disk.total / 1e9).toFixed(0);
+    diskBreakdown.innerText = `Root: ${usedGb} / ${totGb} GB`;
+  }
+  if (uptimeBadge && data.uptime_seconds) {
+    uptimeBadge.innerText = `Up: ${formatUptime(data.uptime_seconds)}`;
+  }
+  if (netRate && data.network) {
+    const rx = formatBytes(data.network.rx_rate) + '/s';
+    const tx = formatBytes(data.network.tx_rate) + '/s';
+    netRate.innerText = `↓ ${rx} • ↑ ${tx}`;
+  }
+
+  // Processes (btop table)
+  const tbody = document.getElementById('telemetry-procs-body');
+  if (tbody && data.top_processes && data.top_processes.length > 0) {
+    tbody.innerHTML = data.top_processes.slice(0, 5).map(p => `
+      <tr>
+        <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${p.name}">${p.name}</td>
+        <td style="text-align: right; color: var(--text-dim);">${p.pid}</td>
+        <td style="text-align: right;"><span class="proc-cpu-badge">${p.cpu.toFixed(1)}%</span></td>
+        <td style="text-align: right; color: var(--text-muted);">${p.mem.toFixed(1)}%</td>
+      </tr>
+    `).join('');
+  }
+
+  const liveText = document.getElementById('live-text');
+  if (liveText) liveText.innerText = 'LIVE 2s';
+}
+
+function toggleTelemetryCollapse() {
+  const grid = document.getElementById('telemetry-grid');
+  const btn = document.getElementById('btn-toggle-telemetry');
+  if (grid.style.display === 'none') {
+    grid.style.display = 'grid';
+    btn.innerText = 'Collapse';
+    localStorage.setItem('devbox_telemetry_collapsed', 'false');
+  } else {
+    grid.style.display = 'none';
+    btn.innerText = 'Expand';
+    localStorage.setItem('devbox_telemetry_collapsed', 'true');
+  }
+}
+
+function refreshAll() {
+  probeAllHealth();
+  fetchSystemTelemetry();
 }
 
 // Search and Filter Handlers
@@ -1529,16 +2005,35 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Tab visibility listener to save battery and network
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    fetchSystemTelemetry();
+  }
+});
+
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('devbox_theme');
   if (savedTheme) {
     document.documentElement.setAttribute('data-theme', savedTheme);
   }
+
+  const isCollapsed = localStorage.getItem('devbox_telemetry_collapsed') === 'true';
+  if (isCollapsed) {
+    const grid = document.getElementById('telemetry-grid');
+    const btn = document.getElementById('btn-toggle-telemetry');
+    if (grid) grid.style.display = 'none';
+    if (btn) btn.innerText = 'Expand';
+  }
+
   renderServices();
   probeAllHealth();
-  // Auto-refresh every 30s
+  fetchSystemTelemetry();
+
+  // Periodic updates
   setInterval(probeAllHealth, 30000);
+  telemetryTimer = setInterval(fetchSystemTelemetry, 2500);
 });
 </script>
 

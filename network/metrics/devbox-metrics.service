@@ -1,0 +1,16 @@
+[Unit]
+Description=Devbox System Metrics Exporter
+After=network.target
+
+[Service]
+Type=simple
+User=aravind
+Group=aravind
+ExecStart=/home/aravind/dev/dotfiles/network/metrics/devbox-metrics.py
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -26,6 +26,10 @@ http://dgraph.local {
 http://devbox.local, http://__LAN_IP__, http://localhost, http://127.0.0.1 {
 	respond /health "OK" 200
 
+	handle /api/system* {
+		reverse_proxy 127.0.0.1:9108
+	}
+
 	handle /api/health/jellyfin* {
 		rewrite * /health
 		reverse_proxy __LAN_IP__:8096

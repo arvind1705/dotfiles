@@ -50,4 +50,12 @@ if [[ -n "$LEGACY_SERVICES" ]]; then
   echo "    ✓ Legacy mdns services cleaned up"
 fi
 
+# 5. Devbox system metrics daemon
+echo "==> Deploying devbox-metrics.service"
+sudo cp "$DIR/metrics/devbox-metrics.service" /etc/systemd/system/devbox-metrics.service
+sudo systemctl daemon-reload
+sudo systemctl enable devbox-metrics.service
+sudo systemctl restart devbox-metrics.service
+echo "    ✓ devbox-metrics.service active (listening on 127.0.0.1:9108)"
+
 echo "==> Network setup complete."
