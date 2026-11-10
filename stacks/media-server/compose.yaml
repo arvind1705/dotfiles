@@ -26,6 +26,7 @@ services:
     volumes:
       - ${MEDIA_ROOT}/config/jellyfin:/config
       - ${MEDIA_ROOT}/library:${MEDIA_ROOT}/library
+      - ${MEDIA_ROOT}/library:/home/aravind/entertainment/library
     ports:
       - "${LAN_IP:-192.168.0.172}:${JELLYFIN_PORT:-8096}:8096/tcp"
       # UDP 7359 = Jellyfin's LAN auto-discovery beacon for the TV app.
@@ -55,6 +56,8 @@ services:
       # /downloads/movies), so finished files show up in Jellyfin immediately.
       # Incomplete torrents go to /downloads/incomplete.
       - ${MEDIA_ROOT}/library:/downloads
+      - ${MEDIA_ROOT}/library:${MEDIA_ROOT}/library
+      - ${MEDIA_ROOT}/library:/home/aravind/entertainment/library
     ports:
       - "${LAN_IP:-192.168.0.172}:${QBT_WEBUI_PORT:-8081}:${QBT_WEBUI_PORT:-8081}/tcp"
       # Incoming BitTorrent peer connections (see README for router forwarding).
