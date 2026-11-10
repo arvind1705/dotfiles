@@ -30,6 +30,11 @@ services:
       - "${LAN_IP:-192.168.0.172}:${JELLYFIN_PORT:-8096}:8096/tcp"
       # UDP 7359 = Jellyfin's LAN auto-discovery beacon for the TV app.
       - "${LAN_IP:-192.168.0.172}:7359:7359/udp"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.5'
+          memory: 2G
     restart: unless-stopped
 
   qbittorrent:
@@ -55,4 +60,9 @@ services:
       # Incoming BitTorrent peer connections (see README for router forwarding).
       - "${LAN_IP:-192.168.0.172}:${QBT_LISTEN_PORT:-6881}:${QBT_LISTEN_PORT:-6881}/tcp"
       - "${LAN_IP:-192.168.0.172}:${QBT_LISTEN_PORT:-6881}:${QBT_LISTEN_PORT:-6881}/udp"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
     restart: unless-stopped

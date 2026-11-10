@@ -7,12 +7,18 @@ services:
     restart: unless-stopped
     ports:
       - "${ROUTER_PORT:-20128}:20128"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:20128/api/health"]
-      interval: 5s
+      interval: 30s
       timeout: 5s
-      retries: 20
+      retries: 3
       start_period: 30s
+      start_interval: 5s
     environment:
       DATA_DIR: /app/data
       INITIAL_PASSWORD: "${INITIAL_PASSWORD:-change_me}"

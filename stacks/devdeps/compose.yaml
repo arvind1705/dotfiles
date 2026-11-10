@@ -11,11 +11,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kg_mcp} -d ${POSTGRES_DB:-kg_mcp_db}"]
-      interval: 5s
+      interval: 30s
       timeout: 5s
-      retries: 12
+      retries: 3
+      start_period: 10s
+      start_interval: 5s
     restart: unless-stopped
 
   redis:
@@ -24,26 +31,41 @@ services:
       - "${LAN_IP:-192.168.0.172}:6380:6379"
     volumes:
       - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 30s
       timeout: 3s
-      retries: 12
+      retries: 3
+      start_period: 5s
+      start_interval: 5s
     restart: unless-stopped
 
   dgraph:
     image: dgraph/standalone:latest
+    environment:
+      DGRAPH_ALPHA_CACHE: "size-mb=512; percentage=40,40,20;"
     ports:
       - "${LAN_IP:-192.168.0.172}:8080:8080"
       - "${LAN_IP:-192.168.0.172}:9080:9080"
     volumes:
       - dgraph_data:/dgraph
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 768M
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
-      interval: 5s
+      interval: 30s
       timeout: 5s
-      retries: 20
+      retries: 3
       start_period: 15s
+      start_interval: 5s
     restart: unless-stopped
 
   langfuse-clickhouse:
@@ -65,12 +87,14 @@ services:
       resources:
         limits:
           cpus: '1.0'
+          memory: 1536M
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8123/ping"]
-      interval: 5s
+      interval: 30s
       timeout: 5s
-      retries: 20
+      retries: 3
       start_period: 10s
+      start_interval: 5s
     restart: unless-stopped
 
   langfuse-minio:
@@ -90,12 +114,18 @@ services:
       - "minio-console.local:host-gateway"
     volumes:
       - minio_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
+      interval: 30s
       timeout: 5s
-      retries: 10
+      retries: 3
       start_period: 5s
+      start_interval: 5s
     restart: unless-stopped
 
 volumes:
