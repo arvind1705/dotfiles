@@ -70,3 +70,12 @@ source "$HOME/.zsh/aliases.zsh"
 # =============================================================================
 
 [[ -s "$BUN_INSTALL/_bun" ]] && source "$BUN_INSTALL/_bun"
+
+
+# =============================================================================
+#   FILE ENCRYPTION
+# =============================================================================
+
+encrypt() { openssl enc -aes-256-cbc -pbkdf2 -salt -in "$1" -out "$1.enc" -pass pass:"$FILE_PASSWORD"; }
+decrypt() { openssl enc -d -aes-256-cbc -pbkdf2 -in "$1" -out "${1%.enc}" -pass pass:"$FILE_PASSWORD"; }
+export FILE_PASSWORD='YourStrongPassword123'
