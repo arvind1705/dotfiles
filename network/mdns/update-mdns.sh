@@ -30,6 +30,7 @@ HOSTNAMES=(
   "minio.local"
   "minio-console.local"
   "dgraph.local"
+  "cube.local"
   "postgres.local"
   "redis.local"
 )

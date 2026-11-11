@@ -115,6 +115,7 @@ check_health() {
     "MinIO console:http://minio-console.local"
     "Jellyfin:http://jellyfin.local"
     "qBittorrent:http://qbittorrent.local"
+    "Cube:http://cube.local/health"
   )
   for item in "${http_endpoints[@]}"; do
     local name="${item%%:*}"

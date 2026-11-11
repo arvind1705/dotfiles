@@ -69,6 +69,10 @@ http://devbox.local, http://__LAN_IP__, http://localhost, http://127.0.0.1 {
 		rewrite * /health
 		reverse_proxy __LAN_IP__:8080
 	}
+	handle /api/health/cube* {
+		rewrite * /readyz
+		reverse_proxy __LAN_IP__:4000
+	}
 
 	root * /srv/devbox-index
 	header Cache-Control "no-cache, no-store, must-revalidate"
@@ -81,4 +85,12 @@ http://9router.local {
 		reverse_proxy __LAN_IP__:20128
 	}
 	reverse_proxy __LAN_IP__:20128
+}
+http://cube.local {
+	encode zstd gzip
+	handle /health {
+		rewrite * /readyz
+		reverse_proxy __LAN_IP__:4000
+	}
+	reverse_proxy __LAN_IP__:4000
 }
