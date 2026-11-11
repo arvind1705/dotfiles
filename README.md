@@ -44,6 +44,7 @@ All services are accessible on your local LAN via mDNS (`.local` domain names) r
 | **qBittorrent** | `http://qbittorrent.local` | `8081` | `media-server` | Torrent downloader with automated queue |
 | **Langfuse** | `http://langfuse.local` | `3005` | `langfuse` | LLM observability & prompt management platform |
 | **9router** | `http://9router.local` | `20128` | `9router` | AI gateway, dynamic model router & rate limiter |
+| **Cube** | `http://cube.local` | `4000` | `cube` | Semantic layer developer playground & REST API |
 | **MinIO Console** | `http://minio-console.local`| `9094` | `devdeps` | Object storage admin UI |
 | **MinIO API** | `http://minio.local` | `9092` | `devdeps` | S3-compatible object storage HTTP API |
 | **ClickHouse HTTP** | `http://clickhouse.local` | `8124` | `devdeps` | Columnar database HTTP ping & query endpoint |
