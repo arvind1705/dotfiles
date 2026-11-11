@@ -19,7 +19,7 @@ echo "==> Setting up network ingress (LAN IP: $LAN_IP)..."
 # 1. Portal dashboard
 echo "==> Deploying devbox dashboard to /srv/devbox-index"
 sudo mkdir -p /srv/devbox-index
-sudo cp "$DIR/portal/index.html" /srv/devbox-index/index.html
+sudo cp -r "$DIR/portal/." /srv/devbox-index/
 
 # 2. Caddyfile
 echo "==> Deploying /etc/caddy/Caddyfile"
