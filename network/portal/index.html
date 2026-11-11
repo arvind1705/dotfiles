@@ -536,7 +536,7 @@ footer a:hover {
     <div style="display: flex; gap: 12px;">
       <a href="/api/system" target="_blank">Telemetry API</a>
       <a href="/health" target="_blank">Health</a>
-      <a href="javascript:void(0)" onclick="copy('192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local minio.local minio-console.local clickhouse.local dgraph.local cube.local postgres.local redis.local', 'Hosts snippet copied')">Hosts Snippet</a>
+      <a href="javascript:void(0)" onclick="copy('192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local minio.local minio-console.local clickhouse.local dgraph.local cube.local t3.local postgres.local redis.local', 'Hosts snippet copied')">Hosts Snippet</a>
     </div>
   </footer>
 </div>
@@ -611,6 +611,17 @@ const SERVICES = [
     probeApi: "/api/health/cube",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>`
+  },
+  {
+    id: "t3",
+    name: "T3 Code",
+    cat: "web",
+    port: 3773,
+    meta: "t3.local:3773",
+    url: "http://t3.local",
+    probeApi: "/api/health/t3",
+    isWeb: true,
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><polyline points="8 10 11 12 8 14"></polyline><line x1="13" y1="15" x2="16" y2="15"></line></svg>`
   },
 
   // --- APIs & Storage ---

@@ -73,6 +73,10 @@ http://devbox.local, http://__LAN_IP__, http://localhost, http://127.0.0.1 {
 		rewrite * /readyz
 		reverse_proxy __LAN_IP__:4000
 	}
+	handle /api/health/t3* {
+		rewrite * /health
+		reverse_proxy __LAN_IP__:3773
+	}
 
 	root * /srv/devbox-index
 	header Cache-Control "no-cache, no-store, must-revalidate"
@@ -93,4 +97,12 @@ http://cube.local {
 		reverse_proxy __LAN_IP__:4000
 	}
 	reverse_proxy __LAN_IP__:4000
+}
+http://t3.local, http://t3code.local {
+	encode zstd gzip
+	handle /health {
+		rewrite * /health
+		reverse_proxy __LAN_IP__:3773
+	}
+	reverse_proxy __LAN_IP__:3773
 }

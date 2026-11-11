@@ -116,6 +116,7 @@ check_health() {
     "Jellyfin:http://jellyfin.local"
     "qBittorrent:http://qbittorrent.local"
     "Cube:http://cube.local/health"
+    "T3 Code:http://t3.local/health"
   )
   for item in "${http_endpoints[@]}"; do
     local name="${item%%:*}"
