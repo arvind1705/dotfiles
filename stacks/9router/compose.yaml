@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     ports:
       - "${ROUTER_PORT:-20128}:20128"
+    cpu_shares: 256
     deploy:
       resources:
         limits:
@@ -14,7 +15,7 @@ services:
           memory: 512M
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:20128/api/health"]
-      interval: 30s
+      interval: 120s
       timeout: 5s
       retries: 3
       start_period: 30s

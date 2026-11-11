@@ -5,8 +5,10 @@ services:
     restart: unless-stopped
     environment:
       NODE_OPTIONS: "--max-old-space-size=640"
+      NEXT_TELEMETRY_DISABLED: "1"
     env_file:
       - ./langfuse.env
+    cpu_shares: 128
     deploy:
       resources:
         limits:
@@ -21,10 +23,13 @@ services:
     environment:
       HOSTNAME: "0.0.0.0"
       NODE_OPTIONS: "--max-old-space-size=1024"
+      NEXT_TELEMETRY_DISABLED: "1"
     env_file:
       - ./langfuse.env
     ports:
       - "${LAN_IP:-192.168.0.172}:3005:3000"
+    mem_reservation: 512M
+    cpu_shares: 512
     deploy:
       resources:
         limits:
@@ -32,7 +37,7 @@ services:
           memory: 1536M
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/public/health"]
-      interval: 30s
+      interval: 120s
       timeout: 15s
       retries: 5
       start_period: 90s

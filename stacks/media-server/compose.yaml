@@ -65,6 +65,7 @@ services:
       # Incoming BitTorrent peer connections (see README for router forwarding).
       - "${LAN_IP:-192.168.0.172}:${QBT_LISTEN_PORT:-6881}:${QBT_LISTEN_PORT:-6881}/tcp"
       - "${LAN_IP:-192.168.0.172}:${QBT_LISTEN_PORT:-6881}:${QBT_LISTEN_PORT:-6881}/udp"
+    cpu_shares: 256
     deploy:
       resources:
         limits:
