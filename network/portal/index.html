@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Devbox</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="shortcut icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACP0lEQVR4AeyVPUwTYRzGn/etB1RodSO4OPkxCbr5sWmclIHFRKORXqiLg7vRuJk4Go2moYkx4gZRdCHiprMVFmAuhG4UGqAF7uV97nLJ3eVy7YXmmpA2fdr3457/78m17/8kPC9zovrQzG9M5yaqq2a+qtopp+bGNBkeJOwAprlzNpevzkHgMyDGhMAZtPnl1BRjZJBFJhF2AMjGlABucyEJkaVSjS9kyfEnm+M61XVOkpQOcYNsKSx1L0mwl0W21ElGvItJjsmW+vYPJgn1sQQGpW8hZDIwIHDtqoHRu72xRA+9ISV9S5EBUingzesMco/TGL2jA8QQPfSyho8YmEQGuHjhBHp6gPKqhdmf9Viih17WCDB908gAQ0PO9p+/Dfyar2NrU2H+tw7yo7noIcmtwXGYHELYTmBt+JKBB/f7MDJsBHaONm05wMLiHqa+7qL0f+9oxIA7MkC5fGBffuWygVs3e5HJCvu7lRNBD81uDY7DFBlgeeUA6+sWzp9LxT4F9FQqFlgjDOyuRQZQCnjxqob3H7ZjnQCemLfvtvH8ZQ2s4cLCviMD0NDfL5BOCw5jiU2IamaKDMAmwmbCptJtRN1G1G1EcU/B8WlE7GT/SvuYbeER7L1mYXG/WQ+y9yUUKvaoEx+aLXW7L3WCTSbZUgjxkZNOiGxZLGS/6d95LvEACt/Jth9GlhDPdIC6VkJvVRPKeEqYHeBTIbtULJzq03/IR4Ca0XdkjZvtkFvDqalmyCgWTmcmJ0+WuXcIAAD//63wUd8AAAAGSURBVAMAxRj59nRkik8AAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAQAElEQVR4AeydC5wbVb3H/2ey3Wz2kd2CbRcpLcWW8lLslcJVQYtXbcECBa4XrqWwzTZbvNwC4u0tWEprSwF5SL0V2+6rfCpgKwpYQPAKtLYoPkAtqH2oBdqi2Apssq/sIzme/2yzZnezyUl2ksx/5p/PnM08zuN/vv/fnJyZOXPWgDx96upk6YIFrTPmLwzPD9SFlgWCLfW1daFnaoOh3wXqWkJqXXIIkWVg+lD5UvnwGfRtwPRxuAZ9jr7Pk8wgh4KWYn5d+78E6lpuVuGFXhl+TxqxbYaUzQJgpRAiqCo5CwScLkD41TovhAmYPlS+VFWYhb4Vpo/lRvQ5+h41UBtsWVJb2z4NQKrDKmYOFssFHagLn1tbF3qwti582IDeVwSIO1U4XwgozoH9nCUBAuh71AAIcRd4en+N2kCNBJRWrDbfsCrD+QtbTwsEQ08KkDtVnteo8D4VeGECyQigNq5BraBmamtbz0gWKZt9IxZ0bW1ocm0wtMmQsdfUmTg7GyM4jXsJmJrxxHahhmqu7TxxpCSyFnRdXftxAXVhBx7YDQLmKUOyzkul5SXnBGxdgIEaMqLdewN1oW/Mn986JltrjWwSLljQ8pFe2btL9F3YFWWTB6dhAoMJCAHFAuB6URT7PWps8HGdbUMnUmKc2oWhWdKAHarwrM+ixPx4nQkMJoDaQo2h1gYfS7edkaDnq3vIMgZPAYhS4A8TyCkBUYpaQ81lUoy2oFXfZoWB95CF6jUDf5hA7gmoltqDmlMXjDfolqYl6IB6OKL6Nst1M+V4TMBSAgLWoAZ18kwraJXRZwWI1TqZUY3DdtufAGpQp0+dUtA1C0NTVFUfVSFlPHWcFyaQawIGSLk5GAyfnKqgYYUaCMgKj7oAVGcGj7NIRZCP5ZGAqIwKuXXuXDmsJpMKesYMWQSe8KPqZnfKsyGPNeGimIBJQABM9ZaGN8MwA5ySCvqkKaEF6gpzppkD/2ECNiOgtHlBIBhamMysIYLGrgYI8dVkkXkfE7ALAQFiRbKuxxBBgye0VAR/7F9x/ssEbEpAwDlvWfimwdYNEHTfoBChfRN7cGa8zQTySUCAvHHetq0DGt8BgjaK5Coh4iGfRnFZTCB7AqKyOCpXJqbvF3Qw2Hq6BLkg8SCvMwG7E0DNJo6j7hd0DOQi1Tp77F4Bto8JJBJA7Xqi3TfG9/ULGiA2K76Tv11IgHCVpYB+7ZqCrqkLn6Ju1U0kXCc23cUE1F25qaaGFQNT0AbE5qh1XpgAWQJxDZuCBhAsaOAPbQJ9GjZqatqqQcLZtCvD1ruewPAU9KRhfHHb8BTX/lVdKQrfA2EApAmghqMQPb97Cto5Y9Wka5J747kEIgRQy4a6u8GCJuIwNjMNASEqdTUeHkHLvODmQnJNQEpoZq/gWNC5r6j9C5CSqrnrT4O2f43tX4HsiohS1Bpqzp8Gbffy2b7+QlarLof0+T504f7g/gXKLwEpobockPvQ+S8rlySEgBAi7rFkQeewZLYsKgg4TtATJ3rgnHO9cOONZTBxYml4z/bvf78BV11VAiedNAo8vF65zIvh+5iAAAEh4iXhOEFfeGERfP3rRfB/t5XBddfmFvSrr/bAL385Co44whv/C38zARsRME7kOEFfc00Z+PiY9xEQYFjQef6xWbxxBPQ4QU+Z4oHvfmfeR95nQY9d/y0fEQGjN71y53GCNn74/P8fAS9a80e/eS9x7uB7E2BB577GLmAFAf40aAVILkIfAixofVxyLSoEWNAqSHIZ+hBgQevjkmvg3QZ4DdhXBPg1tL18Q9g2FjRhZ8gW831oG/qBLZkgARb0BMFydlsRYEHb0RFy2/k+tP28wRZpEGBBa8Dio9YTYEFb7wO2QIMAC1oDFh+1ngAL2nofsAUaBFjQGrD4qPUE/h+wZ0R88v713QAAAABJRU5ErkJggg==">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#6366f1">
+<link rel="shortcut icon" href="/favicon.ico?v=2">
 <style>
 :root {
   --bg-app: #0b0f17;
@@ -440,6 +443,18 @@ footer a:hover {
   100% { transform: rotate(360deg); }
 }
 </style>
+<script>
+  (function() {
+    const iconData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACP0lEQVR4AeyVPUwTYRzGn/etB1RodSO4OPkxCbr5sWmclIHFRKORXqiLg7vRuJk4Go2moYkx4gZRdCHiprMVFmAuhG4UGqAF7uV97nLJ3eVy7YXmmpA2fdr3457/78m17/8kPC9zovrQzG9M5yaqq2a+qtopp+bGNBkeJOwAprlzNpevzkHgMyDGhMAZtPnl1BRjZJBFJhF2AMjGlABucyEJkaVSjS9kyfEnm+M61XVOkpQOcYNsKSx1L0mwl0W21ElGvItJjsmW+vYPJgn1sQQGpW8hZDIwIHDtqoHRu72xRA+9ISV9S5EBUingzesMco/TGL2jA8QQPfSyho8YmEQGuHjhBHp6gPKqhdmf9Viih17WCDB908gAQ0PO9p+/Dfyar2NrU2H+tw7yo7noIcmtwXGYHELYTmBt+JKBB/f7MDJsBHaONm05wMLiHqa+7qL0f+9oxIA7MkC5fGBffuWygVs3e5HJCvu7lRNBD81uDY7DFBlgeeUA6+sWzp9LxT4F9FQqFlgjDOyuRQZQCnjxqob3H7ZjnQCemLfvtvH8ZQ2s4cLCviMD0NDfL5BOCw5jiU2IamaKDMAmwmbCptJtRN1G1G1EcU/B8WlE7GT/SvuYbeER7L1mYXG/WQ+y9yUUKvaoEx+aLXW7L3WCTSbZUgjxkZNOiGxZLGS/6d95LvEACt/Jth9GlhDPdIC6VkJvVRPKeEqYHeBTIbtULJzq03/IR4Ca0XdkjZvtkFvDqalmyCgWTmcmJ0+WuXcIAAD//63wUd8AAAAGSURBVAMAxRj59nRkik8AAAAASUVORK5CYII=';
+    let link = document.querySelector("link[rel*='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = iconData;
+  })();
+</script>
 </head>
 <body>
 
