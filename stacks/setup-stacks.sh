@@ -35,6 +35,7 @@ MEDIA_ROOT="${MEDIA_ROOT:-$HOME/data/media}"
 mkdir -p \
   "$MEDIA_ROOT/config/jellyfin" \
   "$MEDIA_ROOT/config/qbittorrent" \
+  "$MEDIA_ROOT/cache" \
   "$MEDIA_ROOT/library/movies" \
   "$MEDIA_ROOT/library/tv" \
   "$MEDIA_ROOT/library/incomplete"
