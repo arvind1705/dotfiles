@@ -3,36 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Devbox</title>
+<meta name="description" content="Devbox home services & dev infra — open web apps, copy database connection commands, and check live status.">
+<title>Devbox — Services</title>
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACP0lEQVR4AeyVPUwTYRzGn/etB1RodSO4OPkxCbr5sWmclIHFRKORXqiLg7vRuJk4Go2moYkx4gZRdCHiprMVFmAuhG4UGqAF7uV97nLJ3eVy7YXmmpA2fdr3457/78m17/8kPC9zovrQzG9M5yaqq2a+qtopp+bGNBkeJOwAprlzNpevzkHgMyDGhMAZtPnl1BRjZJBFJhF2AMjGlABucyEJkaVSjS9kyfEnm+M61XVOkpQOcYNsKSx1L0mwl0W21ElGvItJjsmW+vYPJgn1sQQGpW8hZDIwIHDtqoHRu72xRA+9ISV9S5EBUingzesMco/TGL2jA8QQPfSyho8YmEQGuHjhBHp6gPKqhdmf9Viih17WCDB908gAQ0PO9p+/Dfyar2NrU2H+tw7yo7noIcmtwXGYHELYTmBt+JKBB/f7MDJsBHaONm05wMLiHqa+7qL0f+9oxIA7MkC5fGBffuWygVs3e5HJCvu7lRNBD81uDY7DFBlgeeUA6+sWzp9LxT4F9FQqFlgjDOyuRQZQCnjxqob3H7ZjnQCemLfvtvH8ZQ2s4cLCviMD0NDfL5BOCw5jiU2IamaKDMAmwmbCptJtRN1G1G1EcU/B8WlE7GT/SvuYbeER7L1mYXG/WQ+y9yUUKvaoEx+aLXW7L3WCTSbZUgjxkZNOiGxZLGS/6d95LvEACt/Jth9GlhDPdIC6VkJvVRPKeEqYHeBTIbtULJzq03/IR4Ca0XdkjZvtkFvDqalmyCgWTmcmJ0+WuXcIAAD//63wUd8AAAAGSURBVAMAxRj59nRkik8AAAAASUVORK5CYII=">
 <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAQAElEQVR4AeydC5wbVb3H/2ey3Wz2kd2CbRcpLcWW8lLslcJVQYtXbcECBa4XrqWwzTZbvNwC4u0tWEprSwF5SL0V2+6rfCpgKwpYQPAKtLYoPkAtqH2oBdqi2Apssq/sIzme/2yzZnezyUl2ksx/5p/PnM08zuN/vv/fnJyZOXPWgDx96upk6YIFrTPmLwzPD9SFlgWCLfW1daFnaoOh3wXqWkJqXXIIkWVg+lD5UvnwGfRtwPRxuAZ9jr7Pk8wgh4KWYn5d+78E6lpuVuGFXhl+TxqxbYaUzQJgpRAiqCo5CwScLkD41TovhAmYPlS+VFWYhb4Vpo/lRvQ5+h41UBtsWVJb2z4NQKrDKmYOFssFHagLn1tbF3qwti582IDeVwSIO1U4XwgozoH9nCUBAuh71AAIcRd4en+N2kCNBJRWrDbfsCrD+QtbTwsEQ08KkDtVnteo8D4VeGECyQigNq5BraBmamtbz0gWKZt9IxZ0bW1ocm0wtMmQsdfUmTg7GyM4jXsJmJrxxHahhmqu7TxxpCSyFnRdXftxAXVhBx7YDQLmKUOyzkul5SXnBGxdgIEaMqLdewN1oW/Mn986JltrjWwSLljQ8pFe2btL9F3YFWWTB6dhAoMJCAHFAuB6URT7PWps8HGdbUMnUmKc2oWhWdKAHarwrM+ixPx4nQkMJoDaQo2h1gYfS7edkaDnq3vIMgZPAYhS4A8TyCkBUYpaQ81lUoy2oFXfZoWB95CF6jUDf5hA7gmoltqDmlMXjDfolqYl6IB6OKL6Nst1M+V4TMBSAgLWoAZ18kwraJXRZwWI1TqZUY3DdtufAGpQp0+dUtA1C0NTVFUfVSFlPHWcFyaQawIGSLk5GAyfnKqgYYUaCMgKj7oAVGcGj7NIRZCP5ZGAqIwKuXXuXDmsJpMKesYMWQSe8KPqZnfKsyGPNeGimIBJQABM9ZaGN8MwA5ySCvqkKaEF6gpzppkD/2ECNiOgtHlBIBhamMysIYLGrgYI8dVkkXkfE7ALAQFiRbKuxxBBgye0VAR/7F9x/ssEbEpAwDlvWfimwdYNEHTfoBChfRN7cGa8zQTySUCAvHHetq0DGt8BgjaK5Coh4iGfRnFZTCB7AqKyOCpXJqbvF3Qw2Hq6BLkg8SCvMwG7E0DNJo6j7hd0DOQi1Tp77F4Bto8JJBJA7Xqi3TfG9/ULGiA2K76Tv11IgHCVpYB+7ZqCrqkLn6Ju1U0kXCc23cUE1F25qaaGFQNT0AbE5qh1XpgAWQJxDZuCBhAsaOAPbQJ9GjZqatqqQcLZtCvD1ruewPAU9KRhfHHb8BTX/lVdKQrfA2EApAmghqMQPb97Cto5Y9Wka5J747kEIgRQy4a6u8GCJuIwNjMNASEqdTUeHkHLvODmQnJNQEpoZq/gWNC5r6j9C5CSqrnrT4O2f43tX4HsiohS1Bpqzp8Gbffy2b7+QlarLof0+T504f7g/gXKLwEpobockPvQ+S8rlySEgBAi7rFkQeewZLYsKgg4TtATJ3rgnHO9cOONZTBxYml4z/bvf78BV11VAiedNAo8vF65zIvh+5iAAAEh4iXhOEFfeGERfP3rRfB/t5XBddfmFvSrr/bAL385Co44whv/C38zARsRME7kOEFfc00Z+PiY9xEQYFjQef6xWbxxBPQ4QU+Z4oHvfmfeR95nQY9d/y0fEQGjN71y53GCNn74/P8fAS9a80e/eS9x7uB7E2BB577GLmAFAf40aAVILkIfAixofVxyLSoEWNAqSHIZ+hBgQevjkmvg3QZ4DdhXBPg1tL18Q9g2FjRhZ8gW831oG/qBLZkgARb0BMFydlsRYEHb0RFy2/k+tP28wRZpEGBBa8Dio9YTYEFb7wO2QIMAC1oDFh+1ngAL2nofsAUaBFjQGrD4qPUE/h+wZ0R88v713QAAAABJRU5ErkJggg==">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
-<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#6366f1">
+<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#1d4ed8">
 <link rel="shortcut icon" href="/favicon.ico?v=2">
 <style>
 :root {
-  --bg-app: #0b0f17;
-  --bg-card: #131926;
-  --bg-card-hover: #1a2234;
-  --bg-subtle: rgba(255, 255, 255, 0.04);
+  /* Dark theme: navy-black surfaces + steel blue accent.
+     --accent is for solid fills (white text on it passes AA);
+     --accent-ink is for text/links/focus on dark surfaces. */
+  --bg-app: #0a0d12;
+  --bg-card: #121820;
+  --bg-card-hover: #1b2330;
+  --bg-subtle: rgba(255, 255, 255, 0.045);
   --bg-subtle-hover: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(99, 102, 241, 0.5);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-hover: rgba(96, 165, 250, 0.45);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
+  --text-primary: #f0f4f8;
+  --text-secondary: #a5b4c4;
+  --text-tertiary: #7e8c9e;
 
-  --accent: #6366f1;
-  --accent-subtle: rgba(99, 102, 241, 0.12);
-  --success: #10b981;
+  --accent: #1d4ed8;
+  --accent-ink: #60a5fa;
+  --accent-subtle: rgba(29, 78, 216, 0.2);
+  --success: #34d399;
   --success-subtle: rgba(16, 185, 129, 0.12);
-  --warning: #f59e0b;
+  --warning: #fbbf24;
   --warning-subtle: rgba(245, 158, 11, 0.12);
-  --danger: #ef4444;
+  --danger: #f87171;
   --danger-subtle: rgba(239, 68, 68, 0.12);
 
   --radius-sm: 6px;
@@ -43,17 +48,22 @@
 }
 
 [data-theme="light"] {
-  --bg-app: #f8fafc;
+  --bg-app: #f7f8f7;
   --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
+  --bg-card-hover: #f0f2f0;
   --bg-subtle: rgba(0, 0, 0, 0.03);
   --bg-subtle-hover: rgba(0, 0, 0, 0.06);
   --border: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(99, 102, 241, 0.5);
+  --border-hover: rgba(29, 78, 216, 0.4);
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
+  --text-primary: #13181c;
+  --text-secondary: #3d4a43;
+  --text-tertiary: #5f6d66;
+
+  --accent-ink: #1d4ed8;
+  --success: #059669;
+  --warning: #b45309;
+  --danger: #dc2626;
 }
 
 * {
@@ -139,23 +149,26 @@ header {
   gap: 8px;
 }
 
-/* Compact Telemetry Micro-Bar */
+/* Header status + system metrics */
 .stats-bar {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 6px;
 }
 
 .stat-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 0;
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--text-secondary);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  white-space: nowrap;
 }
 
 .stat-pill.online {
@@ -172,6 +185,11 @@ header {
   background: var(--danger-subtle);
   color: var(--danger);
   border-color: rgba(239, 68, 68, 0.25);
+}
+
+.metric-label {
+  color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 .dot {
@@ -201,11 +219,35 @@ header {
   border-color: var(--border-hover);
 }
 
-/* Search Bar */
+/* Search Bar — sticky so filters stay reachable while scrolling.
+   Solid background is intentional: content scrolls under it. */
 .search-row {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 14px 0 12px;
+  background: var(--bg-app);
+  border-bottom: 1px solid var(--border);
+}
+
+.search-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: -8px;
+}
+
+.search-hint strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.result-count {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
 }
 
 .search-wrap {
@@ -233,7 +275,7 @@ header {
   transition: border-color 0.15s ease;
 }
 .search-input:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-ink);
 }
 
 .search-kbd {
@@ -271,8 +313,8 @@ header {
 }
 .filter-btn.active {
   background: var(--accent-subtle);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: var(--accent);
+  border-color: rgba(29, 78, 216, 0.35);
+  color: var(--accent-ink);
 }
 
 /* Operating Profiles Strip */
@@ -299,17 +341,6 @@ header {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-}
-.profile-tag {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--bg-subtle);
-  color: var(--text-tertiary);
-  border: 1px solid var(--border);
 }
 .profile-title {
   font-size: 13.5px;
@@ -369,10 +400,10 @@ header {
 .profile-btn.turn-on {
   background: var(--accent);
   color: #ffffff;
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: rgba(29, 78, 216, 0.4);
 }
 .profile-btn.turn-on:hover {
-  background: #4f46e5;
+  background: #1e40af;
 }
 .profile-btn.turn-off {
   background: var(--bg-subtle);
@@ -405,42 +436,61 @@ header {
 }
 
 /* Category Sections */
-.section-title {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-  margin-top: 6px;
-  margin-bottom: 8px;
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-/* Service Grid & Cards */
+.section-title {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-primary);
+}
+
+.section-count {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+/* Service Grid & Cards.
+   Cards are visible surfaces (not hover-only rows) so the list is scannable.
+   Each card states what it does, where it lives, and how to use it. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 4px 14px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
 .card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 8px;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  border: 1px solid transparent;
+  gap: 10px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   color: var(--text-primary);
   text-decoration: none;
   cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
   text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .card:hover {
   border-color: var(--border);
-  background: var(--bg-subtle);
+  background: var(--bg-card-hover);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
 }
 
 .card-left {
@@ -451,10 +501,11 @@ header {
 }
 
 .card-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: transparent;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -462,8 +513,8 @@ header {
   flex-shrink: 0;
 }
 .card-icon svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
 }
 
 .card-text {
@@ -471,17 +522,26 @@ header {
 }
 
 .card-name {
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 650;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
 .card-meta {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -490,18 +550,29 @@ header {
 
 .card-right {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
   flex-shrink: 0;
-  margin-left: 8px;
+}
+
+.card-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .card-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: var(--text-tertiary);
   transition: background-color 0.2s ease;
+  flex-shrink: 0;
 }
 .card-dot.online {
   background-color: var(--success);
@@ -513,24 +584,83 @@ header {
   background-color: var(--text-tertiary);
   opacity: 0.5;
 }
-.card-latency {
-  min-width: 34px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-tertiary);
-  text-align: right;
-}
 
 .card-action {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  opacity: 0.6;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--accent-ink);
+  opacity: 0.85;
+  white-space: nowrap;
 }
-.card:hover .card-action {
-  opacity: 1;
-  color: var(--accent);
-  transform: translateX(1px);
+
+.empty-state {
+  text-align: center;
+  padding: 44px 20px;
+  color: var(--text-tertiary);
+  font-size: 13.5px;
+}
+
+.empty-state p {
+  margin-bottom: 14px;
+}
+
+.empty-state button {
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.empty-state button:hover {
+  border-color: var(--border-hover);
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 18px 14px;
+  }
+
+  .search-row {
+    flex-wrap: wrap;
+  }
+
+  .filter-pills {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .search-hint {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-desc {
+    display: none;
+  }
+
+  footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Toast */
@@ -541,7 +671,7 @@ header {
   z-index: 999;
 }
 .toast {
-  background: #1e293b;
+  background: #1b2330;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
@@ -572,7 +702,7 @@ footer a {
   text-decoration: none;
 }
 footer a:hover {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 @keyframes spin {
@@ -598,7 +728,7 @@ footer a:hover {
   <!-- Minimal Header -->
   <header>
     <div class="brand">
-      <div class="brand-icon">
+      <div class="brand-icon" aria-hidden="true">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="2" width="20" height="8" rx="2"></rect>
           <rect x="2" y="14" width="20" height="8" rx="2"></rect>
@@ -607,21 +737,22 @@ footer a:hover {
         </svg>
       </div>
       <div>
-        <div class="brand-title">Devbox</div>
+        <div class="brand-title">Devbox — Services</div>
+        <div style="font-size:12px; color:var(--text-tertiary); margin-top:1px;">Home services &amp; dev infra</div>
       </div>
-      <span class="ip-badge" onclick="copy('192.168.0.172', 'LAN IP copied')" title="Click to copy IP">192.168.0.172</span>
+      <span class="ip-badge" onclick="copy('192.168.0.172', 'LAN IP copied')" title="Click to copy LAN IP" role="button" tabindex="0" aria-label="Copy LAN IP 192.168.0.172">192.168.0.172</span>
     </div>
 
     <div class="header-right">
-      <div class="stats-bar">
-        <div id="status-pill" class="stat-pill">
-          <span class="dot"></span>
-          <span id="status-text">Probing...</span>
+      <div class="stats-bar" aria-live="polite">
+        <div id="status-pill" class="stat-pill" role="status" title="Service status">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="status-text">Checking services…</span>
         </div>
-        <div class="stat-pill" id="uptime-pill" title="System Uptime">Up: --</div>
-        <div class="stat-pill" id="cpu-pill" title="CPU Load">CPU: --%</div>
-        <div class="stat-pill" id="ram-pill" title="RAM Usage">RAM: -- GiB</div>
-        <div class="stat-pill" id="disk-pill" title="Storage Used">Disk: --%</div>
+        <div class="stat-pill" id="uptime-pill" title="System uptime"><span class="metric-label">Uptime</span> --</div>
+        <div class="stat-pill" id="cpu-pill" title="CPU usage"><span class="metric-label">CPU</span> --</div>
+        <div class="stat-pill" id="ram-pill" title="Memory in use"><span class="metric-label">RAM</span> --</div>
+        <div class="stat-pill" id="disk-pill" title="Disk usage"><span class="metric-label">Disk</span> --</div>
       </div>
 
       <button class="btn-icon" id="btn-refresh" title="Probe Endpoints" onclick="refreshAll()">
@@ -647,41 +778,43 @@ footer a:hover {
   <!-- Search & Category Filters -->
   <div class="search-row">
     <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" id="search-input" class="search-input" placeholder="Search services..." oninput="handleSearch()">
-      <span class="search-kbd">/</span>
+      <input type="text" id="search-input" class="search-input" placeholder="Search by name, host, or port…" aria-label="Search services" oninput="handleSearch()">
+      <span class="search-kbd" aria-hidden="true">/</span>
     </div>
 
-    <div class="filter-pills">
+    <div class="filter-pills" role="group" aria-label="Filter by category">
       <button class="filter-btn active" data-cat="all" onclick="setCategory('all', this)">All</button>
-      <button class="filter-btn" data-cat="web" onclick="setCategory('web', this)">Web</button>
-      <button class="filter-btn" data-cat="api" onclick="setCategory('api', this)">API</button>
-      <button class="filter-btn" data-cat="data" onclick="setCategory('data', this)">Data</button>
+      <button class="filter-btn" data-cat="web" onclick="setCategory('web', this)">Web apps</button>
+      <button class="filter-btn" data-cat="api" onclick="setCategory('api', this)">APIs</button>
+      <button class="filter-btn" data-cat="data" onclick="setCategory('data', this)">Databases</button>
     </div>
+    <span class="result-count" id="result-count" aria-live="polite"></span>
   </div>
+
+  <p class="search-hint"><strong>Web apps</strong> open in a new tab · <strong>Databases &amp; APIs</strong> copy their connection command when clicked.</p>
 
   <!-- Operating Profile: Media Server On/Off Control -->
   <div class="profile-strip" id="media-profile-strip">
     <div class="profile-info">
       <div class="profile-header-line">
-        <span class="profile-tag">PROFILE</span>
         <span class="profile-title">Media Stack</span>
         <span class="profile-status-badge stopped" id="media-status-badge">
           <span class="dot"></span>
-          <span id="media-status-text">Checking...</span>
+          <span id="media-status-text">Checking…</span>
         </span>
       </div>
       <div class="profile-subtext">
-        Jellyfin &amp; qBittorrent on demand · Core Dev Infra is always on
+        Jellyfin &amp; qBittorrent · off by default to save resources — core dev infra is always on.
       </div>
     </div>
     <div class="profile-actions">
-      <button class="profile-btn turn-on" id="media-toggle-btn" onclick="toggleMedia()">
+      <button class="profile-btn turn-on" id="media-toggle-btn" onclick="toggleMedia()" aria-pressed="false">
         <span class="btn-spinner" id="media-btn-spinner"></span>
-        <span id="media-btn-text">Turn On Media</span>
+        <span id="media-btn-text">Turn on Media</span>
       </button>
     </div>
   </div>
@@ -691,11 +824,11 @@ footer a:hover {
 
   <!-- Footer -->
   <footer>
-    <div>Devbox • Caddy &amp; mDNS Ingress</div>
-    <div style="display: flex; gap: 12px;">
-      <a href="/api/system" target="_blank">Telemetry API</a>
-      <a href="/health" target="_blank">Health</a>
-      <a href="javascript:void(0)" onclick="copy('192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local minio.local minio-console.local clickhouse.local dgraph.local cube.local t3.local postgres.local redis.local', 'Hosts snippet copied')">Hosts Snippet</a>
+    <div>Devbox · auto-refreshes every 10s</div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <a href="/api/system" target="_blank" rel="noopener">Telemetry API</a>
+      <a href="/health" target="_blank" rel="noopener">Health</a>
+      <a href="javascript:void(0)" onclick="copy('192.168.0.172 devbox.local jellyfin.local qbittorrent.local langfuse.local 9router.local minio.local minio-console.local clickhouse.local dgraph.local cube.local t3.local postgres.local redis.local', 'Hosts snippet copied')">Copy hosts snippet</a>
     </div>
   </footer>
 </div>
@@ -708,6 +841,7 @@ const SERVICES = [
   {
     id: "jellyfin",
     name: "Jellyfin",
+    desc: "Video & music streaming",
     profile: "media",
     optional: true,
     cat: "web",
@@ -721,6 +855,7 @@ const SERVICES = [
   {
     id: "qbittorrent",
     name: "qBittorrent",
+    desc: "Torrent client",
     profile: "media",
     optional: true,
     cat: "web",
@@ -734,6 +869,7 @@ const SERVICES = [
   {
     id: "langfuse",
     name: "Langfuse",
+    desc: "LLM tracing & observability",
     cat: "web",
     port: 3005,
     meta: "langfuse.local:3005",
@@ -745,6 +881,7 @@ const SERVICES = [
   {
     id: "9router",
     name: "9router",
+    desc: "Model router / LLM gateway",
     cat: "web",
     port: 20128,
     meta: "9router.local:20128",
@@ -756,6 +893,7 @@ const SERVICES = [
   {
     id: "minio-console",
     name: "MinIO Console",
+    desc: "S3 object storage admin",
     cat: "web",
     port: 9094,
     meta: "minio-console.local:9094",
@@ -767,6 +905,7 @@ const SERVICES = [
   {
     id: "cube",
     name: "Cube",
+    desc: "Semantic layer / metrics API",
     cat: "web",
     port: 80,
     meta: "cube.local · SQL 15432",
@@ -778,6 +917,7 @@ const SERVICES = [
   {
     id: "t3",
     name: "T3 Code",
+    desc: "Coding agent workspace",
     cat: "web",
     port: 3773,
     meta: "t3.local:3773",
@@ -791,6 +931,7 @@ const SERVICES = [
   {
     id: "minio-s3",
     name: "MinIO S3",
+    desc: "S3-compatible object storage",
     cat: "api",
     port: 9092,
     meta: "minio.local:9092",
@@ -803,6 +944,7 @@ const SERVICES = [
   {
     id: "clickhouse-http",
     name: "ClickHouse HTTP",
+    desc: "Analytics DB, HTTP interface",
     cat: "api",
     port: 8124,
     meta: "clickhouse.local:8124",
@@ -815,6 +957,7 @@ const SERVICES = [
   {
     id: "dgraph-http",
     name: "Dgraph HTTP",
+    desc: "Graph database, HTTP interface",
     cat: "api",
     port: 8080,
     meta: "dgraph.local:8080",
@@ -829,6 +972,7 @@ const SERVICES = [
   {
     id: "postgres",
     name: "PostgreSQL",
+    desc: "Relational DB",
     cat: "data",
     port: 5432,
     meta: "postgres.local:5432",
@@ -840,6 +984,7 @@ const SERVICES = [
   {
     id: "redis",
     name: "Redis",
+    desc: "Cache / broker",
     cat: "data",
     port: 6380,
     meta: "redis.local:6380",
@@ -851,6 +996,7 @@ const SERVICES = [
   {
     id: "clickhouse-native",
     name: "ClickHouse Native",
+    desc: "Analytics DB, native protocol",
     cat: "data",
     port: 9002,
     meta: "clickhouse.local:9002",
@@ -862,6 +1008,7 @@ const SERVICES = [
   {
     id: "dgraph-grpc",
     name: "Dgraph gRPC",
+    desc: "Graph database, gRPC",
     cat: "data",
     port: 9080,
     meta: "dgraph.local:9080",
@@ -895,25 +1042,27 @@ function updateMediaProfileUI(mediaProfile) {
       badgeText.innerText = 'Active';
       btn.className = 'profile-btn turn-off';
       btn.disabled = false;
-      btnText.innerText = 'Turn Off Media';
+      btn.setAttribute('aria-pressed', 'true');
+      btnText.innerText = 'Turn off Media';
       spinner.className = 'btn-spinner';
     } else if (currentMediaStatus === 'stopped') {
       badgeText.innerText = 'Stopped';
       btn.className = 'profile-btn turn-on';
       btn.disabled = false;
-      btnText.innerText = 'Turn On Media';
+      btn.setAttribute('aria-pressed', 'false');
+      btnText.innerText = 'Turn on Media';
       spinner.className = 'btn-spinner';
     } else if (currentMediaStatus === 'starting') {
-      badgeText.innerText = 'Starting...';
+      badgeText.innerText = 'Starting…';
       btn.className = 'profile-btn busy';
       btn.disabled = true;
-      btnText.innerText = 'Starting...';
+      btnText.innerText = 'Starting…';
       spinner.className = 'btn-spinner active';
     } else if (currentMediaStatus === 'stopping') {
-      badgeText.innerText = 'Stopping...';
+      badgeText.innerText = 'Stopping…';
       btn.className = 'profile-btn busy';
       btn.disabled = true;
-      btnText.innerText = 'Stopping...';
+      btnText.innerText = 'Stopping…';
       spinner.className = 'btn-spinner active';
     }
   }
@@ -978,7 +1127,7 @@ function updateOverallStatus() {
 
   if (knownCount === 0) {
     pill.className = 'stat-pill';
-    txt.innerText = 'Probing...';
+    txt.innerText = 'Checking services…';
     return;
   }
 
@@ -988,59 +1137,98 @@ function updateOverallStatus() {
       const jOnline = healthMap['jellyfin']?.status === 'online';
       const qOnline = healthMap['qbittorrent']?.status === 'online';
       const mediaOnline = (jOnline ? 1 : 0) + (qOnline ? 1 : 0);
+      const allTotal = SERVICES.length;
       if (mediaOnline === 2) {
         pill.className = 'stat-pill online';
-        txt.innerText = 'All 14 Online';
+        txt.innerText = `All ${allTotal} services online`;
       } else {
-        pill.className = 'stat-pill online';
-        txt.innerText = `${total + mediaOnline}/14 Online`;
+        pill.className = 'stat-pill warning';
+        txt.innerText = `Core online · Media ${mediaOnline}/2`;
       }
+    } else if (currentMediaStatus === 'starting' || currentMediaStatus === 'stopping') {
+      pill.className = 'stat-pill warning';
+      txt.innerText = `Core online · Media ${currentMediaStatus}`;
     } else {
       pill.className = 'stat-pill online';
-      txt.innerText = `All ${total} Core Online`;
+      txt.innerText = `All ${total} core services online`;
     }
   } else if (onlineCount > 0) {
     pill.className = 'stat-pill warning';
-    txt.innerText = `${onlineCount}/${total} Core Online`;
+    txt.innerText = `${onlineCount}/${total} core services online`;
   } else {
     pill.className = 'stat-pill offline';
-    txt.innerText = 'Offline';
+    txt.innerText = 'Core services offline';
   }
+}
+
+function matchesQuery(s) {
+  const q = searchFilter.toLowerCase().trim();
+  if (!q) return true;
+  const haystack = `${s.name} ${s.desc || ''} ${s.meta}`.toLowerCase();
+  return q.split(/\s+/).every(token => haystack.includes(token));
 }
 
 function render() {
   const root = document.getElementById('services-root');
-  const filtered = SERVICES.filter(s => {
-    const matchCat = currentCat === 'all' || s.cat === currentCat;
-    const q = searchFilter.toLowerCase().trim();
-    const matchQ = !q || s.name.toLowerCase().includes(q) || s.meta.toLowerCase().includes(q);
-    return matchCat && matchQ;
-  });
+  const filtered = SERVICES.filter(s => (currentCat === 'all' || s.cat === currentCat) && matchesQuery(s));
+
+  const resultCount = document.getElementById('result-count');
+  if (resultCount) {
+    resultCount.textContent = (currentCat === 'all' && !searchFilter)
+      ? `${SERVICES.length} services`
+      : `${filtered.length} of ${SERVICES.length}`;
+  }
 
   if (filtered.length === 0) {
-    root.innerHTML = `<div style="text-align:center; padding:32px 0; color:var(--text-tertiary); font-size:13px;">No services found</div>`;
+    const q = searchFilter.trim();
+    root.innerHTML = `<div class="empty-state">
+      <p>No services match${q ? ` "${q}"` : ''}${currentCat !== 'all' ? ` in the current category` : ''}.</p>
+      <button type="button" onclick="clearFilters()">Clear search &amp; filters</button>
+    </div>`;
     return;
   }
 
   const sections = [
-    { id: 'web', title: 'Web Applications' },
-    { id: 'api', title: 'APIs & Storage' },
-    { id: 'data', title: 'Databases & TCP' }
+    { id: 'web', title: 'Web apps' },
+    { id: 'api', title: 'APIs' },
+    { id: 'data', title: 'Databases' }
   ];
 
   let html = '';
-  if (currentCat === 'all' && !searchFilter) {
-    for (const sec of sections) {
-      const items = filtered.filter(s => s.cat === sec.id);
-      if (items.length === 0) continue;
-      html += `<div class="section-title">${sec.title}</div>`;
-      html += `<div class="grid">${items.map(renderCard).join('')}</div>`;
-    }
-  } else {
-    html = `<div class="grid">${filtered.map(renderCard).join('')}</div>`;
+  for (const sec of sections) {
+    const items = filtered.filter(s => s.cat === sec.id);
+    if (items.length === 0) continue;
+    const online = items.filter(s => healthMap[s.id]?.status === 'online').length;
+    const countLabel = healthMap[items[0].id] ? `${online}/${items.length} online` : `${items.length} services`;
+    html += `<div class="section-head">
+      <span class="section-title">${sec.title}</span>
+      <span class="section-count">${countLabel}</span>
+    </div>`;
+    html += `<div class="grid">${items.map(renderCard).join('')}</div>`;
   }
 
   root.innerHTML = html;
+}
+
+function clearFilters() {
+  searchFilter = '';
+  currentCat = 'all';
+  const input = document.getElementById('search-input');
+  if (input) input.value = '';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
+  render();
+}
+
+function statusText(s, h) {
+  const isMedia = s.profile === 'media';
+  const isMediaStopped = isMedia && currentMediaStatus === 'stopped';
+  const isMediaTransition = isMedia && (currentMediaStatus === 'starting' || currentMediaStatus === 'stopping');
+
+  if (isMediaStopped) return 'Off';
+  if (isMediaTransition) return currentMediaStatus === 'starting' ? 'Starting…' : 'Stopping…';
+  if (h.status === 'online') return h.kind === 'tcp' ? 'Online' : (h.latency > 0 ? `Online · ${h.latency}ms` : 'Online');
+  if (h.status === 'offline') return 'Offline';
+  return 'Checking…';
 }
 
 function renderCard(s) {
@@ -1050,63 +1238,48 @@ function renderCard(s) {
   const isMediaTransition = isMedia && (currentMediaStatus === 'starting' || currentMediaStatus === 'stopping');
 
   let dotClass = '';
-  let latency = '—';
-  let dotTitle = 'Checking';
-
   if (isMediaStopped) {
     dotClass = 'stopped';
-    latency = 'Off';
-    dotTitle = 'Media Profile Stopped (Click switch above to start)';
   } else if (isMediaTransition) {
     dotClass = 'offline';
-    latency = '...';
-    dotTitle = currentMediaStatus === 'starting' ? 'Media Starting...' : 'Media Stopping...';
-  } else {
-    const isOnline = h.status === 'online';
-    dotClass = isOnline ? 'online' : (h.status === 'offline' ? 'offline' : '');
-    latency = h.kind === 'tcp' ? 'TCP' : (h.latency > 0 ? `${h.latency}ms` : '—');
-    dotTitle = isOnline ? `Online${h.latency > 1 ? ` · ${h.latency}ms` : ''}` : (h.status === 'offline' ? 'Offline' : 'Checking');
+  } else if (h.status === 'online') {
+    dotClass = 'online';
+  } else if (h.status === 'offline') {
+    dotClass = 'offline';
   }
 
+  const text = statusText(s, h);
+  const desc = s.desc || '';
+  const action = s.isWeb ? 'Open ↗' : 'Copy ⧉';
   const clickHandler = isMediaStopped ? `onclick="showToast('Media stack is stopped. Turn it on using the switch above!'); return false;"` : '';
+
+  const left = `
+        <div class="card-left">
+          <div class="card-icon" aria-hidden="true">${s.icon}</div>
+          <div class="card-text">
+            <div class="card-name">${s.name}</div>
+            ${desc ? `<div class="card-desc">${desc}</div>` : ''}
+            <div class="card-meta">${s.meta}</div>
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="card-status"><span class="card-dot ${dotClass}" id="dot-${s.id}"></span><span id="ctext-${s.id}">${text}</span></span>
+          <span class="card-action">${action}</span>
+        </div>`;
 
   if (s.isWeb) {
     return `
-      <a href="${s.url}" target="_blank" rel="noopener" class="card" id="card-${s.id}" ${clickHandler}>
-        <div class="card-left">
-          <div class="card-icon">${s.icon}</div>
-          <div class="card-text">
-            <div class="card-name">${s.name}</div>
-            <div class="card-meta">${s.meta}</div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${dotTitle}"></span>
-          <span class="card-latency" id="latency-${s.id}">${latency}</span>
-          <span class="card-action">↗</span>
-        </div>
+      <a href="${s.url}" target="_blank" rel="noopener" class="card" id="card-${s.id}" title="${s.name} — ${text}" ${clickHandler}>${left}
       </a>
     `;
-  } else {
-    const val = (s.copyVal || s.meta).replace(/'/g, "\\'");
-    const msg = (s.copyMsg || 'Copied').replace(/'/g, "\\'");
-    return `
-      <div class="card" id="card-${s.id}" onclick="copy('${val}', '${msg}')" title="Click to copy connection command">
-        <div class="card-left">
-          <div class="card-icon">${s.icon}</div>
-          <div class="card-text">
-            <div class="card-name">${s.name}</div>
-            <div class="card-meta">${s.meta}</div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${dotTitle}"></span>
-          <span class="card-latency" id="latency-${s.id}">${latency}</span>
-          <span class="card-action">⧉</span>
-        </div>
+  }
+
+  const val = (s.copyVal || s.meta).replace(/'/g, "\\'");
+  const msg = (s.copyMsg || 'Copied').replace(/'/g, "\\'");
+  return `
+      <div class="card" id="card-${s.id}" onclick="copy('${val}', '${msg}')" title="Click to copy connection command" role="button" tabindex="0" aria-label="Copy connection command for ${s.name}">${left}
       </div>
     `;
-  }
 }
 
 // Search & Category Filters
@@ -1126,33 +1299,28 @@ function setCategory(cat, btn) {
 function updateDot(id, isOnline, latency, kind) {
   const isMedia = (id === 'jellyfin' || id === 'qbittorrent');
   const dot = document.getElementById(`dot-${id}`);
-  const latencyEl = document.getElementById(`latency-${id}`);
+  const textEl = document.getElementById(`ctext-${id}`);
+  const s = SERVICES.find(x => x.id === id);
+  const h = { status: isOnline ? 'online' : 'offline', latency, kind };
 
   if (isMedia && currentMediaStatus === 'stopped') {
-    if (dot) {
-      dot.className = 'card-dot stopped';
-      dot.title = 'Media Profile Stopped';
-    }
-    if (latencyEl) latencyEl.innerText = 'Off';
+    if (dot) dot.className = 'card-dot stopped';
+    if (textEl) textEl.innerText = 'Off';
     return;
   }
   if (isMedia && (currentMediaStatus === 'starting' || currentMediaStatus === 'stopping')) {
-    if (dot) {
-      dot.className = 'card-dot offline';
-      dot.title = currentMediaStatus === 'starting' ? 'Starting...' : 'Stopping...';
-    }
-    if (latencyEl) latencyEl.innerText = '...';
+    if (dot) dot.className = 'card-dot offline';
+    if (textEl) textEl.innerText = currentMediaStatus === 'starting' ? 'Starting…' : 'Stopping…';
     return;
   }
 
-  if (dot) {
-    dot.className = `card-dot ${isOnline ? 'online' : 'offline'}`;
-    dot.title = isOnline ? `Online${latency > 1 ? ` · ${latency}ms` : ''}` : 'Offline';
-  }
-  if (latencyEl) {
-    if (kind === 'tcp') latencyEl.innerText = 'TCP';
-    else if (latency > 0) latencyEl.innerText = `${latency}ms`;
-  }
+  if (dot) dot.className = `card-dot ${isOnline ? 'online' : 'offline'}`;
+  if (textEl) textEl.innerText = statusText(s, h);
+}
+
+function setMetric(id, label, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = `<span class="metric-label">${label}</span> ${value}`;
 }
 
 // Telemetry Polling
@@ -1181,7 +1349,7 @@ async function fetchTelemetry(forceHealth = false) {
     if (d.uptime_seconds !== undefined) {
       const el = document.getElementById('uptime-pill');
       if (el) {
-        el.innerText = `Up: ${formatUptime(d.uptime_seconds)}`;
+        setMetric('uptime-pill', 'Uptime', formatUptime(d.uptime_seconds));
         const d_days = Math.floor(d.uptime_seconds / 86400);
         const d_hours = Math.floor((d.uptime_seconds % 86400) / 3600);
         const d_mins = Math.floor((d.uptime_seconds % 3600) / 60);
@@ -1190,17 +1358,14 @@ async function fetchTelemetry(forceHealth = false) {
     }
 
     if (d.cpu) {
-      const el = document.getElementById('cpu-pill');
-      if (el) el.innerText = `CPU: ${d.cpu.percent ? d.cpu.percent.toFixed(0) : 0}%`;
+      setMetric('cpu-pill', 'CPU', `${d.cpu.percent ? d.cpu.percent.toFixed(0) : 0}%`);
     }
     if (d.memory) {
-      const el = document.getElementById('ram-pill');
       const gib = 1024 * 1024 * 1024;
-      if (el && d.memory.used) el.innerText = `RAM: ${(d.memory.used / gib).toFixed(1)}G`;
+      if (d.memory.used) setMetric('ram-pill', 'RAM', `${(d.memory.used / gib).toFixed(1)}G`);
     }
     if (d.disk) {
-      const el = document.getElementById('disk-pill');
-      if (el && d.disk.percent !== undefined) el.innerText = `Disk: ${d.disk.percent.toFixed(0)}%`;
+      if (d.disk.percent !== undefined) setMetric('disk-pill', 'Disk', `${d.disk.percent.toFixed(0)}%`);
     }
   } catch (e) {}
   finally {
@@ -1267,6 +1432,23 @@ document.addEventListener('DOMContentLoaded', () => {
   loadTelemetry(true);
 
   setInterval(loadTelemetry, 10000);
+});
+
+// Keyboard activation for copy-cards and the IP badge (both use role=button).
+document.addEventListener('keydown', (e) => {
+  const el = document.activeElement;
+  if (!el) return;
+  if (e.key === 'Escape' && el.id === 'search-input') {
+    el.value = '';
+    handleSearch();
+    return;
+  }
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  if (el.tagName === 'INPUT' || el.tagName === 'BUTTON' || el.tagName === 'A') return;
+  if (el.getAttribute('role') === 'button') {
+    e.preventDefault();
+    el.click();
+  }
 });
 
 document.addEventListener('visibilitychange', () => {
