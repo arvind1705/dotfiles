@@ -114,7 +114,7 @@ All container resource limits are carefully budgeted for host stability on a 2-c
   - `cpus: '0.75'`
 
 ### 2. Media Server (`stacks/media-server/compose.yaml`)
-- **RAM Disk Transcode Cache**: Mounted `tmpfs: /cache/transcodes:size=1024M,mode=1777` directly in RAM. Eliminates up to ~12 GB of daily temporary HLS segment writes on the 5,400 RPM hard drive, preventing disk thrashing and streaming stutters.
+- **Transcode Cache & Throttling**: Mounted `${MEDIA_ROOT}/cache:/cache` on disk with transcode throttling (`EnableThrottling: true`) and segment deletion enabled. Throttling ensures Jellyfin only transcodes 180s ahead during playback, eliminating HDD write thrashing without the fatal out-of-space errors that occur when bounding remuxes of full-length movies to a small tmpfs RAM disk.
 - **Dual Path Mounts**: Both `${MEDIA_ROOT}/library` (`/home/aravind/data/media/library`) and `/home/aravind/entertainment/library` are mounted inside the container to maintain full backwards and forwards compatibility with Jellyfin's SQLite database index.
 - **Hardware Transcoding**: Passed `/dev/dri` device and `render`/`video` groups for Intel Quick Sync Video (QSV) hardware-accelerated video transcode and remuxing.
 - **qBittorrent WebUI Port**: Bound to port `8081` matching host and container to satisfy qBittorrent 5.x CSRF/Host-header validation.
