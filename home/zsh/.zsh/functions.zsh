@@ -111,7 +111,7 @@ fetcharuba() {
 
 # AWS SSO login — prints verification code in huge text
 sso() {
-  local profile="${1:-shared_repo}"
+  local profile="${1:-self}"
   local seen=0
   setopt localoptions pipefail 2>/dev/null
   aws sso login --profile "$profile" --use-device-code --no-browser 2>&1 |

@@ -8,5 +8,5 @@ export ARUBA_HOME="$HOME/aruba"
 export GOPATH="$HOME/.cache/go"
 export GOMODCACHE="$HOME/.cache/go/pkg/mod"
 
-export AWS_PROFILE="shared_repo"
+export AWS_PROFILE="self"
 export APP_ENV="DEVELOPMENT"
