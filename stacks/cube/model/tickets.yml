@@ -1,0 +1,94 @@
+# All five ticket types with their shared columns, for generic ticket searches,
+# device traversals, trends and aging. Each branch reads its type cube's SQL,
+# so membership, priority/severity normalization and the open flag are defined
+# once, per type. Columns a type does not record are NULL (as the field is
+# absent on that type in Dgraph).
+cubes:
+  - name: tickets
+    sql: >
+      SELECT 'Incident' AS ticket_type, t.incident_number AS ticket_number, t.state,
+        t.priority_norm AS priority, NULL::text AS severity, t.incident_category AS category, t.issue_type,
+        t.created_at, t.updated_at, t.resolved_at, NULL::timestamptz AS closed_at,
+        t.creation_type, t.assigned_to, t.assignment_group, t.device_id,
+        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id,
+        t.is_open_flag AS is_open
+      FROM ({incidents.sql()}) t
+      UNION ALL
+      SELECT 'Case', t.case_number, t.state,
+        t.priority_norm, NULL::text, NULL::text, t.issue_type,
+        t.created_at, t.updated_at, t.resolved_at, NULL::timestamptz,
+        t.creation_type, t.assigned_to, t.assignment_group, t.device_id,
+        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id,
+        t.is_open_flag
+      FROM ({cases.sql()}) t
+      UNION ALL
+      SELECT 'ChangeRequest', t.change_request_number, t.state,
+        t.priority_norm, NULL::text, t.category, t.issue_type,
+        t.created_at, t.updated_at, NULL::timestamptz, t.closed_at,
+        t.creation_type, t.assigned_to, t.assignment_group, t.device_id,
+        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id,
+        t.is_open_flag
+      FROM ({change_requests.sql()}) t
+      UNION ALL
+      SELECT 'PETRequest', t.requested_item_number, t.state,
+        NULL::text, t.severity_norm, NULL::text, t.issue_type,
+        t.created_at, t.updated_at, NULL::timestamptz, NULL::timestamptz,
+        NULL::text, t.assigned_to, t.assignment_group, t.serial_number,
+        t.account_id, t.sub_account_id, t.site_id, NULL::text, t.scope_account_id,
+        t.is_open_flag
+      FROM ({pet_requests.sql()}) t
+      UNION ALL
+      SELECT 'TACCase', t.tac_case_number, t.state,
+        NULL::text, t.severity_norm, NULL::text, NULL::text,
+        t.created_at, t.updated_at, NULL::timestamptz, NULL::timestamptz,
+        NULL::text, NULL::text, NULL::text, t.serial_number,
+        t.account_id, NULL::text, NULL::text, NULL::text, t.scope_account_id,
+        NULL::boolean
+      FROM ({tac_cases.sql()}) t
+
+    measures:
+      - name: count
+        type: count
+
+      - name: open_count
+        type: count
+        filters:
+          - sql: "{CUBE}.is_open"
+
+      - name: device_count
+        type: count_distinct
+        sql: device_id
+
+    dimensions:
+      - name: ticketKey
+        sql: "{CUBE}.ticket_type || ':' || {CUBE}.ticket_number"
+        type: string
+        primary_key: true
+      - { name: ticketType, sql: ticket_type, type: string }
+      - { name: ticketNumber, sql: ticket_number, type: string }
+      - { name: state, sql: state, type: string }
+      - { name: priority, sql: priority, type: string }
+      - { name: severity, sql: severity, type: string }
+      - { name: category, sql: category, type: string }
+      - { name: issueType, sql: issue_type, type: string }
+      - { name: creationType, sql: creation_type, type: string }
+      - { name: is_open, sql: is_open, type: boolean }
+      - { name: isUnassigned, sql: "NULLIF(TRIM({CUBE}.assigned_to), '') IS NULL", type: boolean }
+      - { name: assignmentGroup, sql: assignment_group, type: string }
+      - { name: assignedTo, sql: assigned_to, type: string }
+      - { name: deviceId, sql: device_id, type: string }
+      - { name: accountId, sql: account_id, type: string }
+      - { name: subAccountId, sql: sub_account_id, type: string }
+      - { name: siteId, sql: site_id, type: string }
+      - { name: subSiteId, sql: sub_site_id, type: string }
+      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
+      # queryRewrite when they match the signed digest in the token.
+      - { name: deviceScopeTicket, sql: ticket_number, type: string }
+      - { name: scopeAccountId, sql: scope_account_id, type: string }
+      - { name: createdAt, sql: created_at, type: time }
+      - { name: updatedAt, sql: updated_at, type: time }
+      - { name: resolvedAt, sql: resolved_at, type: time }
+      - { name: closedAt, sql: closed_at, type: time }
+      - { name: createdAtMissing, sql: "{CUBE}.created_at IS NULL", type: boolean }
+      - { name: updatedAtMissing, sql: "{CUBE}.updated_at IS NULL", type: boolean }
+      - { name: priorityMissing, sql: "{CUBE}.priority IS NULL", type: boolean }

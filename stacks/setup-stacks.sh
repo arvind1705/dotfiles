@@ -63,11 +63,29 @@ fi
 # 4. Initialize 9router .env
 if [[ ! -f "$STACKS_DIR/9router/.env" ]]; then
   echo "==> Creating stacks/9router/.env from template..."
-  cp "$STACKS_DIR/9router/.env.example" "$STACKS_DIR/9router/.env"
+  sed "s|^LAN_IP=.*|LAN_IP=$LAN_IP|" "$STACKS_DIR/9router/.env.example" > "$STACKS_DIR/9router/.env"
   chmod 600 "$STACKS_DIR/9router/.env"
 fi
 
-# 5. Initialize media-server .env
+# 5. Initialize Cube .env
+if [[ ! -f "$STACKS_DIR/cube/.env" ]]; then
+  echo "==> Creating stacks/cube/.env with a generated API secret..."
+  CUBE_API_SECRET="$(openssl rand -hex 32)"
+  CUBE_SQL_PASSWORD="$(openssl rand -hex 32)"
+  sed -e "s|^LAN_IP=.*|LAN_IP=$LAN_IP|" \
+      -e "s|generate_a_long_random_secret|$CUBE_API_SECRET|" \
+      -e "s|generate_a_long_random_sql_password|$CUBE_SQL_PASSWORD|" \
+      "$STACKS_DIR/cube/.env.example" > "$STACKS_DIR/cube/.env"
+  chmod 600 "$STACKS_DIR/cube/.env"
+fi
+
+# 6. Ensure the shared network exists before stacks with external network references start.
+if ! docker network inspect ai-infra-local >/dev/null 2>&1; then
+  echo "==> Creating shared Docker network ai-infra-local..."
+  docker network create ai-infra-local >/dev/null
+fi
+
+# 7. Initialize media-server .env
 if [[ ! -f "$STACKS_DIR/media-server/.env" ]]; then
   echo "==> Creating stacks/media-server/.env with detected machine values..."
   cat > "$STACKS_DIR/media-server/.env" <<EOF
@@ -88,21 +106,32 @@ EOF
   chmod 600 "$STACKS_DIR/media-server/.env"
 fi
 
-# 6. Install systemd stack@.service template for auto-boot
+# 8. Install systemd stack@.service template for auto-boot
 if [[ -d /etc/systemd/system ]]; then
   echo "==> Installing systemd stack@.service for boot auto-start..."
   sudo cp "$STACKS_DIR/systemd/stack@.service" /etc/systemd/system/stack@.service
-  if [[ -d "$STACKS_DIR/systemd/stack@langfuse.service.d" ]]; then
-    sudo mkdir -p /etc/systemd/system/stack@langfuse.service.d
-    sudo cp "$STACKS_DIR/systemd/stack@langfuse.service.d/override.conf" /etc/systemd/system/stack@langfuse.service.d/
+  # Clean up legacy or removed profile units if present
+  if systemctl is-enabled stack@analytics.service >/dev/null 2>&1 || [[ -f /etc/systemd/system/stack@analytics.service ]]; then
+    sudo systemctl disable --now stack@analytics.service 2>/dev/null || true
+    sudo rm -f /etc/systemd/system/stack@analytics.service
   fi
+
+  for override_dir in langfuse cube; do
+    if [[ -d "$STACKS_DIR/systemd/stack@$override_dir.service.d" ]]; then
+      sudo mkdir -p "/etc/systemd/system/stack@$override_dir.service.d"
+      sudo cp "$STACKS_DIR/systemd/stack@$override_dir.service.d/override.conf" "/etc/systemd/system/stack@$override_dir.service.d/"
+    fi
+  done
   sudo systemctl daemon-reload
 
-  # Enable all stacks on boot
-  for stack in devdeps langfuse 9router media-server; do
-    echo "    Enabling boot service: stack@$stack..."
+  # Enable all general dev infra stacks on boot (always-on)
+  for stack in devdeps cube langfuse 9router; do
+    echo "    Enabling boot service (always-on): stack@$stack..."
     sudo systemctl enable "stack@$stack"
   done
+
+  # Media is available on demand but is not started automatically on a server boot.
+  sudo systemctl disable stack@media-server 2>/dev/null || true
 
   # Clean up legacy media-stack.service if present
   if systemctl is-enabled media-stack.service >/dev/null 2>&1; then

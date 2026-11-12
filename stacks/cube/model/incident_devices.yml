@@ -1,0 +1,19 @@
+# Incident-to-device links as the loader writes affectsDevice: the incident's
+# device plus each serial in other_asset_ids. Reachable only through incidents.
+cubes:
+  - name: incident_devices
+    sql: >
+      SELECT DISTINCT i.incident_number, TRIM(d.serial) AS serial
+      FROM public.incident30d i
+      CROSS JOIN LATERAL unnest(
+        array_cat(ARRAY[i.device_id], string_to_array(COALESCE(i.other_asset_ids, ''), ','))
+      ) AS d(serial)
+      WHERE NULLIF(TRIM(d.serial), '') IS NOT NULL
+
+    dimensions:
+      - name: linkKey
+        sql: "{CUBE}.incident_number || '|' || {CUBE}.serial"
+        type: string
+        primary_key: true
+      - { name: incidentNumber, sql: incident_number, type: string }
+      - { name: serial, sql: serial, type: string }

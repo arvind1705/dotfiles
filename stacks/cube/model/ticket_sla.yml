@@ -1,0 +1,48 @@
+# One row per ticket with an SLA record: flags rolled up over the ticket's SLA
+# records, with the same semantics as the Dgraph population summary (a blank
+# flag is missing; near-breach counts when the record is active or its active
+# state is unknown). Reachable only through a scoped ticket cube.
+cubes:
+  - name: ticket_sla
+    sql: >
+      SELECT
+        task_id,
+        bool_or(LOWER(TRIM(has_breached)) IN ('true', 't', '1', 'yes')) AS any_breached,
+        bool_or(LOWER(TRIM(has_breached)) IN ('false', 'f', '0', 'no')) AS any_not_breached,
+        bool_or(NULLIF(TRIM(has_breached), '') IS NULL) AS bad_breach,
+        bool_or(NULLIF(TRIM(near_breached), '') IS NULL) AS bad_near,
+        bool_or(
+          LOWER(TRIM(near_breached)) IN ('true', 't', '1', 'yes')
+          AND (LOWER(TRIM(active)) IN ('true', 't', '1', 'yes') OR NULLIF(TRIM(active), '') IS NULL)
+        ) AS near_active,
+        bool_or(
+          LOWER(TRIM(near_breached)) IN ('true', 't', '1', 'yes') AND NULLIF(TRIM(active), '') IS NULL
+        ) AS near_unknown_active
+      FROM public.customerdata_sla
+      WHERE NULLIF(TRIM(task_id), '') IS NOT NULL
+      GROUP BY task_id
+
+    dimensions:
+      - { name: taskId, sql: task_id, type: string, primary_key: true }
+      # True for tickets joined to at least one SLA record.
+      - { name: hasRecord, sql: "{CUBE}.task_id IS NOT NULL", type: boolean }
+      - { name: anyBreached, sql: "COALESCE({CUBE}.any_breached, false)", type: boolean }
+      - { name: anyNotBreached, sql: "COALESCE({CUBE}.any_not_breached, false)", type: boolean }
+      - { name: badBreach, sql: "COALESCE({CUBE}.bad_breach, false)", type: boolean }
+      - { name: badNear, sql: "COALESCE({CUBE}.bad_near, false)", type: boolean }
+      - { name: nearActive, sql: "COALESCE({CUBE}.near_active, false)", type: boolean }
+      - { name: nearUnknownActive, sql: "COALESCE({CUBE}.near_unknown_active, false)", type: boolean }
+
+  # One rollup per ticket cube so a query that touches incidents and cases
+  # (parent-case summaries) joins each ticket to its own SLA rollup.
+  - name: incident_sla
+    extends: ticket_sla
+
+  - name: case_sla
+    extends: ticket_sla
+
+  - name: change_request_sla
+    extends: ticket_sla
+
+  - name: pet_request_sla
+    extends: ticket_sla

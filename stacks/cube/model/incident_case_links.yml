@@ -1,0 +1,30 @@
+# Incident-to-case links as Dgraph records them: from the incident's case
+# number and from the case's incident number. Reachable only through a scoped
+# ticket cube; the linked case must itself be authorized (cases scope).
+cubes:
+  - name: incident_case_links
+    sql: >
+      SELECT DISTINCT incident_number, case_number FROM (
+        SELECT incident_number, case_number FROM public.incident30d
+        WHERE NULLIF(TRIM(case_number), '') IS NOT NULL
+        UNION
+        SELECT incident_number, case_number FROM public.case30d
+        WHERE NULLIF(TRIM(incident_number), '') IS NOT NULL
+      ) links
+
+    joins:
+      - name: cases
+        relationship: many_to_one
+        sql: "{CUBE}.case_number = {cases}.case_number"
+
+      - name: incidents
+        relationship: many_to_one
+        sql: "{CUBE}.incident_number = {incidents}.incident_number"
+
+    dimensions:
+      - name: linkKey
+        sql: "{CUBE}.incident_number || '|' || {CUBE}.case_number"
+        type: string
+        primary_key: true
+      - { name: incidentNumber, sql: incident_number, type: string }
+      - { name: caseNumber, sql: case_number, type: string }

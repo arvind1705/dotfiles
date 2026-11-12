@@ -1,0 +1,49 @@
+# TAC cases: membership matches the loader's `tac` query. TAC rows carry
+# Every source column comes from the generated base (columns/), under its own
+# name; this cube adds membership, scope, normalization and flags.
+# account_id but no site or sub-site.
+cubes:
+  - name: tac_cases
+    extends: tac_case_columns
+    public: true
+    sql: >
+      SELECT
+        c.*,
+        -- Normalized as the loader normalizes it.
+        CASE TRIM(c.severity)
+        WHEN '1 - Critical' THEN 'Critical' WHEN '1-Critical-Down' THEN 'Critical'
+        WHEN '2 - High' THEN 'Major' WHEN '2-Critical-Degraded' THEN 'Major'
+        WHEN '3 - Moderate' THEN 'Minor' WHEN '3 - Normal' THEN 'Normal'
+        WHEN '3-Normal' THEN 'Normal' WHEN '4 - Low' THEN 'Warning' WHEN '4-Low' THEN 'Warning'
+        WHEN 'CRITICAL' THEN 'Critical' WHEN 'MAJOR' THEN 'Major' WHEN 'MINOR' THEN 'Minor'
+        WHEN 'NORMAL' THEN 'Normal' WHEN 'WARNING' THEN 'Warning' WHEN 'BLOCKER' THEN 'Blocker'
+        WHEN 'HIGH' THEN 'Major' WHEN 'MEDIUM' THEN 'Minor' WHEN 'LOW' THEN 'Warning'
+        WHEN 'Critical' THEN 'Critical' WHEN 'Major' THEN 'Major' WHEN 'Minor' THEN 'Minor'
+        WHEN 'Normal' THEN 'Normal' WHEN 'Warning' THEN 'Warning' WHEN 'Blocker' THEN 'Blocker'
+        END AS severity_norm,
+        (SELECT a.account_name FROM public.account_count_summary a
+          WHERE a.account_id = c.account_id LIMIT 1) AS account_name,
+        c.account_id AS scope_account_id
+      FROM public.customerdata_supporttaccase c
+
+    measures:
+      - name: count
+        type: count
+
+    dimensions:
+      # Ticket key shared by every ticket cube (here the TAC case number).
+      - { name: ticketNumber, sql: tac_case_number, type: string }
+      - { name: stateKey, sql: "LOWER(REPLACE(TRIM({CUBE}.state), '_', ' '))", type: string }
+      # Unrecognized severities are dropped, as the loader does today.
+      - { name: severityNorm, sql: severity_norm, type: string }
+      # Account name from the org directory (TAC rows carry only the ID).
+      - { name: accountName, sql: account_name, type: string }
+      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
+      # queryRewrite when they match the signed digest in the token.
+      - { name: deviceScopeTicket, sql: tac_case_number, type: string }
+      - { name: scopeAccountId, sql: scope_account_id, type: string }
+      # Sort helpers: missing values sort last in both directions, as in Dgraph.
+      - { name: createdAtMissing, sql: "{CUBE}.created_at IS NULL", type: boolean }
+      - { name: updatedAtMissing, sql: "{CUBE}.updated_at IS NULL", type: boolean }
+      - { name: severityMissing, sql: "{CUBE}.severity_norm IS NULL", type: boolean }
+      - { name: stateMissing, sql: "NULLIF(TRIM({CUBE}.state), '') IS NULL", type: boolean }

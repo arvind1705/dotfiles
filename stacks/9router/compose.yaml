@@ -6,7 +6,7 @@ services:
     container_name: 9router
     restart: unless-stopped
     ports:
-      - "${ROUTER_PORT:-20128}:20128"
+      - "${LAN_IP:-192.168.0.172}:${ROUTER_PORT:-20128}:20128"
     cpu_shares: 256
     deploy:
       resources:

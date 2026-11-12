@@ -12,7 +12,7 @@ Group=aravind
 SupplementaryGroups=docker
 WorkingDirectory=/home/aravind/dev/dotfiles/stacks/%i
 Environment=HOME=/home/aravind
-ExecStart=/usr/bin/docker compose up -d --wait --remove-orphans
+ExecStart=/usr/bin/docker compose up -d --wait
 ExecStop=/usr/bin/docker compose down
 TimeoutStartSec=300
 

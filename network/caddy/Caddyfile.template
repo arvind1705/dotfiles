@@ -71,7 +71,7 @@ http://devbox.local, http://__LAN_IP__, http://localhost, http://127.0.0.1 {
 	}
 	handle /api/health/cube* {
 		rewrite * /readyz
-		reverse_proxy __LAN_IP__:4000
+		reverse_proxy 127.0.0.1:4000
 	}
 	handle /api/health/t3* {
 		rewrite * /health
@@ -94,9 +94,9 @@ http://cube.local {
 	encode zstd gzip
 	handle /health {
 		rewrite * /readyz
-		reverse_proxy __LAN_IP__:4000
+		reverse_proxy 127.0.0.1:4000
 	}
-	reverse_proxy __LAN_IP__:4000
+	reverse_proxy 127.0.0.1:4000
 }
 http://t3.local, http://t3code.local {
 	encode zstd gzip

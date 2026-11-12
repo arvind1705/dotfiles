@@ -69,18 +69,18 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 24px 20px;
+  padding: 28px 24px;
   transition: background-color 0.2s ease, color 0.2s ease;
   -webkit-font-smoothing: antialiased;
 }
 
 .container {
-  max-width: 980px;
+  max-width: 1080px;
   width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 /* Header */
@@ -90,7 +90,7 @@ header {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding-bottom: 16px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -144,19 +144,17 @@ header {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
 }
 
 .stat-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 2px 0;
   border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 500;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
   color: var(--text-secondary);
 }
 
@@ -258,12 +256,12 @@ header {
 }
 
 .filter-btn {
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.15s ease;
@@ -272,9 +270,138 @@ header {
   color: var(--text-primary);
 }
 .filter-btn.active {
+  background: var(--accent-subtle);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--accent);
+}
+
+/* Operating Profiles Strip */
+.profile-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 11px 16px;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.profile-header-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.profile-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border);
+}
+.profile-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.profile-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  transition: all 0.2s ease;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border);
+}
+.profile-status-badge.running {
+  background: var(--success-subtle);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.profile-status-badge.stopped {
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  border-color: var(--border);
+}
+.profile-status-badge.starting,
+.profile-status-badge.stopping {
+  background: var(--warning-subtle);
+  color: var(--warning);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.profile-subtext {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+}
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+.profile-btn.turn-on {
   background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  color: #ffffff;
+  border-color: rgba(99, 102, 241, 0.4);
+}
+.profile-btn.turn-on:hover {
+  background: #4f46e5;
+}
+.profile-btn.turn-off {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+.profile-btn.turn-off:hover {
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.profile-btn.busy {
+  opacity: 0.75;
+  cursor: not-allowed;
+  background: var(--bg-subtle);
+  color: var(--warning);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.btn-spinner {
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.btn-spinner.active {
+  display: inline-block;
 }
 
 /* Category Sections */
@@ -292,7 +419,7 @@ header {
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 10px;
+  gap: 4px 14px;
   margin-bottom: 16px;
 }
 
@@ -300,10 +427,10 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  border-radius: var(--radius);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--text-primary);
   text-decoration: none;
   cursor: pointer;
@@ -312,9 +439,8 @@ header {
 }
 
 .card:hover {
-  border-color: var(--border-hover);
-  background: var(--bg-card-hover);
-  transform: translateY(-1px);
+  border-color: var(--border);
+  background: var(--bg-subtle);
 }
 
 .card-left {
@@ -325,10 +451,10 @@ header {
 }
 
 .card-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
-  background: var(--bg-subtle);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -371,18 +497,28 @@ header {
 }
 
 .card-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: var(--text-tertiary);
   transition: background-color 0.2s ease;
 }
 .card-dot.online {
   background-color: var(--success);
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
 }
 .card-dot.offline {
   background-color: var(--danger);
+}
+.card-dot.stopped {
+  background-color: var(--text-tertiary);
+  opacity: 0.5;
+}
+.card-latency {
+  min-width: 34px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-align: right;
 }
 
 .card-action {
@@ -527,6 +663,29 @@ footer a:hover {
     </div>
   </div>
 
+  <!-- Operating Profile: Media Server On/Off Control -->
+  <div class="profile-strip" id="media-profile-strip">
+    <div class="profile-info">
+      <div class="profile-header-line">
+        <span class="profile-tag">PROFILE</span>
+        <span class="profile-title">Media Stack</span>
+        <span class="profile-status-badge stopped" id="media-status-badge">
+          <span class="dot"></span>
+          <span id="media-status-text">Checking...</span>
+        </span>
+      </div>
+      <div class="profile-subtext">
+        Jellyfin &amp; qBittorrent on demand · Core Dev Infra is always on
+      </div>
+    </div>
+    <div class="profile-actions">
+      <button class="profile-btn turn-on" id="media-toggle-btn" onclick="toggleMedia()">
+        <span class="btn-spinner" id="media-btn-spinner"></span>
+        <span id="media-btn-text">Turn On Media</span>
+      </button>
+    </div>
+  </div>
+
   <!-- Service List -->
   <main id="services-root"></main>
 
@@ -549,6 +708,8 @@ const SERVICES = [
   {
     id: "jellyfin",
     name: "Jellyfin",
+    profile: "media",
+    optional: true,
     cat: "web",
     port: 8096,
     meta: "jellyfin.local:8096",
@@ -560,6 +721,8 @@ const SERVICES = [
   {
     id: "qbittorrent",
     name: "qBittorrent",
+    profile: "media",
+    optional: true,
     cat: "web",
     port: 8081,
     meta: "qbittorrent.local:8081",
@@ -605,8 +768,8 @@ const SERVICES = [
     id: "cube",
     name: "Cube",
     cat: "web",
-    port: 4000,
-    meta: "cube.local:4000",
+    port: 80,
+    meta: "cube.local · SQL 15432",
     url: "http://cube.local",
     probeApi: "/api/health/cube",
     isWeb: true,
@@ -712,20 +875,100 @@ const SERVICES = [
 let currentCat = 'all';
 let searchFilter = '';
 const healthMap = {};
-let latestTcpServices = {};
 let telemetryPromise = null;
-let isProbing = false;
+let currentMediaStatus = 'unknown';
+
+function updateMediaProfileUI(mediaProfile) {
+  if (!mediaProfile || !mediaProfile.status) return;
+  const prevStatus = currentMediaStatus;
+  currentMediaStatus = mediaProfile.status;
+
+  const badge = document.getElementById('media-status-badge');
+  const badgeText = document.getElementById('media-status-text');
+  const btn = document.getElementById('media-toggle-btn');
+  const btnText = document.getElementById('media-btn-text');
+  const spinner = document.getElementById('media-btn-spinner');
+
+  if (badge && badgeText && btn && btnText && spinner) {
+    badge.className = `profile-status-badge ${currentMediaStatus}`;
+    if (currentMediaStatus === 'running') {
+      badgeText.innerText = 'Active';
+      btn.className = 'profile-btn turn-off';
+      btn.disabled = false;
+      btnText.innerText = 'Turn Off Media';
+      spinner.className = 'btn-spinner';
+    } else if (currentMediaStatus === 'stopped') {
+      badgeText.innerText = 'Stopped';
+      btn.className = 'profile-btn turn-on';
+      btn.disabled = false;
+      btnText.innerText = 'Turn On Media';
+      spinner.className = 'btn-spinner';
+    } else if (currentMediaStatus === 'starting') {
+      badgeText.innerText = 'Starting...';
+      btn.className = 'profile-btn busy';
+      btn.disabled = true;
+      btnText.innerText = 'Starting...';
+      spinner.className = 'btn-spinner active';
+    } else if (currentMediaStatus === 'stopping') {
+      badgeText.innerText = 'Stopping...';
+      btn.className = 'profile-btn busy';
+      btn.disabled = true;
+      btnText.innerText = 'Stopping...';
+      spinner.className = 'btn-spinner active';
+    }
+  }
+
+  if (prevStatus !== currentMediaStatus) {
+    render();
+    updateOverallStatus();
+  }
+}
+
+async function toggleMedia() {
+  if (currentMediaStatus === 'starting' || currentMediaStatus === 'stopping') {
+    showToast('Media stack is transitioning. Please wait...');
+    return;
+  }
+  const nextAction = currentMediaStatus === 'running' ? 'stop' : 'start';
+  const targetState = nextAction === 'start' ? 'starting' : 'stopping';
+
+  updateMediaProfileUI({ status: targetState });
+  showToast(nextAction === 'start' ? 'Starting Media stack (Jellyfin & qBittorrent)...' : 'Stopping Media stack...');
+
+  try {
+    const res = await fetch('/api/system/media', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: nextAction })
+    });
+    const d = await res.json();
+    if (d && d.media_profile) {
+      updateMediaProfileUI(d.media_profile);
+    }
+  } catch (err) {
+    showToast('Failed to toggle media profile');
+  }
+
+  [1200, 3000, 6000, 10000, 15000, 22000].forEach(delay => {
+    setTimeout(() => {
+      if (document.visibilityState === 'visible') {
+        loadTelemetry(true);
+      }
+    }, delay);
+  });
+}
 
 function updateOverallStatus() {
   const pill = document.getElementById('status-pill');
   const txt = document.getElementById('status-text');
   if (!pill || !txt) return;
 
-  const total = SERVICES.length;
+  const required = SERVICES.filter(s => !s.optional);
+  const total = required.length;
   let onlineCount = 0;
   let knownCount = 0;
 
-  for (const s of SERVICES) {
+  for (const s of required) {
     const h = healthMap[s.id];
     if (h && (h.status === 'online' || h.status === 'offline')) {
       knownCount++;
@@ -741,11 +984,24 @@ function updateOverallStatus() {
 
   pill.removeAttribute('style');
   if (onlineCount === total) {
-    pill.className = 'stat-pill online';
-    txt.innerText = `All ${total} Online`;
+    if (currentMediaStatus === 'running') {
+      const jOnline = healthMap['jellyfin']?.status === 'online';
+      const qOnline = healthMap['qbittorrent']?.status === 'online';
+      const mediaOnline = (jOnline ? 1 : 0) + (qOnline ? 1 : 0);
+      if (mediaOnline === 2) {
+        pill.className = 'stat-pill online';
+        txt.innerText = 'All 14 Online';
+      } else {
+        pill.className = 'stat-pill online';
+        txt.innerText = `${total + mediaOnline}/14 Online`;
+      }
+    } else {
+      pill.className = 'stat-pill online';
+      txt.innerText = `All ${total} Core Online`;
+    }
   } else if (onlineCount > 0) {
     pill.className = 'stat-pill warning';
-    txt.innerText = `${onlineCount}/${total} Online`;
+    txt.innerText = `${onlineCount}/${total} Core Online`;
   } else {
     pill.className = 'stat-pill offline';
     txt.innerText = 'Offline';
@@ -789,12 +1045,34 @@ function render() {
 
 function renderCard(s) {
   const h = healthMap[s.id] || { status: 'checking' };
-  const isOnline = h.status === 'online';
-  const dotClass = isOnline ? 'online' : (h.status === 'offline' ? 'offline' : '');
+  const isMedia = s.profile === 'media';
+  const isMediaStopped = isMedia && currentMediaStatus === 'stopped';
+  const isMediaTransition = isMedia && (currentMediaStatus === 'starting' || currentMediaStatus === 'stopping');
+
+  let dotClass = '';
+  let latency = '—';
+  let dotTitle = 'Checking';
+
+  if (isMediaStopped) {
+    dotClass = 'stopped';
+    latency = 'Off';
+    dotTitle = 'Media Profile Stopped (Click switch above to start)';
+  } else if (isMediaTransition) {
+    dotClass = 'offline';
+    latency = '...';
+    dotTitle = currentMediaStatus === 'starting' ? 'Media Starting...' : 'Media Stopping...';
+  } else {
+    const isOnline = h.status === 'online';
+    dotClass = isOnline ? 'online' : (h.status === 'offline' ? 'offline' : '');
+    latency = h.kind === 'tcp' ? 'TCP' : (h.latency > 0 ? `${h.latency}ms` : '—');
+    dotTitle = isOnline ? `Online${h.latency > 1 ? ` · ${h.latency}ms` : ''}` : (h.status === 'offline' ? 'Offline' : 'Checking');
+  }
+
+  const clickHandler = isMediaStopped ? `onclick="showToast('Media stack is stopped. Turn it on using the switch above!'); return false;"` : '';
 
   if (s.isWeb) {
     return `
-      <a href="${s.url}" target="_blank" rel="noopener" class="card" id="card-${s.id}">
+      <a href="${s.url}" target="_blank" rel="noopener" class="card" id="card-${s.id}" ${clickHandler}>
         <div class="card-left">
           <div class="card-icon">${s.icon}</div>
           <div class="card-text">
@@ -803,7 +1081,8 @@ function renderCard(s) {
           </div>
         </div>
         <div class="card-right">
-          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${isOnline ? 'Online' : 'Checking'}"></span>
+          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${dotTitle}"></span>
+          <span class="card-latency" id="latency-${s.id}">${latency}</span>
           <span class="card-action">↗</span>
         </div>
       </a>
@@ -821,8 +1100,9 @@ function renderCard(s) {
           </div>
         </div>
         <div class="card-right">
-          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${isOnline ? 'Online' : 'Checking'}"></span>
-          <span class="card-action">📋</span>
+          <span class="card-dot ${dotClass}" id="dot-${s.id}" title="${dotTitle}"></span>
+          <span class="card-latency" id="latency-${s.id}">${latency}</span>
+          <span class="card-action">⧉</span>
         </div>
       </div>
     `;
@@ -842,102 +1122,60 @@ function setCategory(cat, btn) {
   render();
 }
 
-// Probing & Health
-async function probeOne(service) {
-  // If this is a TCP service without an HTTP probeApi or web URL, await telemetry if pending
-  if (!service.probeApi && !service.isWeb) {
-    if (!latestTcpServices || latestTcpServices[service.id] === undefined) {
-      if (telemetryPromise) {
-        try {
-          await telemetryPromise;
-        } catch (e) {}
-      }
-    }
-    if (latestTcpServices && latestTcpServices[service.id] !== undefined) {
-      return { status: latestTcpServices[service.id] ? 'online' : 'offline', latency: 1 };
-    }
-  }
-
-  if (latestTcpServices && latestTcpServices[service.id] !== undefined) {
-    return { status: latestTcpServices[service.id] ? 'online' : 'offline', latency: 1 };
-  }
-
-  if (service.probeApi) {
-    const t0 = performance.now();
-    const ctrl = new AbortController();
-    const timeout = setTimeout(() => ctrl.abort(), 4000);
-    try {
-      const res = await fetch(service.probeApi, { method: 'GET', cache: 'no-store', signal: ctrl.signal });
-      clearTimeout(timeout);
-      if (res.ok || res.status === 200 || res.status === 204 || res.status === 403) {
-        return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
-      }
-    } catch (e) {
-      clearTimeout(timeout);
-    }
-  }
-
-  if (service.isWeb) {
-    const t0 = performance.now();
-    const ctrl = new AbortController();
-    const timeout = setTimeout(() => ctrl.abort(), 4000);
-    try {
-      await fetch(service.url, { method: 'GET', mode: 'no-cors', cache: 'no-store', signal: ctrl.signal });
-      clearTimeout(timeout);
-      return { status: 'online', latency: Math.max(1, Math.round(performance.now() - t0)) };
-    } catch (e) {
-      clearTimeout(timeout);
-    }
-  }
-
-  const prev = healthMap[service.id];
-  if (prev && prev.status === 'online' && !prev._failedOnce) {
-    return { status: 'online', latency: prev.latency || 20, _failedOnce: true };
-  }
-
-  return { status: 'offline' };
-}
-
-async function probeAll() {
-  const icon = document.getElementById('refresh-icon');
-  if (icon) icon.style.animation = 'spin 0.8s linear infinite';
-  isProbing = true;
-
-  try {
-    await Promise.all(SERVICES.map(async s => {
-      const res = await probeOne(s);
-      healthMap[s.id] = res;
-      updateDot(s.id, res.status === 'online');
-    }));
-  } finally {
-    isProbing = false;
-    updateOverallStatus();
-    if (icon) setTimeout(() => { icon.style.animation = ''; }, 400);
-  }
-}
-
-function updateDot(id, isOnline) {
+// Service status and telemetry come from one backend snapshot.
+function updateDot(id, isOnline, latency, kind) {
+  const isMedia = (id === 'jellyfin' || id === 'qbittorrent');
   const dot = document.getElementById(`dot-${id}`);
-  if (!dot) return;
-  dot.className = `card-dot ${isOnline ? 'online' : 'offline'}`;
+  const latencyEl = document.getElementById(`latency-${id}`);
+
+  if (isMedia && currentMediaStatus === 'stopped') {
+    if (dot) {
+      dot.className = 'card-dot stopped';
+      dot.title = 'Media Profile Stopped';
+    }
+    if (latencyEl) latencyEl.innerText = 'Off';
+    return;
+  }
+  if (isMedia && (currentMediaStatus === 'starting' || currentMediaStatus === 'stopping')) {
+    if (dot) {
+      dot.className = 'card-dot offline';
+      dot.title = currentMediaStatus === 'starting' ? 'Starting...' : 'Stopping...';
+    }
+    if (latencyEl) latencyEl.innerText = '...';
+    return;
+  }
+
+  if (dot) {
+    dot.className = `card-dot ${isOnline ? 'online' : 'offline'}`;
+    dot.title = isOnline ? `Online${latency > 1 ? ` · ${latency}ms` : ''}` : 'Offline';
+  }
+  if (latencyEl) {
+    if (kind === 'tcp') latencyEl.innerText = 'TCP';
+    else if (latency > 0) latencyEl.innerText = `${latency}ms`;
+  }
 }
 
 // Telemetry Polling
-async function fetchTelemetry() {
+async function fetchTelemetry(forceHealth = false) {
   if (document.visibilityState !== 'visible') return;
+  const icon = document.getElementById('refresh-icon');
+  if (forceHealth && icon) icon.style.animation = 'spin 0.8s linear infinite';
   try {
-    const res = await fetch('/api/system', { cache: 'no-store' });
+    const res = await fetch(`/api/system${forceHealth ? '?refresh=1' : ''}`, { cache: 'no-store' });
     if (!res.ok) return;
     const d = await res.json();
-    if (d.tcp_services) {
-      latestTcpServices = d.tcp_services;
-      for (const [id, isUp] of Object.entries(d.tcp_services)) {
-        healthMap[id] = { status: isUp ? 'online' : 'offline', latency: 1 };
-        updateDot(id, isUp);
+    if (d.media_profile) {
+      updateMediaProfileUI(d.media_profile);
+    }
+    if (d.service_status) {
+      for (const [id, value] of Object.entries(d.service_status)) {
+        const isUp = typeof value === 'object' ? value.online : value;
+        const latency = typeof value === 'object' ? value.latency : 1;
+        const kind = typeof value === 'object' ? value.kind : 'tcp';
+        healthMap[id] = { status: isUp ? 'online' : 'offline', latency, kind };
+        updateDot(id, isUp, latency, kind);
       }
-      if (!isProbing) {
-        updateOverallStatus();
-      }
+      updateOverallStatus();
     }
 
     if (d.uptime_seconds !== undefined) {
@@ -958,15 +1196,16 @@ async function fetchTelemetry() {
     if (d.memory) {
       const el = document.getElementById('ram-pill');
       const gib = 1024 * 1024 * 1024;
-      if (el && d.memory.used) {
-        el.innerText = `RAM: ${(d.memory.used / gib).toFixed(1)}G`;
-      }
+      if (el && d.memory.used) el.innerText = `RAM: ${(d.memory.used / gib).toFixed(1)}G`;
     }
     if (d.disk) {
       const el = document.getElementById('disk-pill');
       if (el && d.disk.percent !== undefined) el.innerText = `Disk: ${d.disk.percent.toFixed(0)}%`;
     }
   } catch (e) {}
+  finally {
+    if (forceHealth && icon) setTimeout(() => { icon.style.animation = ''; }, 400);
+  }
 }
 
 function formatUptime(seconds) {
@@ -980,14 +1219,13 @@ function formatUptime(seconds) {
   return `${Math.floor(seconds)}s`;
 }
 
-function loadTelemetry() {
-  telemetryPromise = fetchTelemetry();
+function loadTelemetry(forceHealth = false) {
+  telemetryPromise = fetchTelemetry(forceHealth);
   return telemetryPromise;
 }
 
 function refreshAll() {
-  loadTelemetry();
-  probeAll();
+  loadTelemetry(true);
 }
 
 function toggleTheme() {
@@ -1026,11 +1264,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (saved) document.documentElement.setAttribute('data-theme', saved);
 
   render();
-  loadTelemetry();
-  probeAll();
+  loadTelemetry(true);
 
-  setInterval(loadTelemetry, 3000);
-  setInterval(probeAll, 15000);
+  setInterval(loadTelemetry, 10000);
 });
 
 document.addEventListener('visibilitychange', () => {

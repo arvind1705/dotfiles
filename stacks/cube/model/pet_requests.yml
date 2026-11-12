@@ -1,0 +1,73 @@
+# PET requests: membership matches the loader's `pet_requests` query.
+# Every source column comes from the generated base (columns/), under its own
+# name; this cube adds membership, scope, normalization and flags.
+cubes:
+  - name: pet_requests
+    extends: pet_request_columns
+    public: true
+    sql: >
+      SELECT
+        p.*,
+        -- Normalized as the loader normalizes it.
+        CASE TRIM(p.severity)
+        WHEN '1 - Critical' THEN 'Critical' WHEN '1-Critical-Down' THEN 'Critical'
+        WHEN '2 - High' THEN 'Major' WHEN '2-Critical-Degraded' THEN 'Major'
+        WHEN '3 - Moderate' THEN 'Minor' WHEN '3 - Normal' THEN 'Normal'
+        WHEN '3-Normal' THEN 'Normal' WHEN '4 - Low' THEN 'Warning' WHEN '4-Low' THEN 'Warning'
+        WHEN 'CRITICAL' THEN 'Critical' WHEN 'MAJOR' THEN 'Major' WHEN 'MINOR' THEN 'Minor'
+        WHEN 'NORMAL' THEN 'Normal' WHEN 'WARNING' THEN 'Warning' WHEN 'BLOCKER' THEN 'Blocker'
+        WHEN 'HIGH' THEN 'Major' WHEN 'MEDIUM' THEN 'Minor' WHEN 'LOW' THEN 'Warning'
+        WHEN 'Critical' THEN 'Critical' WHEN 'Major' THEN 'Major' WHEN 'Minor' THEN 'Minor'
+        WHEN 'Normal' THEN 'Normal' WHEN 'Warning' THEN 'Warning' WHEN 'Blocker' THEN 'Blocker'
+        END AS severity_norm,
+        LOWER(REPLACE(TRIM(p.state), '_', ' ')) IN ('open', 'in progress') AS is_open_flag,
+        COALESCE(
+          p.account_id,
+          (SELECT a.account_id FROM public.account_count_summary a
+            WHERE a.sub_account_id = p.sub_account_id LIMIT 1),
+          (SELECT a.account_id FROM public.account_count_summary a
+            WHERE a.site_id = p.site_id LIMIT 1)
+        ) AS scope_account_id
+      FROM public.petdata_30d p
+
+    joins:
+      - name: sla
+        relationship: one_to_many
+        sql: "{CUBE}.requested_item_number = {sla}.task_id"
+
+      - name: pet_request_sla
+        relationship: one_to_one
+        sql: "{CUBE}.requested_item_number = {pet_request_sla}.task_id"
+
+    measures:
+      - name: count
+        type: count
+
+      - name: open_count
+        type: count
+        filters:
+          - sql: "{CUBE}.is_open_flag"
+
+    dimensions:
+      # Ticket key shared by every ticket cube (here the requested item number).
+      - { name: ticketNumber, sql: requested_item_number, type: string }
+      - { name: stateKey, sql: "LOWER(REPLACE(TRIM({CUBE}.state), '_', ' '))", type: string }
+      - { name: is_open, sql: is_open_flag, type: boolean }
+      # Unrecognized severities are dropped, as the loader does today.
+      - { name: severityNorm, sql: severity_norm, type: string }
+      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
+      # queryRewrite when they match the signed digest in the token.
+      - { name: deviceScopeTicket, sql: requested_item_number, type: string }
+      - { name: scopeAccountId, sql: scope_account_id, type: string }
+      - name: isUnassigned
+        sql: "NULLIF(TRIM({CUBE}.assigned_to), '') IS NULL"
+        type: boolean
+      - name: hasAssignmentGroup
+        sql: "NULLIF(TRIM({CUBE}.assignment_group), '') IS NOT NULL"
+        type: boolean
+      # Sort helpers: missing values sort last in both directions, as in Dgraph.
+      - { name: createdAtMissing, sql: "{CUBE}.created_at IS NULL", type: boolean }
+      - { name: updatedAtMissing, sql: "{CUBE}.updated_at IS NULL", type: boolean }
+      - { name: severityMissing, sql: "{CUBE}.severity_norm IS NULL", type: boolean }
+      - { name: stateMissing, sql: "NULLIF(TRIM({CUBE}.state), '') IS NULL", type: boolean }
+      - { name: issueTypeMissing, sql: "NULLIF(TRIM({CUBE}.issue_type), '') IS NULL", type: boolean }

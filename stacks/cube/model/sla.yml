@@ -1,0 +1,43 @@
+# SLA records, joined to ticket cubes on task_id. Reachable only through a
+# scoped ticket cube. Every customerdata_sla column comes from the generated
+# base (columns/), under its own name; the flag columns are text, so typed
+# booleans are added here.
+cubes:
+  - name: sla
+    extends: sla_columns
+    public: true
+    sql: >
+      SELECT
+        s.*,
+        s.task_id || '|' || COALESCE(s.sla, '') || '|' || COALESCE(s.target, '') AS sla_key
+      FROM public.customerdata_sla s
+
+    measures:
+      - name: count
+        type: count
+
+      - name: breached_count
+        type: count
+        filters:
+          - sql: "{CUBE.isBreached}"
+
+      - name: breached_tickets
+        type: count_distinct
+        sql: task_id
+        filters:
+          - sql: "{CUBE.isBreached}"
+
+    dimensions:
+      - { name: slaKey, sql: sla_key, type: string, primary_key: true }
+      - name: isActive
+        sql: "LOWER(TRIM({CUBE}.active)) IN ('true', 't', '1', 'yes')"
+        type: boolean
+      - name: isBreached
+        sql: "LOWER(TRIM({CUBE}.has_breached)) IN ('true', 't', '1', 'yes')"
+        type: boolean
+      - name: isNearBreached
+        sql: "LOWER(TRIM({CUBE}.near_breached)) IN ('true', 't', '1', 'yes')"
+        type: boolean
+      - name: businessPercent
+        sql: "NULLIF(TRIM({CUBE}.business_percentage), '')::float"
+        type: number

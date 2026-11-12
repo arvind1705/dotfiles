@@ -62,7 +62,15 @@ if [[ -d /etc/sysctl.d ]]; then
   echo "    ✓ sysctl low-swappiness & cache tuning applied"
 fi
 
-# 7. Enable zswap compressed swap cache service
+# 7. Restrict network-online waiting to the active Wi-Fi interface.
+if [[ -f "$DIR/systemd/systemd-networkd-wait-online.service.d/override.conf" ]]; then
+  sudo mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
+  sudo cp "$DIR/systemd/systemd-networkd-wait-online.service.d/override.conf" /etc/systemd/system/systemd-networkd-wait-online.service.d/
+  sudo systemctl daemon-reload
+  echo "    ✓ network-online wait restricted to wlp3s0"
+fi
+
+# 8. Enable zswap compressed swap cache service
 sudo cp "$DIR/zswap/zswap-enable.service" /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now zswap-enable.service || true

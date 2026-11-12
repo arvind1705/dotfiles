@@ -1,0 +1,19 @@
+# Organization directory (account, sub-account, site, sub-site names).
+# Dgraph keeps the hierarchy IDs and edges; names are served from here. Every
+# account_count_summary column comes from the generated base (columns/).
+cubes:
+  - name: org
+    extends: org_columns
+    public: true
+
+    measures:
+      - name: count
+        type: count
+
+      - name: site_count
+        type: count_distinct
+        sql: site_id
+
+      - name: sub_site_count
+        type: count_distinct
+        sql: sub_site_id

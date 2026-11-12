@@ -1,0 +1,87 @@
+# Change requests: membership matches the loader's `change_request` query.
+# Every source column comes from the generated base (columns/), under its own
+# name; this cube adds membership, scope, normalization and flags.
+cubes:
+  - name: change_requests
+    extends: change_request_columns
+    public: true
+    sql: >
+      SELECT
+        cr.*,
+        -- Normalized as the loader normalizes it.
+        CASE TRIM(cr.priority)
+        WHEN '1 - Critical' THEN 'P1' WHEN '1-Critical-Down' THEN 'P1'
+        WHEN '2 - High' THEN 'P2' WHEN '2-Critical-Degraded' THEN 'P2'
+        WHEN '3 - Moderate' THEN 'P3' WHEN '3-Normal' THEN 'P3'
+        WHEN '4 - Low' THEN 'P4' WHEN '4-Low' THEN 'P4'
+        WHEN 'Priority 1' THEN 'P1' WHEN 'PRIORITY 1' THEN 'P1'
+        WHEN 'Priority 2' THEN 'P2' WHEN 'PRIORITY 2' THEN 'P2'
+        WHEN 'Priority 3' THEN 'P3' WHEN 'PRIORITY 3' THEN 'P3'
+        WHEN 'Priority 4' THEN 'P4' WHEN 'PRIORITY 4' THEN 'P4'
+        ELSE TRIM(cr.priority)
+        END AS priority_norm,
+        LOWER(REPLACE(TRIM(cr.state), '_', ' ')) IN ('authorize', 'implement', 'review', 'scheduled', 'validate') AS is_open_flag,
+        COALESCE(
+          cr.account_id,
+          (SELECT a.account_id FROM public.account_count_summary a
+            WHERE a.sub_account_id = cr.sub_account_id LIMIT 1),
+          (SELECT a.account_id FROM public.account_count_summary a
+            WHERE a.site_id = cr.site_id LIMIT 1)
+        ) AS scope_account_id
+      FROM public.change_request_30d cr
+      WHERE cr.is_impacted_store_active
+
+    joins:
+      - name: sla
+        relationship: one_to_many
+        sql: "{CUBE}.change_request_number = {sla}.task_id"
+
+      - name: change_request_sla
+        relationship: one_to_one
+        sql: "{CUBE}.change_request_number = {change_request_sla}.task_id"
+
+    measures:
+      - name: count
+        type: count
+
+      - name: open_count
+        type: count
+        filters:
+          - sql: "{CUBE}.is_open_flag"
+
+    dimensions:
+      # Ticket key shared by every ticket cube (here the change request number).
+      - { name: ticketNumber, sql: change_request_number, type: string }
+      - { name: stateKey, sql: "LOWER(REPLACE(TRIM({CUBE}.state), '_', ' '))", type: string }
+      - { name: is_open, sql: is_open_flag, type: boolean }
+      - { name: priorityNorm, sql: priority_norm, type: string }
+      - name: isPostponed
+        sql: "NULLIF({CUBE}.postpone, '')::boolean"
+        type: boolean
+      # Closure outcome from the close notes, same rules as the MCP filter
+      # today. Evaluated per row inside the scoped query; needs no index.
+      - name: closureOutcome
+        sql: >
+          CASE
+            WHEN {CUBE}.close_notes ILIKE 'successful%' THEN 'successful'
+            WHEN {CUBE}.close_notes IN ('Unsuccessful', 'Abandoned') THEN 'failed'
+            WHEN {CUBE}.close_notes = 'Withdrawn' THEN 'rollback'
+          END
+        type: string
+      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
+      # queryRewrite when they match the signed digest in the token.
+      - { name: deviceScopeTicket, sql: change_request_number, type: string }
+      - { name: scopeAccountId, sql: scope_account_id, type: string }
+      - name: isUnassigned
+        sql: "NULLIF(TRIM({CUBE}.assigned_to), '') IS NULL"
+        type: boolean
+      - name: hasAssignmentGroup
+        sql: "NULLIF(TRIM({CUBE}.assignment_group), '') IS NOT NULL"
+        type: boolean
+      # Sort helpers: missing values sort last in both directions, as in Dgraph.
+      - { name: createdAtMissing, sql: "{CUBE}.created_at IS NULL", type: boolean }
+      - { name: updatedAtMissing, sql: "{CUBE}.updated_at IS NULL", type: boolean }
+      - { name: priorityMissing, sql: "NULLIF(TRIM({CUBE}.priority), '') IS NULL", type: boolean }
+      - { name: stateMissing, sql: "NULLIF(TRIM({CUBE}.state), '') IS NULL", type: boolean }
+      - { name: categoryMissing, sql: "NULLIF(TRIM({CUBE}.category), '') IS NULL", type: boolean }
+      - { name: issueTypeMissing, sql: "NULLIF(TRIM({CUBE}.issue_type), '') IS NULL", type: boolean }

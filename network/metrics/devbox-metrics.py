@@ -15,6 +15,8 @@ import shutil
 import socket
 import subprocess
 import threading
+import urllib.error
+import urllib.request
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 PORT = 9108
@@ -32,6 +34,102 @@ class MetricsCollector:
         self.cached_metrics = None
         self.last_sample_time = 0
         self.smoothed_temp = None
+        self.last_http_check = 0
+        self.cached_http_services = {}
+        self.media_transition = None
+        self.media_transition_lock = threading.Lock()
+
+    def _is_media_active(self):
+        try:
+            res = subprocess.run(
+                ["systemctl", "is-active", "stack@media-server"],
+                capture_output=True,
+                text=True,
+                timeout=1.5
+            )
+            if res.stdout.strip() == "active":
+                return True
+        except Exception:
+            pass
+        try:
+            res = subprocess.run(
+                ["docker", "ps", "--filter", "name=jellyfin", "--filter", "name=qbittorrent", "--format", "{{.Names}}"],
+                capture_output=True,
+                text=True,
+                timeout=1.5
+            )
+            names = res.stdout.strip().split()
+            if "jellyfin" in names or "qbittorrent" in names:
+                return True
+        except Exception:
+            pass
+        return False
+
+    def get_media_status(self):
+        with self.media_transition_lock:
+            if self.media_transition:
+                state, t0 = self.media_transition
+                if time.time() - t0 < 40:
+                    is_active = self._is_media_active()
+                    if state == "starting" and is_active:
+                        self.media_transition = None
+                        return "running"
+                    elif state == "stopping" and not is_active:
+                        self.media_transition = None
+                        return "stopped"
+                    return state
+                else:
+                    self.media_transition = None
+
+        return "running" if self._is_media_active() else "stopped"
+
+    def get_media_profile_info(self):
+        status = self.get_media_status()
+        jellyfin_up = bool(self.cached_http_services.get("jellyfin", {}).get("online", False))
+        qbittorrent_up = bool(self.cached_http_services.get("qbittorrent", {}).get("online", False))
+        return {
+            "name": "media",
+            "title": "Media Server",
+            "status": status,
+            "enabled_on_boot": False,
+            "services": {
+                "jellyfin": jellyfin_up,
+                "qbittorrent": qbittorrent_up
+            }
+        }
+
+    def trigger_media_action(self, action):
+        if action not in ("start", "stop"):
+            return False, "Invalid action. Use start or stop."
+
+        current = self.get_media_status()
+        if action == "start" and current in ("running", "starting"):
+            return True, current
+        if action == "stop" and current in ("stopped", "stopping"):
+            return True, current
+
+        target_trans = "starting" if action == "start" else "stopping"
+        with self.media_transition_lock:
+            self.media_transition = (target_trans, time.time())
+
+        def _worker():
+            try:
+                cmd = ["sudo", "-n", "systemctl", action, "stack@media-server"]
+                subprocess.run(cmd, capture_output=True, timeout=120)
+            except Exception:
+                pass
+            finally:
+                time.sleep(1.0)
+                try:
+                    self.sample(force_health=True)
+                except Exception:
+                    pass
+                with self.media_transition_lock:
+                    self.media_transition = None
+
+        t = threading.Thread(target=_worker, daemon=True)
+        t.start()
+        return True, target_trans
 
     def _get_cpu_name(self):
         try:
@@ -109,6 +207,34 @@ class MetricsCollector:
         except Exception:
             return False
 
+    def _check_http(self, path, timeout=0.8):
+        started = time.monotonic()
+        try:
+            req = urllib.request.Request(f"http://127.0.0.1{path}", headers={"Host": "devbox.local"})
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                online = response.status in (200, 204, 301, 302, 403)
+        except urllib.error.HTTPError as exc:
+            online = exc.code in (200, 204, 301, 302, 403)
+        except Exception:
+            online = False
+        latency = max(1, round((time.monotonic() - started) * 1000))
+        return {"online": online, "latency": latency, "kind": "http"}
+
+    def _check_http_services(self):
+        paths = {
+            "jellyfin": "/api/health/jellyfin",
+            "qbittorrent": "/api/health/qbittorrent",
+            "langfuse": "/api/health/langfuse",
+            "9router": "/api/health/9router",
+            "minio-console": "/api/health/minio-console",
+            "minio-s3": "/api/health/minio",
+            "clickhouse-http": "/api/health/clickhouse",
+            "dgraph-http": "/api/health/dgraph",
+            "cube": "/api/health/cube",
+            "t3": "/api/health/t3",
+        }
+        return {name: self._check_http(path) for name, path in paths.items()}
+
     def _read_temperature(self):
         """Find coretemp Package id 0 temperature, or fallback to CPU thermal zones."""
         # 1. Check hwmon coretemp / k10temp
@@ -167,10 +293,10 @@ class MetricsCollector:
                     continue
         return None
 
-    def sample(self):
+    def sample(self, force_health=False):
         with self.lock:
             now = time.time()
-            if self.cached_metrics and (now - self.last_sample_time < 0.5):
+            if self.cached_metrics and not force_health and (now - self.last_sample_time < 0.5):
                 return self.cached_metrics
 
             # CPU calculations (overall & per-core)
@@ -298,6 +424,14 @@ class MetricsCollector:
                 "clickhouse-native": self._check_tcp(lan_ip, 9002),
                 "dgraph-grpc": self._check_tcp(lan_ip, 9080)
             }
+            if force_health or (now - self.last_http_check >= 10):
+                self.cached_http_services = self._check_http_services()
+                self.last_http_check = now
+            service_status = {
+                name: {"online": online, "latency": 0, "kind": "tcp"}
+                for name, online in tcp_services.items()
+            }
+            service_status.update(self.cached_http_services)
 
             self.cached_metrics = {
                 "cpu": {
@@ -326,6 +460,8 @@ class MetricsCollector:
                 "uptime_seconds": uptime_sec,
                 "top_processes": procs,
                 "tcp_services": tcp_services,
+                "service_status": service_status,
+                "media_profile": self.get_media_profile_info(),
                 "timestamp": int(now)
             }
             self.last_sample_time = now
@@ -334,23 +470,92 @@ class MetricsCollector:
 collector = MetricsCollector()
 
 class MetricsHandler(BaseHTTPRequestHandler):
+    def _send_cors_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Cache-Control")
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self._send_cors_headers()
+        self.end_headers()
+
     def do_GET(self):
-        if self.path in ("/api/system", "/api/system/"):
-            data = collector.sample()
+        request_path = self.path.split("?", 1)[0]
+        if request_path in ("/api/system", "/api/system/"):
+            force_health = "refresh=1" in self.path
+            data = collector.sample(force_health=force_health)
             body = json.dumps(data).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
-            self.send_header("Access-Control-Allow-Origin", "*")
+            self._send_cors_headers()
+            self.end_headers()
+            self.wfile.write(body)
+        elif request_path in ("/api/system/media", "/api/system/profile/media"):
+            action = None
+            if "?" in self.path:
+                query = self.path.split("?", 1)[1]
+                for part in query.split("&"):
+                    if part.startswith("action="):
+                        action = part.split("=", 1)[1]
+            if action in ("start", "stop"):
+                ok, state = collector.trigger_media_action(action)
+                payload = {"ok": ok, "action": action, "status": state, "media_profile": collector.get_media_profile_info()}
+            else:
+                payload = {"ok": True, "media_profile": collector.get_media_profile_info()}
+            body = json.dumps(payload).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+            self._send_cors_headers()
             self.end_headers()
             self.wfile.write(body)
         elif self.path in ("/health", "/api/system/health"):
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
-            self.send_header("Access-Control-Allow-Origin", "*")
+            self._send_cors_headers()
             self.end_headers()
             self.wfile.write(b"OK")
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+    def do_POST(self):
+        request_path = self.path.split("?", 1)[0]
+        if request_path in ("/api/system/media", "/api/system/profile/media"):
+            content_length = int(self.headers.get("Content-Length", 0))
+            action = None
+            if content_length > 0:
+                try:
+                    raw_body = self.rfile.read(content_length)
+                    data = json.loads(raw_body.decode("utf-8"))
+                    action = data.get("action")
+                except Exception:
+                    pass
+            if not action and "?" in self.path:
+                query = self.path.split("?", 1)[1]
+                for part in query.split("&"):
+                    if part.startswith("action="):
+                        action = part.split("=", 1)[1]
+            if action in ("start", "stop"):
+                ok, state = collector.trigger_media_action(action)
+                payload = {"ok": ok, "action": action, "status": state, "media_profile": collector.get_media_profile_info()}
+                body = json.dumps(payload).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self._send_cors_headers()
+                self.end_headers()
+                self.wfile.write(body)
+            else:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self._send_cors_headers()
+                self.end_headers()
+                self.wfile.write(b'{"error": "Invalid action. Use start or stop."}')
         else:
             self.send_response(404)
             self.end_headers()

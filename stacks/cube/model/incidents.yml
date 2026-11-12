@@ -1,0 +1,145 @@
+# Incidents: one row per incident in the active-store population.
+# Every incident30d column comes from the generated base (columns/), under its
+# own name; this cube adds membership, scope, normalization, flags and joins.
+# Membership matches the loader's `incident` query in config.py so Cube and
+# the Dgraph ID graph agree on which incidents exist.
+cubes:
+  - name: incidents
+    extends: incident_columns
+    public: true
+    sql: >
+      SELECT
+        i.*,
+        -- Normalized as the loader normalizes it.
+        CASE TRIM(i.priority)
+        WHEN '1 - Critical' THEN 'P1' WHEN '1-Critical-Down' THEN 'P1'
+        WHEN '2 - High' THEN 'P2' WHEN '2-Critical-Degraded' THEN 'P2'
+        WHEN '3 - Moderate' THEN 'P3' WHEN '3-Normal' THEN 'P3'
+        WHEN '4 - Low' THEN 'P4' WHEN '4-Low' THEN 'P4'
+        WHEN 'Priority 1' THEN 'P1' WHEN 'PRIORITY 1' THEN 'P1'
+        WHEN 'Priority 2' THEN 'P2' WHEN 'PRIORITY 2' THEN 'P2'
+        WHEN 'Priority 3' THEN 'P3' WHEN 'PRIORITY 3' THEN 'P3'
+        WHEN 'Priority 4' THEN 'P4' WHEN 'PRIORITY 4' THEN 'P4'
+        ELSE TRIM(i.priority)
+        END AS priority_norm,
+        LOWER(REPLACE(TRIM(i.state), '_', ' ')) IN ('new', 'open', 'in progress', 'on hold') AS is_open_flag,
+        COALESCE(i.ai_sub_category, i.incident_subcategory) AS sub_category,
+        am.name AS alert_name,
+        COALESCE(
+          i.account_id,
+          (SELECT a.account_id FROM public.account_count_summary a
+            WHERE a.sub_account_id = i.sub_account_id LIMIT 1),
+          (SELECT a.account_id FROM public.account_count_summary a
+            WHERE a.site_id = i.site_id LIMIT 1)
+        ) AS scope_account_id
+      FROM public.incident30d i
+      LEFT JOIN public.alert_metadata am
+        ON i.incident_category = am.category
+       AND i.incident_subcategory = am.sub_category
+      WHERE i.is_impacted_store_active
+
+    joins:
+      - name: incident_comments
+        relationship: one_to_one
+        sql: "{CUBE}.incident_number = {incident_comments}.incident_number"
+
+      - name: sla
+        relationship: one_to_many
+        sql: "{CUBE}.incident_number = {sla}.task_id"
+
+      - name: incident_sla
+        relationship: one_to_one
+        sql: "{CUBE}.incident_number = {incident_sla}.task_id"
+
+      - name: incident_case_links
+        relationship: one_to_many
+        sql: "{CUBE}.incident_number = {incident_case_links}.incident_number"
+
+      - name: incident_devices
+        relationship: one_to_many
+        sql: "{CUBE}.incident_number = {incident_devices}.incident_number"
+
+    measures:
+      - name: count
+        type: count
+
+      - name: open_count
+        type: count
+        filters:
+          - sql: "{CUBE}.is_open_flag"
+
+      - name: device_count
+        type: count_distinct
+        sql: device_id
+
+      - name: avg_resolution_hours
+        type: avg
+        sql: "EXTRACT(EPOCH FROM ({CUBE}.resolved_at - {CUBE}.created_at)) / 3600.0"
+
+      - name: oldest_created_at
+        type: min
+        sql: created_at
+
+    dimensions:
+      # Ticket key shared by every ticket cube (here the incident number).
+      - { name: ticketNumber, sql: incident_number, type: string }
+      # Case- and separator-insensitive state key; filters compare against
+      # folded values so "IN_PROGRESS", "In Progress" and "in progress" match.
+      - name: stateKey
+        sql: "LOWER(REPLACE(TRIM({CUBE}.state), '_', ' '))"
+        type: string
+      - { name: is_open, sql: is_open_flag, type: boolean }
+      - { name: priorityNorm, sql: priority_norm, type: string }
+      # The AI sub-category when present, else the recorded one.
+      - { name: subCategory, sql: sub_category, type: string }
+      # From alert_metadata, matched on category and sub-category.
+      - { name: alertName, sql: alert_name, type: string }
+      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
+      # queryRewrite when they match the signed digest in the token.
+      - { name: deviceScopeTicket, sql: incident_number, type: string }
+      # Authorization key: the owning account, from the ticket itself or its
+      # sub-account or site. queryRewrite filters on it for every request.
+      - { name: scopeAccountId, sql: scope_account_id, type: string }
+
+      # Population summary flags. Blank assignment values count as absent.
+      - name: isUnassigned
+        sql: "NULLIF(TRIM({CUBE}.assigned_to), '') IS NULL"
+        type: boolean
+      - name: hasAssignmentGroup
+        sql: "NULLIF(TRIM({CUBE}.assignment_group), '') IS NOT NULL"
+        type: boolean
+      - name: isReopened
+        sql: "{CUBE}.reopened_at IS NOT NULL"
+        type: boolean
+      - name: isHighPriority
+        sql: "{CUBE}.priority_norm IN ('P1', 'P2')"
+        type: boolean
+      # Sort helpers: missing values sort last in both directions, as in Dgraph.
+      - { name: createdAtMissing, sql: "{CUBE}.created_at IS NULL", type: boolean }
+      - { name: updatedAtMissing, sql: "{CUBE}.updated_at IS NULL", type: boolean }
+      - { name: resolvedAtMissing, sql: "{CUBE}.resolved_at IS NULL", type: boolean }
+      - { name: priorityMissing, sql: "NULLIF(TRIM({CUBE}.priority), '') IS NULL", type: boolean }
+      - { name: stateMissing, sql: "NULLIF(TRIM({CUBE}.state), '') IS NULL", type: boolean }
+      - { name: categoryMissing, sql: "NULLIF(TRIM({CUBE}.incident_category), '') IS NULL", type: boolean }
+      - { name: issueTypeMissing, sql: "NULLIF(TRIM({CUBE}.issue_type), '') IS NULL", type: boolean }
+
+  # Incident comments: the comments column plus the latest comment.
+  - name: incident_comments
+    extends: incident_comment_columns
+    public: true
+    sql: >
+      SELECT
+        c.*,
+        CASE
+          WHEN c.comments = '[]' THEN NULL
+          ELSE regexp_replace(
+            split_part(c.comments, chr(125) || ',' || chr(123), 1),
+            '^.*''comment'':''|''$',
+            '',
+            'g'
+          )
+        END AS latest_comment
+      FROM public.customerdata_incident c
+
+    dimensions:
+      - { name: latestComment, sql: latest_comment, type: string }

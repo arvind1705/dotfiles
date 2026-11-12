@@ -4,7 +4,7 @@ The consolidated, single source of truth for:
 - **Personal Shell & Editor Dotfiles** (`home/`: zsh, starship, ghostty, git, vscode)
 - **Host OS Configuration & Hardening** (`system/`: headless power, ssh key-only, wifi powersave, firewall, unattended upgrades)
 - **Network Ingress & Local Discovery** (`network/`: Caddy reverse proxy, native Avahi mDNS for `*.local` domains, dashboard)
-- **Container Infrastructure Stacks** (`stacks/`: PostgreSQL, Redis, Dgraph, ClickHouse, MinIO, Langfuse, 9router, Jellyfin + qBittorrent)
+- **Container Infrastructure Stacks** (`stacks/`: PostgreSQL, Redis, Dgraph, ClickHouse, MinIO, Cube, Langfuse, 9router, Jellyfin + qBittorrent)
 - **Automated Boot Convergence** (`stack@.service`: reliable systemd multi-stack startup on boot)
 
 ---
@@ -44,7 +44,7 @@ All services are accessible on your local LAN via mDNS (`.local` domain names) r
 | **qBittorrent** | `http://qbittorrent.local` | `8081` | `media-server` | Torrent downloader with automated queue |
 | **Langfuse** | `http://langfuse.local` | `3005` | `langfuse` | LLM observability & prompt management platform |
 | **9router** | `http://9router.local` | `20128` | `9router` | AI gateway, dynamic model router & rate limiter |
-| **Cube** | `http://cube.local` | `4000` | `cube` | Semantic layer developer playground & REST API |
+| **Cube** | `http://cube.local` | `15432` (SQL) | `cube` | Semantic layer REST API and SQL endpoint |
 | **T3 Code** | `http://t3.local` | `3773` | `host` | Autonomous agentic coding server & web interface |
 | **MinIO Console** | `http://minio-console.local`| `9094` | `devdeps` | Object storage admin UI |
 | **MinIO API** | `http://minio.local` | `9092` | `devdeps` | S3-compatible object storage HTTP API |
@@ -77,17 +77,22 @@ Everyday operations are controlled via the `./stacks/stacks.sh` management CLI:
 # Check status of all containers (status, uptime, ports)
 ./stacks/stacks.sh status
 
-# Probe real-time HTTP and TCP health of all 15 endpoints
+# Probe real-time HTTP and TCP health of all service endpoints
 ./stacks/stacks.sh health
 
-# Start, stop, or restart all stacks
+# Start, stop, or restart general dev infra stacks (default)
 ./stacks/stacks.sh up
 ./stacks/stacks.sh down
 ./stacks/stacks.sh restart
 
-# Target an individual stack (devdeps, langfuse, 9router, media-server)
-./stacks/stacks.sh up 9router
-./stacks/stacks.sh logs langfuse
+# Target an operating profile
+./stacks/stacks.sh up general        # Always-on dev infra (devdeps, cube, langfuse, 9router)
+./stacks/stacks.sh up media          # On-demand media server (jellyfin, qbittorrent)
+./stacks/stacks.sh down media        # Stop media server
+
+# Target an individual stack
+./stacks/stacks.sh up cube
+./stacks/stacks.sh logs 9router
 ./stacks/stacks.sh restart media-server
 ```
 
@@ -114,14 +119,30 @@ All container resource limits are carefully budgeted for host stability on a 2-c
 - **Hardware Transcoding**: Passed `/dev/dri` device and `render`/`video` groups for Intel Quick Sync Video (QSV) hardware-accelerated video transcode and remuxing.
 - **qBittorrent WebUI Port**: Bound to port `8081` matching host and container to satisfy qBittorrent 5.x CSRF/Host-header validation.
 
-### 3. Devdeps Datastores (`stacks/devdeps/compose.yaml`)
+### 3. Operating Profiles
+- **General Dev Infra Profile (Always On)**:
+  - Consists of all developer infrastructure: PostgreSQL, Redis, ClickHouse, MinIO, Dgraph, Cube, 9router, and Langfuse.
+  - Automatically started and enabled at boot via templated systemd services (`stack@devdeps`, `stack@cube`, `stack@langfuse`, `stack@9router`).
+- **Media Profile (On Demand & Web Toggleable)**:
+  - Consists of Jellyfin and qBittorrent (`stacks/media-server`).
+  - Toggleable on/off directly from the `http://devbox.local` dashboard with a single click, or via CLI (`./stacks/stacks.sh up media` / `./stacks/stacks.sh down media`).
+  - Intentionally kept disabled at boot to conserve CPU and RAM on headless restarts until needed.
+
+### 4. Devdeps Datastores (`stacks/devdeps/compose.yaml`)
 - **PostgreSQL**: Tuned with `shared_buffers=256MB` (allowing 100% of the active database to live in RAM), `work_mem=16MB`, and `synchronous_commit=off` to eliminate mechanical disk `fsync` stalls.
 - **Redis**: Tuned with `--maxmemory 192mb --maxmemory-policy allkeys-lru` to auto-evict expired cache keys without risking Docker OOM kills, with conservative RDB disk snapshot intervals.
 - **ClickHouse**: Configured with `<async_insert>1</async_insert>` and `<wait_for_async_insert>0</wait_for_async_insert>` in `users-tuning.xml` to buffer incoming inserts in RAM and consolidate disk writes.
 - **Dgraph**: Cache bounded to `size-mb=256` to lower background Raft consensus memory pressure on a 4-thread CPU.
 - **MinIO**: Memory limited to `512M`, `cpus: '0.75'`.
 
-### 4. Kernel & Ingress Performance
+### 5. Cube (`stacks/cube/compose.yaml`)
+- HTTP API is bound to localhost and exposed through Caddy at `cube.local`.
+- Cube SQL remains LAN-bound on port `15432`.
+- The image is pinned by digest, with a 768M memory and 0.75 CPU ceiling.
+- Development mode is disabled by default; enable it only for local Playground work.
+- Uses the memory cache/queue driver and disables the refresh worker because no pre-aggregations are currently defined.
+
+### 6. Kernel & Ingress Performance
 - **Kernel Swap & Cache (`/etc/sysctl.d/99-devbox.conf`)**: `vm.swappiness = 10` (prevents premature memory eviction to disk) and `vm.vfs_cache_pressure = 50` (retains directory/inode cache longer in RAM).
 - **zswap Compressed Swap Cache**: Enabled via `zswap-enable.service` with LZO compression to intercept swapped pages and compress them in RAM.
 - **Filesystem `noatime`**: Root ext4 partition mounted with `noatime` to eliminate metadata write wear on disk reads.
@@ -136,12 +157,12 @@ All stacks are governed by a templated systemd unit: `/etc/systemd/system/stack@
 
 On machine boot:
 1. `systemd` waits for network initialization (`network-online.target`) and `docker.service`.
-2. Automatically triggers:
-   - `stack@devdeps`
+2. Automatically triggers the always-on general dev infra services:
+   - `stack@devdeps` (PostgreSQL, Redis, ClickHouse, MinIO, Dgraph)
+   - `stack@cube`
    - `stack@langfuse`
    - `stack@9router`
-   - `stack@media-server`
-3. Each stack runs `docker compose up -d --remove-orphans`, ensuring that any stopped, missing, or updated containers converge automatically to their desired state.
+3. Jellyfin and qBittorrent remain available through the `http://devbox.local` web toggle or `./stacks/stacks.sh up media`, and are not started automatically at boot.
 
 ---
 
@@ -198,10 +219,11 @@ sudo systemctl restart devbox-metrics.service
 └── stacks/                     # Docker Compose infrastructure
     ├── stacks.sh               # CLI: up, down, restart, status, health, logs
     ├── setup-stacks.sh         # Generates .env files & sets up boot systemd units
-    ├── devdeps/                # Postgres, Redis, Dgraph, ClickHouse, MinIO
+    ├── devdeps/                # Postgres, Redis, ClickHouse, MinIO, Dgraph
+    ├── cube/                   # Cube semantic layer and SQL endpoint
     ├── langfuse/               # Observability Web UI & Background Worker
     ├── 9router/                # AI Gateway (LiteLLM/9router)
-    ├── media-server/           # Streaming & Torrent Stack (Jellyfin + qBittorrent)
+    ├── media-server/           # On-demand streaming & torrent stack
     └── systemd/stack@.service  # Templated systemd boot service
 ```
 

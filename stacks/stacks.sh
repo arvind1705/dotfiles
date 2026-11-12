@@ -5,11 +5,13 @@
 set -euo pipefail
 
 STACKS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ALL_STACKS=("devdeps" "langfuse" "9router" "media-server")
+GENERAL_STACKS=("devdeps" "cube" "langfuse" "9router")
+MEDIA_STACKS=("media-server")
+ALL_STACKS=("${GENERAL_STACKS[@]}" "${MEDIA_STACKS[@]}")
 
 usage() {
   cat <<EOF
-Usage: $0 <command> [stack-name]
+Usage: $0 <command> [stack-name|profile]
 
 Commands:
   up        Start stack(s)
@@ -19,13 +21,20 @@ Commands:
   health    Probe HTTP and TCP service endpoints
   logs      Tail logs for stack(s)
 
-Available stacks:
+Profiles:
+  general   Always-on Dev Infrastructure (devdeps, cube, langfuse, 9router) [default]
+  media     On-demand Media Server (media-server: jellyfin, qbittorrent)
+  all       All stacks (general + media)
+
+Individual stacks:
   ${ALL_STACKS[*]}
 
 Examples:
   $0 status
-  $0 up devdeps
-  $0 up
+  $0 up                # Starts the general dev infra profile
+  $0 up media          # Starts on-demand media server
+  $0 down media        # Stops on-demand media server
+  $0 up devdeps        # Starts an individual stack
   $0 logs 9router
 EOF
   exit 1
@@ -51,7 +60,7 @@ run_cmd() {
     cd "$dir"
     case "$action" in
       up)
-        docker compose up -d --remove-orphans
+        docker compose up -d --wait
         ;;
       down)
         docker compose down
@@ -91,6 +100,7 @@ check_health() {
     "ClickHouse native:$lan_ip:9002"
     "9router direct:$lan_ip:20128"
     "Langfuse direct:$lan_ip:3005"
+    "Cube SQL:$lan_ip:15432"
   )
   for item in "${tcp_endpoints[@]}"; do
     local name="${item%%:*}"
@@ -134,13 +144,24 @@ check_health() {
 
 case "$CMD" in
   up|down|restart)
-    if [[ -n "$TARGET" ]]; then
-      run_cmd "$TARGET" "$CMD"
-    else
-      for s in "${ALL_STACKS[@]}"; do
-        run_cmd "$s" "$CMD"
-      done
-    fi
+    case "${TARGET:-general}" in
+      general)
+        for s in "${GENERAL_STACKS[@]}"; do
+          run_cmd "$s" "$CMD"
+        done
+        ;;
+      media)
+        run_cmd "media-server" "$CMD"
+        ;;
+      all)
+        for s in "${ALL_STACKS[@]}"; do
+          run_cmd "$s" "$CMD"
+        done
+        ;;
+      *)
+        run_cmd "$TARGET" "$CMD"
+        ;;
+    esac
     ;;
   status)
     echo "========================================================================"
