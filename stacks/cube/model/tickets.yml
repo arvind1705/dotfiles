@@ -64,6 +64,7 @@ cubes:
         sql: "{CUBE}.ticket_type || ':' || {CUBE}.ticket_number"
         type: string
         primary_key: true
+        public: true
       - { name: ticketType, sql: ticket_type, type: string }
       - { name: ticketNumber, sql: ticket_number, type: string }
       - { name: state, sql: state, type: string }

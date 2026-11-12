@@ -8,3 +8,9 @@ the Cube SQL protocol remains available on the configured LAN port. The cache/qu
 Operate it with `./stacks/stacks.sh {status,up,down,restart} cube` or
 `systemctl status stack@cube`. The live `.env` is machine-local and excluded
 from git; start from `.env.example` when provisioning another host.
+
+The model (`cube.js`, `model/`) is generated and maintained in the
+`pl-ai-infra-graph-data-loader` repository under `cube/` (feature branch
+`feature/SIP-58743-itsm-cube` until merged). Copy it here from that
+directory, then run `./stacks/stacks.sh restart cube`. Clients on the LAN use
+`http://cube.local/cubejs-api/v1`; the direct port 4000 is local to the host.
