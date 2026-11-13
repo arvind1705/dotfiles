@@ -797,6 +797,52 @@ footer a:hover {
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
+
+.stat-pill.clickable {
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.stat-pill.clickable:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* Collapsible System Details Drawer */
+.sys-details {
+  display: none;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+}
+.sys-details.open {
+  display: grid;
+}
+.sys-block-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.sys-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.sys-kv span:last-child {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-primary);
+}
 </style>
 </head>
 <body>
@@ -826,10 +872,10 @@ footer a:hover {
           <span class="dot" aria-hidden="true"></span>
           <span id="status-text">Checking services…</span>
         </div>
-        <div class="stat-pill" id="uptime-pill" title="System uptime"><span class="metric-label">Uptime</span> --</div>
-        <div class="stat-pill" id="cpu-pill" title="CPU usage"><span class="metric-label">CPU</span> --</div>
-        <div class="stat-pill" id="ram-pill" title="Memory in use"><span class="metric-label">RAM</span> --</div>
-        <div class="stat-pill" id="disk-pill" title="Disk usage"><span class="metric-label">Disk</span> --</div>
+        <div class="stat-pill clickable" id="uptime-pill" title="System uptime (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">Uptime</span> --</div>
+        <div class="stat-pill clickable" id="cpu-pill" title="CPU usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">CPU</span> --</div>
+        <div class="stat-pill clickable" id="ram-pill" title="Memory in use (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">RAM</span> --</div>
+        <div class="stat-pill clickable" id="disk-pill" title="Disk usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">Disk</span> --</div>
       </div>
 
       <button class="btn-icon" id="btn-refresh" title="Probe Endpoints" onclick="refreshAll()">
@@ -839,6 +885,21 @@ footer a:hover {
       </button>
     </div>
   </header>
+
+  <section class="sys-details" id="sys-details" aria-label="System details">
+    <div>
+      <div class="sys-block-title">Host &amp; Memory</div>
+      <div id="sys-host-rows"></div>
+    </div>
+    <div>
+      <div class="sys-block-title">Network &amp; Load</div>
+      <div id="sys-net-rows"></div>
+    </div>
+    <div>
+      <div class="sys-block-title">Top Processes</div>
+      <div id="sys-proc-rows"></div>
+    </div>
+  </section>
 
   <!-- Search & Category Filters -->
   <div class="search-row">
@@ -902,6 +963,8 @@ footer a:hover {
 <div class="toast-container" id="toast-root"></div>
 
 <script>
+const LAN_IP = '192.168.0.172';
+
 const SERVICES = [
   // --- Web Apps ---
   {
@@ -914,7 +977,6 @@ const SERVICES = [
     port: 8096,
     meta: "jellyfin.local:8096",
     url: "http://jellyfin.local",
-    probeApi: "/api/health/jellyfin",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10 15 5-3-5-3v6Z"></path><rect width="20" height="14" x="2" y="3" rx="2"></rect><path d="M12 17v4"></path><path d="M8 21h8"></path></svg>`
   },
@@ -928,7 +990,6 @@ const SERVICES = [
     port: 8081,
     meta: "qbittorrent.local:8081",
     url: "http://qbittorrent.local",
-    probeApi: "/api/health/qbittorrent",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
   },
@@ -940,7 +1001,6 @@ const SERVICES = [
     port: 3005,
     meta: "langfuse.local:3005",
     url: "http://langfuse.local",
-    probeApi: "/api/health/langfuse",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"></path><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="M2 12h20"></path><path d="m4.93 19.07 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path></svg>`
   },
@@ -952,7 +1012,6 @@ const SERVICES = [
     port: 20128,
     meta: "9router.local:20128",
     url: "http://9router.local",
-    probeApi: "/api/health/9router",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="8" x="3" y="3" rx="2"></rect><rect width="18" height="8" x="3" y="13" rx="2"></rect><line x1="7" y1="7" x2="7.01" y2="7"></line><line x1="7" y1="17" x2="7.01" y2="17"></line></svg>`
   },
@@ -964,7 +1023,6 @@ const SERVICES = [
     port: 9094,
     meta: "minio-console.local:9094",
     url: "http://minio-console.local",
-    probeApi: "/api/health/minio-console",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`
   },
@@ -976,7 +1034,6 @@ const SERVICES = [
     port: 80,
     meta: "cube.local · SQL 15432",
     url: "http://cube.local",
-    probeApi: "/api/health/cube",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>`
   },
@@ -988,7 +1045,6 @@ const SERVICES = [
     port: 3773,
     meta: "t3.local:3773",
     url: "http://t3.local",
-    probeApi: "/api/health/t3",
     isWeb: true,
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><polyline points="8 10 11 12 8 14"></polyline><line x1="13" y1="15" x2="16" y2="15"></line></svg>`
   },
@@ -1001,7 +1057,6 @@ const SERVICES = [
     cat: "api",
     port: 9092,
     meta: "minio.local:9092",
-    probeApi: "/api/health/minio",
     isWeb: false,
     copyVal: "http://minio.local:9092",
     copyMsg: "MinIO S3 URL copied",
@@ -1014,7 +1069,6 @@ const SERVICES = [
     cat: "api",
     port: 8124,
     meta: "clickhouse.local:8124",
-    probeApi: "/api/health/clickhouse",
     isWeb: false,
     copyVal: "curl http://clickhouse.local:8124/ping",
     copyMsg: "ClickHouse ping command copied",
@@ -1027,7 +1081,6 @@ const SERVICES = [
     cat: "api",
     port: 8080,
     meta: "dgraph.local:8080",
-    probeApi: "/api/health/dgraph",
     isWeb: false,
     copyVal: "curl http://dgraph.local:8080/health",
     copyMsg: "Dgraph health command copied",
@@ -1043,7 +1096,7 @@ const SERVICES = [
     port: 5432,
     meta: "postgres.local:5432",
     isWeb: false,
-    copyVal: "psql -h 192.168.0.172 -p 5432 -U kg_mcp -d kg_mcp_db",
+    copyVal: `psql -h ${LAN_IP} -p 5432 -U kg_mcp -d kg_mcp_db`,
     copyMsg: "psql command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>`
   },
@@ -1055,7 +1108,7 @@ const SERVICES = [
     port: 6380,
     meta: "redis.local:6380",
     isWeb: false,
-    copyVal: "redis-cli -h 192.168.0.172 -p 6380",
+    copyVal: `redis-cli -h ${LAN_IP} -p 6380`,
     copyMsg: "redis-cli command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
   },
@@ -1067,7 +1120,7 @@ const SERVICES = [
     port: 9002,
     meta: "clickhouse.local:9002",
     isWeb: false,
-    copyVal: "clickhouse-client --host 192.168.0.172 --port 9002",
+    copyVal: `clickhouse-client --host ${LAN_IP} --port 9002`,
     copyMsg: "clickhouse-client command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`
   },
@@ -1079,7 +1132,7 @@ const SERVICES = [
     port: 9080,
     meta: "dgraph.local:9080",
     isWeb: false,
-    copyVal: "grpcurl -plaintext 192.168.0.172:9080 list",
+    copyVal: `grpcurl -plaintext ${LAN_IP}:9080 list`,
     copyMsg: "grpcurl command copied",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`
   }
@@ -1232,10 +1285,16 @@ function updateOverallStatus() {
   }
 }
 
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
 function matchesQuery(s) {
   const q = searchFilter.toLowerCase().trim();
   if (!q) return true;
-  const haystack = `${s.name} ${s.desc || ''} ${s.meta}`.toLowerCase();
+  const haystack = `${s.name} ${s.desc || ''} ${s.meta} ${s.copyVal || ''}`.toLowerCase();
   return q.split(/\s+/).every(token => haystack.includes(token));
 }
 
@@ -1251,7 +1310,7 @@ function render() {
   }
 
   if (filtered.length === 0) {
-    const q = searchFilter.trim();
+    const q = escapeHtml(searchFilter.trim());
     root.innerHTML = `<div class="empty-state">
       <p>No services match${q ? ` "${q}"` : ''}${currentCat !== 'all' ? ` in the current category` : ''}.</p>
       <button type="button" onclick="clearFilters()">Clear search &amp; filters</button>
@@ -1477,6 +1536,7 @@ async function fetchTelemetry(forceHealth = false) {
     if (d.disk) {
       if (d.disk.percent !== undefined) setMetric('disk-pill', 'Disk', `${d.disk.percent.toFixed(0)}%`, d.disk.percent);
     }
+    renderSystemDetails(d);
   } catch (e) {}
   finally {
     if (forceHealth && icon) setTimeout(() => { icon.style.animation = ''; }, 400);
@@ -1503,12 +1563,77 @@ function refreshAll() {
   loadTelemetry(true);
 }
 
+function toggleSystemDetails() {
+  const el = document.getElementById('sys-details');
+  if (el) el.classList.toggle('open');
+}
+
+function formatRate(bytesPerSec) {
+  if (typeof bytesPerSec !== 'number' || bytesPerSec < 0) return '--';
+  if (bytesPerSec < 1024) return `${bytesPerSec} B/s`;
+  if (bytesPerSec < 1024 * 1024) return `${(bytesPerSec / 1024).toFixed(1)} KB/s`;
+  return `${(bytesPerSec / (1024 * 1024)).toFixed(2)} MB/s`;
+}
+
+function renderSystemDetails(d) {
+  const hostEl = document.getElementById('sys-host-rows');
+  const netEl = document.getElementById('sys-net-rows');
+  const procEl = document.getElementById('sys-proc-rows');
+  if (!hostEl || !netEl || !procEl) return;
+
+  const gib = 1024 * 1024 * 1024;
+  const swapUsed = d.memory && typeof d.memory.swap_used === 'number' ? (d.memory.swap_used / gib).toFixed(2) : '--';
+  const swapPct = d.memory && typeof d.memory.swap_percent === 'number' ? `${d.memory.swap_percent.toFixed(0)}%` : '--';
+  const diskFree = d.disk && typeof d.disk.free === 'number' ? `${(d.disk.free / gib).toFixed(0)}G` : '--';
+  hostEl.innerHTML = [
+    ['Cores / Threads', d.cpu ? `${d.cpu.physical_cores}c / ${d.cpu.threads}t` : '--'],
+    ['Swap', `${swapUsed}G (${swapPct})`],
+    ['Disk Free', diskFree]
+  ].map(([k, v]) => `<div class="sys-kv"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  const loadStr = d.cpu && Array.isArray(d.cpu.load) ? d.cpu.load.map(x => x.toFixed(2)).join(' ') : '--';
+  netEl.innerHTML = [
+    ['Load (1/5/15m)', loadStr],
+    ['Net RX', d.network ? formatRate(d.network.rx_rate) : '--'],
+    ['Net TX', d.network ? formatRate(d.network.tx_rate) : '--']
+  ].map(([k, v]) => `<div class="sys-kv"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  const procs = Array.isArray(d.top_processes) ? d.top_processes.slice(0, 3) : [];
+  procEl.innerHTML = procs.length
+    ? procs.map(p => `<div class="sys-kv"><span>${escapeHtml(p.name)}</span><span>${p.cpu.toFixed(1)}% · ${p.mem.toFixed(1)}%m</span></div>`).join('')
+    : '<div class="sys-kv"><span>No data</span><span>--</span></div>';
+}
+
+function writeClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  }
+  return fallbackCopy(text);
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    return Promise.resolve();
+  } catch (e) {
+    return Promise.reject(e);
+  } finally {
+    ta.remove();
+  }
+}
+
 function copy(text, msg) {
-  navigator.clipboard.writeText(text).then(() => showToast(msg || 'Copied'));
+  writeClipboard(text).then(() => showToast(msg || 'Copied')).catch(() => showToast('Copy failed'));
 }
 
 function copyCard(id, text, msg) {
-  navigator.clipboard.writeText(text).then(() => {
+  writeClipboard(text).then(() => {
     showToast(msg || 'Copied');
     const el = document.getElementById(`caction-${id}`);
     if (el) {
@@ -1520,7 +1645,7 @@ function copyCard(id, text, msg) {
         el.classList.remove('copied');
       }, 1500);
     }
-  });
+  }).catch(() => showToast('Copy failed'));
 }
 
 function showToast(msg) {
