@@ -125,10 +125,19 @@ class MetricsCollector:
             try:
                 cmd = ["sudo", "-n", "systemctl", action, "stack@media-server"]
                 subprocess.run(cmd, capture_output=True, timeout=120)
+                if action == "stop":
+                    self._media_active_cache = None
+                    if self._is_media_active():
+                        subprocess.run(
+                            ["docker", "compose", "-f", "/home/aravind/dev/dotfiles/stacks/media-server/compose.yaml", "down"],
+                            capture_output=True,
+                            timeout=120
+                        )
             except Exception:
                 pass
             finally:
                 time.sleep(1.0)
+                self._media_active_cache = None
                 try:
                     self.sample(force_health=True)
                 except Exception:
