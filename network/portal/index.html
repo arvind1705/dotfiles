@@ -1432,7 +1432,7 @@ function renderCard(s) {
 
   if (s.isWeb) {
     return `
-      <a href="${s.url}" target="_blank" rel="noopener" class="card${stoppedClass}" id="card-${s.id}" title="${s.name} — ${text}" ${clickHandler}>${left}
+      <a href="${s.url}" target="_blank" rel="noopener" class="card${stoppedClass}" id="card-${s.id}" ${clickHandler}>${left}
       </a>
     `;
   }
@@ -1440,7 +1440,7 @@ function renderCard(s) {
   const val = (s.copyVal || s.meta).replace(/'/g, "\\'");
   const msg = (s.copyMsg || 'Copied').replace(/'/g, "\\'");
   return `
-      <div class="card${stoppedClass}" id="card-${s.id}" onclick="copyCard('${s.id}', '${val}', '${msg}')" title="Click to copy connection command" role="button" tabindex="0" aria-label="Copy connection command for ${s.name}">${left}
+      <div class="card${stoppedClass}" id="card-${s.id}" onclick="copyCard('${s.id}', '${val}', '${msg}')" role="button" tabindex="0" aria-label="Copy connection command for ${s.name}">${left}
       </div>
     `;
 }
