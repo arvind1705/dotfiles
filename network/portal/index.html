@@ -1170,6 +1170,9 @@ let searchFilter = '';
 const healthMap = {};
 let resourceMap = {};
 let hoveredServiceId = null;
+let pendingHoverId = null;
+let hoverTimer = null;
+const HOVER_TOOLTIP_DELAY_MS = 5000;
 let telemetryPromise = null;
 let currentMediaStatus = 'unknown';
 
@@ -1790,7 +1793,25 @@ function showServiceTooltip(id, cardEl) {
   tip.style.top = `${top}px`;
 }
 
+function scheduleServiceTooltip(id) {
+  if (hoveredServiceId === id || pendingHoverId === id) return;
+  hideServiceTooltip();
+  pendingHoverId = id;
+  hoverTimer = setTimeout(() => {
+    hoverTimer = null;
+    if (pendingHoverId !== id) return;
+    pendingHoverId = null;
+    const card = document.getElementById(`card-${id}`);
+    if (!card) return;
+    hoveredServiceId = id;
+    showServiceTooltip(id, card);
+  }, HOVER_TOOLTIP_DELAY_MS);
+}
+
 function hideServiceTooltip() {
+  clearTimeout(hoverTimer);
+  hoverTimer = null;
+  pendingHoverId = null;
   hoveredServiceId = null;
   const tip = document.getElementById('svc-tooltip');
   if (tip) {
@@ -1805,11 +1826,7 @@ document.addEventListener('DOMContentLoaded', () => {
     root.addEventListener('mouseover', (e) => {
       const card = e.target.closest('.card');
       if (!card) return;
-      const id = card.id.replace('card-', '');
-      if (id !== hoveredServiceId) {
-        hoveredServiceId = id;
-        showServiceTooltip(id, card);
-      }
+      scheduleServiceTooltip(card.id.replace('card-', ''));
     });
     root.addEventListener('mouseout', (e) => {
       const card = e.target.closest('.card');
@@ -1819,8 +1836,7 @@ document.addEventListener('DOMContentLoaded', () => {
     root.addEventListener('focusin', (e) => {
       const card = e.target.closest('.card');
       if (!card) return;
-      hoveredServiceId = card.id.replace('card-', '');
-      showServiceTooltip(hoveredServiceId, card);
+      scheduleServiceTooltip(card.id.replace('card-', ''));
     });
     root.addEventListener('focusout', (e) => {
       const card = e.target.closest('.card');
