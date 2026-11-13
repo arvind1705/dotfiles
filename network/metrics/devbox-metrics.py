@@ -23,6 +23,22 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 PORT = 9108
 HOST = "127.0.0.1"
 
+SERVICE_CONTAINERS = {
+    "jellyfin": ["jellyfin"],
+    "qbittorrent": ["qbittorrent"],
+    "langfuse": ["aruba-langfuse-langfuse-web-1", "aruba-langfuse-langfuse-worker-1"],
+    "9router": ["9router"],
+    "minio-console": ["aruba-devdeps-langfuse-minio-1"],
+    "minio-s3": ["aruba-devdeps-langfuse-minio-1"],
+    "cube": ["cube-core"],
+    "clickhouse-http": ["aruba-devdeps-langfuse-clickhouse-1"],
+    "clickhouse-native": ["aruba-devdeps-langfuse-clickhouse-1"],
+    "dgraph-http": ["aruba-devdeps-dgraph-1"],
+    "dgraph-grpc": ["aruba-devdeps-dgraph-1"],
+    "postgres": ["aruba-devdeps-postgres-1"],
+    "redis": ["aruba-devdeps-redis-1"],
+}
+
 class MetricsCollector:
     def __init__(self):
         self.lock = threading.Lock()
@@ -40,6 +56,10 @@ class MetricsCollector:
         self.media_transition = None
         self.media_transition_lock = threading.Lock()
         self._media_active_cache = None
+        self._container_map_cache = (0, {})
+        self._last_cgroup_cpu = {}
+        self._t3_pid_cache = (0, None)
+        self._last_t3_cpu = None
 
     def _is_media_active(self):
         now = time.monotonic()
@@ -118,6 +138,7 @@ class MetricsCollector:
 
         target_trans = "starting" if action == "start" else "stopping"
         self._media_active_cache = None
+        self._container_map_cache = (0, {})
         with self.media_transition_lock:
             self.media_transition = (target_trans, time.time())
 
@@ -328,6 +349,143 @@ class MetricsCollector:
                     continue
         return None
 
+    def _get_container_map(self, now):
+        cached_at, cmap = self._container_map_cache
+        if cmap and (now - cached_at < 30.0):
+            return cmap
+        new_map = {}
+        try:
+            res = subprocess.run(
+                ["docker", "ps", "--no-trunc", "--format", "{{.ID}} {{.Names}}"],
+                capture_output=True,
+                text=True,
+                timeout=2.0
+            )
+            for line in res.stdout.splitlines():
+                parts = line.split(None, 1)
+                if len(parts) == 2:
+                    new_map[parts[1]] = parts[0]
+        except Exception:
+            return cmap
+        self._container_map_cache = (now, new_map)
+        return new_map
+
+    def _read_cgroup_container(self, cid, now):
+        scope = f"/sys/fs/cgroup/system.slice/docker-{cid}.scope"
+        if not os.path.isdir(scope):
+            return None
+        mem_bytes = None
+        mem_limit = None
+        cpu_pct = 0.0
+        cpu_limit = None
+        try:
+            with open(f"{scope}/memory.current") as f:
+                mem_bytes = int(f.read().strip())
+        except Exception:
+            return None
+        try:
+            with open(f"{scope}/memory.max") as f:
+                raw = f.read().strip()
+                if raw.isdigit():
+                    mem_limit = int(raw)
+        except Exception:
+            pass
+        try:
+            with open(f"{scope}/cpu.max") as f:
+                parts = f.read().strip().split()
+                if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+                    period = int(parts[1])
+                    if period > 0:
+                        cpu_limit = round(int(parts[0]) / period, 2)
+        except Exception:
+            pass
+        try:
+            with open(f"{scope}/cpu.stat") as f:
+                for line in f:
+                    if line.startswith("usage_usec "):
+                        usage_usec = int(line.split()[1])
+                        prev = self._last_cgroup_cpu.get(cid)
+                        self._last_cgroup_cpu[cid] = (now, usage_usec)
+                        if prev:
+                            dt_usec = (now - prev[0]) * 1_000_000.0
+                            if dt_usec > 0:
+                                cpu_pct = round(max(0.0, (usage_usec - prev[1]) / dt_usec * 100.0), 1)
+                        break
+        except Exception:
+            pass
+        return {
+            "mem_bytes": mem_bytes,
+            "mem_limit_bytes": mem_limit,
+            "cpu_pct": cpu_pct,
+            "cpu_limit_cores": cpu_limit,
+        }
+
+    def _read_t3_resource(self, now):
+        cached_at, pid = self._t3_pid_cache
+        if not pid or (now - cached_at >= 30.0) or not os.path.exists(f"/proc/{pid}/statm"):
+            pid = None
+            try:
+                res = subprocess.run(["ss", "-tlnp", "sport = :3773"], capture_output=True, text=True, timeout=1.5)
+                for token in res.stdout.split(","):
+                    if token.startswith("pid="):
+                        pid = token.split("=", 1)[1].strip()
+                        break
+            except Exception:
+                pass
+            self._t3_pid_cache = (now, pid)
+        if not pid:
+            return None
+        try:
+            with open(f"/proc/{pid}/statm") as f:
+                rss_pages = int(f.read().split()[1])
+            mem_bytes = rss_pages * os.sysconf("SC_PAGE_SIZE")
+            with open(f"/proc/{pid}/stat") as f:
+                raw = f.read()
+            after_comm = raw[raw.rfind(")") + 2:].split()
+            ticks = int(after_comm[11]) + int(after_comm[12])
+            cpu_pct = 0.0
+            if self._last_t3_cpu and self._last_t3_cpu[0] == pid:
+                dt = now - self._last_t3_cpu[1]
+                if dt > 0:
+                    clk = os.sysconf("SC_CLK_TCK")
+                    cpu_pct = round(max(0.0, (ticks - self._last_t3_cpu[2]) / (dt * clk) * 100.0), 1)
+            self._last_t3_cpu = (pid, now, ticks)
+            return {
+                "mem_bytes": mem_bytes,
+                "mem_limit_bytes": None,
+                "cpu_pct": cpu_pct,
+                "cpu_limit_cores": None,
+            }
+        except Exception:
+            return None
+
+    def _read_service_resources(self, now):
+        cmap = self._get_container_map(now)
+        cstats = {}
+        for cid in cmap.values():
+            st = self._read_cgroup_container(cid, now)
+            if st:
+                cstats[cid] = st
+        out = {}
+        for svc_id, cnames in SERVICE_CONTAINERS.items():
+            items = [cstats[cmap[n]] for n in cnames if n in cmap and cmap[n] in cstats]
+            if not items:
+                continue
+            mem_bytes = sum(x["mem_bytes"] for x in items)
+            limits = [x["mem_limit_bytes"] for x in items if x["mem_limit_bytes"] is not None]
+            cpu_pct = round(sum(x["cpu_pct"] for x in items), 1)
+            cpu_limits = [x["cpu_limit_cores"] for x in items if x["cpu_limit_cores"] is not None]
+            out[svc_id] = {
+                "mem_bytes": mem_bytes,
+                "mem_limit_bytes": sum(limits) if len(limits) == len(items) else None,
+                "cpu_pct": cpu_pct,
+                "cpu_limit_cores": round(sum(cpu_limits), 2) if len(cpu_limits) == len(items) else None,
+            }
+        t3_res = self._read_t3_resource(now)
+        if t3_res:
+            out["t3"] = t3_res
+        return out
+
     def sample(self, force_health=False):
         with self.lock:
             now = time.time()
@@ -467,6 +625,7 @@ class MetricsCollector:
                 for name, online in tcp_services.items()
             }
             service_status.update(self.cached_http_services)
+            service_resources = self._read_service_resources(now)
 
             self.cached_metrics = {
                 "cpu": {
@@ -496,6 +655,7 @@ class MetricsCollector:
                 "top_processes": procs,
                 "tcp_services": tcp_services,
                 "service_status": service_status,
+                "service_resources": service_resources,
                 "media_profile": self.get_media_profile_info(),
                 "timestamp": int(now)
             }

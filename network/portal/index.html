@@ -844,6 +844,44 @@ footer a:hover {
   font-size: 11.5px;
   color: var(--text-primary);
 }
+
+/* Fast Service Resource Hover Tooltip */
+.svc-tooltip {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.svc-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.svc-tooltip-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+.svc-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  line-height: 1.45;
+}
+.svc-tooltip-row span:last-child {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
 </style>
 </head>
 <body>
@@ -949,6 +987,7 @@ footer a:hover {
 </div>
 
 <div class="toast-container" id="toast-root"></div>
+<div class="svc-tooltip" id="svc-tooltip" role="tooltip" aria-hidden="true"></div>
 
 <script>
 const LAN_IP = '192.168.0.172';
@@ -1129,6 +1168,8 @@ const SERVICES = [
 let currentCat = 'all';
 let searchFilter = '';
 const healthMap = {};
+let resourceMap = {};
+let hoveredServiceId = null;
 let telemetryPromise = null;
 let currentMediaStatus = 'unknown';
 
@@ -1485,6 +1526,13 @@ async function fetchTelemetry(forceHealth = false) {
       updateOverallStatus();
     }
 
+    if (d.service_resources) {
+      resourceMap = d.service_resources;
+      if (hoveredServiceId) {
+        const card = document.getElementById(`card-${hoveredServiceId}`);
+        if (card) showServiceTooltip(hoveredServiceId, card);
+      }
+    }
     if (d.uptime_seconds !== undefined) {
       const el = document.getElementById('uptime-pill');
       if (el) {
@@ -1697,7 +1745,90 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+function formatBytes(b) {
+  if (typeof b !== 'number' || b < 0) return '--';
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KiB`;
+  if (b < 1024 * 1024 * 1024) return `${(b / (1024 * 1024)).toFixed(0)} MiB`;
+  return `${(b / (1024 * 1024 * 1024)).toFixed(2)} GiB`;
+}
+
+function showServiceTooltip(id, cardEl) {
+  const tip = document.getElementById('svc-tooltip');
+  const s = SERVICES.find(x => x.id === id);
+  if (!tip || !s) return;
+
+  const r = resourceMap[id];
+  const isMediaStopped = s.profile === 'media' && currentMediaStatus === 'stopped';
+  let rowsHtml = '';
+  if (isMediaStopped) {
+    rowsHtml = '<div class="svc-tooltip-row"><span>Status</span><span>Stopped (0 MiB)</span></div>';
+  } else if (r) {
+    const memUsed = formatBytes(r.mem_bytes);
+    const memVal = r.mem_limit_bytes
+      ? `${memUsed} / ${formatBytes(r.mem_limit_bytes)} (${Math.round(r.mem_bytes / r.mem_limit_bytes * 100)}%)`
+      : `${memUsed} (host)`;
+    const cpuVal = r.cpu_limit_cores
+      ? `${r.cpu_pct.toFixed(1)}% / ${r.cpu_limit_cores.toFixed(2)}c`
+      : `${r.cpu_pct.toFixed(1)}%`;
+    rowsHtml = `<div class="svc-tooltip-row"><span>RAM</span><span>${memVal}</span></div>`
+      + `<div class="svc-tooltip-row"><span>CPU</span><span>${cpuVal}</span></div>`;
+  } else {
+    rowsHtml = '<div class="svc-tooltip-row"><span>Resources</span><span>Unavailable</span></div>';
+  }
+
+  tip.innerHTML = `<div class="svc-tooltip-title">${escapeHtml(s.name)}</div>${rowsHtml}`;
+  tip.classList.add('visible');
+  tip.setAttribute('aria-hidden', 'false');
+
+  const rect = cardEl.getBoundingClientRect();
+  const tipRect = tip.getBoundingClientRect();
+  let left = rect.left + (rect.width - tipRect.width) / 2;
+  left = Math.max(10, Math.min(window.innerWidth - tipRect.width - 10, left));
+  let top = rect.top - tipRect.height - 8;
+  if (top < 8) top = rect.bottom + 8;
+  tip.style.left = `${left}px`;
+  tip.style.top = `${top}px`;
+}
+
+function hideServiceTooltip() {
+  hoveredServiceId = null;
+  const tip = document.getElementById('svc-tooltip');
+  if (tip) {
+    tip.classList.remove('visible');
+    tip.setAttribute('aria-hidden', 'true');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  const root = document.getElementById('services-root');
+  if (root) {
+    root.addEventListener('mouseover', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      const id = card.id.replace('card-', '');
+      if (id !== hoveredServiceId) {
+        hoveredServiceId = id;
+        showServiceTooltip(id, card);
+      }
+    });
+    root.addEventListener('mouseout', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      if (!card.contains(e.relatedTarget)) hideServiceTooltip();
+    });
+    root.addEventListener('focusin', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      hoveredServiceId = card.id.replace('card-', '');
+      showServiceTooltip(hoveredServiceId, card);
+    });
+    root.addEventListener('focusout', (e) => {
+      const card = e.target.closest('.card');
+      if (card && !card.contains(e.relatedTarget)) hideServiceTooltip();
+    });
+  }
+  window.addEventListener('scroll', hideServiceTooltip, { passive: true });
+
   render();
   loadTelemetry(true);
 
