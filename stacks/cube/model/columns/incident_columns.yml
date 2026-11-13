@@ -8,41 +8,118 @@ cubes:
 
     dimensions:
       - { name: incidentNumber, sql: incident_number, type: string, primary_key: true, public: true }
-      - { name: accountName, sql: account_name, type: string }
-      - { name: siteName, sql: site_name, type: string }
-      - { name: priority, sql: priority, type: string }
+      - { name: caseNumber, sql: case_number, type: string }
       - { name: state, sql: state, type: string }
-      - { name: createdAt, sql: created_at, type: time }
-      - { name: resolvedAt, sql: resolved_at, type: time }
-      - { name: updatedAt, sql: updated_at, type: time }
-      - { name: creationType, sql: creation_type, type: string }
-      - { name: shortDescription, sql: short_description, type: string }
+      - { name: priority, sql: priority, type: string }
+      - { name: identifiedBy, sql: identified_by, type: string }
+      - { name: alertId, sql: alert_id, type: string }
+      - { name: aiCategory, sql: ai_category, type: string }
+      - { name: aiSubCategory, sql: ai_sub_category, type: string }
+      - { name: isActionable, sql: is_actionable, type: boolean }
       - { name: deviceId, sql: device_id, type: string }
       - { name: deviceName, sql: device_name, type: string }
-      - { name: accountId, sql: account_id, type: string }
-      - { name: caseNumber, sql: case_number, type: string }
-      - { name: issueType, sql: issue_type, type: string }
-      - { name: assignmentGroup, sql: assignment_group, type: string }
-      - { name: assignedTo, sql: assigned_to, type: string }
+      - { name: accountName, sql: account_name, type: string }
+      - { name: subAccountName, sql: sub_account_name, type: string }
+      - { name: siteName, sql: site_name, type: string }
       - { name: subSiteName, sql: sub_site_name, type: string }
-      - { name: incidentCategory, sql: incident_category, type: string }
-      - { name: incidentSubcategory, sql: incident_subcategory, type: string }
+      - { name: incidentParentId, sql: incident_parent_id, type: string }
+      - { name: accountId, sql: account_id, type: string }
       - { name: subAccountId, sql: sub_account_id, type: string }
       - { name: siteId, sql: site_id, type: string }
       - { name: subSiteId, sql: sub_site_id, type: string }
-      - { name: alertId, sql: alert_id, type: string }
-      - { name: otherAssetIds, sql: other_asset_ids, type: string }
-      - { name: otherImpactedSubSite, sql: other_impacted_sub_site, type: string }
-      - { name: createdBy, sql: created_by, type: string }
+      - { name: alertLastOccurredAt, sql: alert_last_occurred_at, type: time }
+      - { name: issueType, sql: issue_type, type: string }
+      - { name: subIssueType, sql: sub_issue_type, type: string }
+      - { name: resolvedAt, sql: resolved_at, type: time }
       - { name: resolvedBy, sql: resolved_by, type: string }
+      - { name: ticketClassification, sql: ticket_classification, type: string }
+      - { name: openedAt, sql: opened_at, type: time }
+      - { name: shortDescription, sql: short_description, type: string }
+      - { name: callerId, sql: caller_id, type: string }
+      - { name: assetSerialNumber, sql: asset_serial_number, type: string }
+      - { name: assignmentGroup, sql: assignment_group, type: string }
+      - { name: configurationItem, sql: configuration_item, type: string }
+      - { name: assignedTo, sql: assigned_to, type: string }
+      - { name: createdAt, sql: created_at, type: time }
+      - { name: createdBy, sql: created_by, type: string }
+      - { name: updatedAt, sql: updated_at, type: time }
+      - { name: updatedBy, sql: updated_by, type: string }
+      - { name: description, sql: description, type: string }
+      - { name: impactedDeviceCount, sql: impacted_device_count, type: number }
+      - { name: recommendations, sql: recommendations, type: string }
+      - { name: openChildIncidents, sql: open_child_incidents, type: string }
+      - { name: childIncidents, sql: child_incidents, type: string }
+      - { name: changeRequests, sql: change_requests, type: number }
+      - { name: caseState, sql: case_state, type: string }
       - { name: onHoldReason, sql: on_hold_reason, type: string }
+      - { name: reportingSensorCount, sql: reporting_sensor_count, type: number }
+      - { name: commentCount, sql: comment_count, type: number }
+      - { name: recommendationCount, sql: recommendation_count, type: number }
+      - { name: advisory, sql: advisory, type: string }
+      - { name: cancelledAt, sql: cancelled_at, type: time }
+      - { name: cancelledBy, sql: cancelled_by, type: string }
+      - { name: causedBy, sql: caused_by, type: string }
+      - { name: closedBy, sql: closed_by, type: string }
+      - { name: contactType, sql: contact_type, type: string }
+      - { name: isImpactedStoreActive, sql: is_impacted_store_active, type: boolean }
+      - { name: partner, sql: partner, type: string }
+      - { name: partnerContact, sql: partner_contact, type: string }
+      - { name: watchList, sql: watch_list, type: string }
       - { name: workNotes, sql: work_notes, type: string }
+      - { name: assignedToName, sql: assigned_to_name, type: string }
+      - { name: city, sql: city, type: string }
+      - { name: country, sql: country, type: string }
+      - { name: stateProvince, sql: state_province, type: string }
+      - { name: street, sql: street, type: string }
+      - { name: zipCode, sql: zip_code, type: string }
+      - { name: impactedSubSitesCount, sql: impacted_sub_sites_count, type: number }
+      - { name: aggregatedIncident, sql: aggregated_incident, type: boolean }
+      - { name: createdByName, sql: created_by_name, type: string }
+      - { name: updatedByName, sql: updated_by_name, type: string }
+      - { name: ebondingIncident, sql: ebonding_incident, type: string }
+      - { name: alertAdditionalInformation, sql: alert_additional_information, type: string }
+      - { name: asset, sql: asset, type: string }
       - { name: closeCode, sql: close_code, type: string }
       - { name: closeNotes, sql: close_notes, type: string }
-      - { name: causedBy, sql: caused_by, type: string }
+      - { name: closedAt, sql: closed_at, type: time }
+      - { name: company, sql: company, type: string }
+      - { name: creationType, sql: creation_type, type: string }
+      - { name: impact, sql: impact, type: string }
+      - { name: impactedType, sql: impacted_type, type: string }
+      - { name: incidentCategory, sql: incident_category, type: string }
+      - { name: incidentState, sql: incident_state, type: string }
+      - { name: incidentSubcategory, sql: incident_subcategory, type: string }
+      - { name: isPlatformSynced, sql: is_platform_synced, type: boolean }
+      - { name: openedBy, sql: opened_by, type: string }
+      - { name: otherAssetIds, sql: other_asset_ids, type: string }
+      - { name: otherAssetNames, sql: other_asset_names, type: string }
+      - { name: otherImpactedSubSite, sql: other_impacted_sub_site, type: string }
+      - { name: pleaseSpecify, sql: please_specify, type: string }
+      - { name: reassignmentCount, sql: reassignment_count, type: number }
       - { name: reopenCount, sql: reopen_count, type: number }
       - { name: reopenedAt, sql: reopened_at, type: time }
       - { name: reopenedBy, sql: reopened_by, type: string }
-      - { name: isImpactedStoreActive, sql: is_impacted_store_active, type: boolean }
-      - { name: aiSubCategory, sql: ai_sub_category, type: string }
-      - { name: description, sql: description, type: string }
+      - { name: retryCount, sql: retry_count, type: number }
+      - { name: tacCaseStatus, sql: tac_case_status, type: string }
+      - { name: tacNumber, sql: tac_number, type: string }
+      - { name: urgency, sql: urgency, type: string }
+      - { name: workNoteUsers, sql: work_note_users, type: string }
+      - { name: ruleId, sql: rule_id, type: number }
+      - { name: aggregatedAlertDetails, sql: aggregated_alert_details, type: string }
+      - { name: category, sql: category, type: string }
+      - { name: orchestratorSite, sql: orchestrator_site, type: string }
+      - { name: updatedFrom, sql: updated_from, type: string }
+      - { name: aiAssistWorkflowStatus, sql: ai_assist_workflow_status, type: string }
+      - { name: isAiAssistEnabled, sql: is_ai_assist_enabled, type: boolean }
+      - { name: originalAssignedTo, sql: original_assigned_to, type: string }
+      - { name: originalAssignedToName, sql: original_assigned_to_name, type: string }
+      - { name: originalAssignmentGroup, sql: original_assignment_group, type: string }
+      - { name: originalPriority, sql: original_priority, type: string }
+      - { name: closedByName, sql: closed_by_name, type: string }
+      - { name: openedByName, sql: opened_by_name, type: string }
+      - { name: reopenedByName, sql: reopened_by_name, type: string }
+      - { name: resolvedByName, sql: resolved_by_name, type: string }
+      - { name: uCancelledByName, sql: u_cancelled_by_name, type: string }
+      - { name: alertSource, sql: alert_source, type: string }
+      - { name: uSpecifyOnHoldReason, sql: u_specify_on_hold_reason, type: string }
+      - { name: alertFirstOccurredAt, sql: alert_first_occurred_at, type: time }

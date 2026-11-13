@@ -1,0 +1,276 @@
+# Bug details: one row per bug identity per customer account.
+# Queried by ID from MCP bug tools. Scoped by customer account via customer_report.
+# Follows the ITSM Cube model conventions for scoping, dimensions, and measures.
+cubes:
+  - name: bug_details
+    # Results are cached until the source rows or customer reports change.
+    refresh_key:
+      every: 5 minute
+      sql: "SELECT COUNT(*), MAX(updated_at), (SELECT COUNT(*) || '|' || MAX(id) FROM public.customer_report) FROM public.report_bugs"
+    public: true
+    sql: >
+      WITH scoped_report_bugs AS (
+        SELECT DISTINCT ON (rb.bug_id, cr.account_id)
+          rb.bug_id,
+          cr.account_id,
+          rb.summary,
+          rb.severity,
+          rb.jira_status,
+          rb.bug_status,
+          rb.bug_classification,
+          rb.os,
+          rb.components,
+          rb.features,
+          rb.impact_category,
+          rb.impacted_product_types,
+          rb.hardware,
+          rb.description,
+          rb.trigger,
+          rb.workaround,
+          rb.cli,
+          rb.updated_at,
+          rb.affects_in_version,
+          rb.fixed_in_versions,
+          rb.is_release_noted
+        FROM public.report_bugs rb
+        JOIN public.customer_report cr ON rb.report_id = cr.id
+        WHERE rb.bug_id IS NOT NULL AND btrim(rb.bug_id) <> ''
+          AND cr.account_id IS NOT NULL AND btrim(cr.account_id) <> ''
+        ORDER BY rb.bug_id, cr.account_id, rb.updated_at DESC NULLS LAST, rb.id DESC
+      ),
+      bug_relation_source AS (
+        SELECT
+          bug_id,
+          account_id,
+          CASE jsonb_typeof(affects_in_version)
+            WHEN 'array' THEN affects_in_version
+            WHEN 'string' THEN jsonb_build_array(affects_in_version)
+            WHEN 'null' THEN '[]'::jsonb
+            ELSE COALESCE(affects_in_version, '[]'::jsonb)
+          END AS affected_rules,
+          CASE jsonb_typeof(fixed_in_versions)
+            WHEN 'array' THEN fixed_in_versions
+            WHEN 'string' THEN jsonb_build_array(fixed_in_versions)
+            WHEN 'null' THEN '[]'::jsonb
+            ELSE COALESCE(fixed_in_versions, '[]'::jsonb)
+          END AS fixed_rules,
+          is_release_noted,
+          impacted_product_types
+        FROM scoped_report_bugs
+      ),
+      version_rules AS (
+        SELECT
+          source.bug_id,
+          source.account_id,
+          jsonb_agg(DISTINCT rule.value) FILTER (WHERE rule.rule_type = 'affected') AS affects_in_version,
+          jsonb_agg(DISTINCT rule.value) FILTER (WHERE rule.rule_type = 'fixed') AS fixed_in_versions
+        FROM bug_relation_source AS source
+        LEFT JOIN LATERAL (
+          SELECT 'affected' AS rule_type, value
+          FROM jsonb_array_elements(source.affected_rules) AS rule(value)
+          UNION ALL
+          SELECT 'fixed', value
+          FROM jsonb_array_elements(source.fixed_rules) AS rule(value)
+        ) AS rule ON TRUE
+        GROUP BY source.bug_id, source.account_id
+      ),
+      release_notes AS (
+        SELECT
+          source.bug_id,
+          source.account_id,
+          jsonb_agg(DISTINCT note.version) AS is_release_noted
+        FROM bug_relation_source AS source
+        CROSS JOIN LATERAL unnest(
+          COALESCE(source.is_release_noted, ARRAY[]::varchar[])
+        ) AS note(version)
+        GROUP BY source.bug_id, source.account_id
+      ),
+      release_catalog AS (
+        SELECT DISTINCT btrim(version) AS version, lower(btrim(device_type)) AS device_type
+        FROM public.software_version_release_details
+        WHERE version IS NOT NULL
+          AND btrim(version) <> ''
+          AND device_type IS NOT NULL
+          AND lower(btrim(device_type)) IN ('ap', 'gateway', 'switch')
+      ),
+      release_note_resolution AS (
+        SELECT
+          source.bug_id,
+          source.account_id,
+          btrim(note.version) AS version,
+          bool_or(catalog.version IS NOT NULL) AS resolved
+        FROM bug_relation_source AS source
+        CROSS JOIN LATERAL unnest(
+          COALESCE(source.is_release_noted, ARRAY[]::varchar[])
+        ) AS note(version)
+        LEFT JOIN LATERAL unnest(
+          COALESCE(source.impacted_product_types, ARRAY[]::varchar[])
+        ) AS product(device_type) ON TRUE
+        LEFT JOIN release_catalog AS catalog
+          ON catalog.version = btrim(note.version)
+          AND catalog.device_type = lower(btrim(product.device_type))
+        GROUP BY source.bug_id, source.account_id, btrim(note.version)
+      ),
+      release_note_status AS (
+        SELECT
+          bug_id,
+          account_id,
+          bool_or(NOT resolved) AS unresolved
+        FROM release_note_resolution
+        GROUP BY bug_id, account_id
+      )
+      SELECT
+        rb.bug_id,
+        rb.account_id,
+        rb.summary,
+        rb.severity,
+        rb.jira_status,
+        rb.bug_status,
+        rb.bug_classification,
+        rb.os,
+        COALESCE(array_to_json(rb.components)::text, '[]') AS components,
+        COALESCE(array_to_json(rb.features)::text, '[]') AS features,
+        COALESCE(array_to_json(rb.impact_category)::text, '[]') AS impact_category,
+        COALESCE(array_to_json(rb.impacted_product_types)::text, '[]') AS impacted_product_types,
+        COALESCE(array_to_json(rb.hardware)::text, '[]') AS hardware,
+        rb.description,
+        rb.trigger,
+        rb.workaround,
+        rb.cli,
+        rb.updated_at,
+        (
+          COALESCE(jsonb_array_length(version_rules.affects_in_version), 0) > 0
+          OR COALESCE(jsonb_array_length(version_rules.fixed_in_versions), 0) > 0
+          OR COALESCE(release_status.unresolved, FALSE)
+        ) AS version_relations_unresolved,
+        COALESCE(version_rules.affects_in_version, '[]'::jsonb)::text AS affects_in_version,
+        COALESCE(version_rules.fixed_in_versions, '[]'::jsonb)::text AS fixed_in_versions,
+        COALESCE(release_notes.is_release_noted, '[]'::jsonb)::text AS is_release_noted
+      FROM scoped_report_bugs AS rb
+      LEFT JOIN version_rules
+        ON version_rules.bug_id = rb.bug_id AND version_rules.account_id = rb.account_id
+      LEFT JOIN release_notes
+        ON release_notes.bug_id = rb.bug_id AND release_notes.account_id = rb.account_id
+      LEFT JOIN release_note_status AS release_status
+        ON release_status.bug_id = rb.bug_id AND release_status.account_id = rb.account_id
+
+    measures:
+      - name: count
+        type: count
+        description: Total number of bug records
+
+      - name: distinct_bug_count
+        type: count_distinct
+        sql: bug_id
+        description: Number of distinct bug identities
+
+      - name: critical_count
+        type: count
+        filters:
+          - sql: "LOWER({CUBE}.severity) IN ('critical', '1')"
+        description: Count of critical severity bugs
+
+      - name: high_severity_count
+        type: count
+        filters:
+          - sql: "LOWER({CUBE}.severity) IN ('critical', 'high', '1', '2')"
+        description: Count of high or critical severity bugs
+
+      - name: release_noted_count
+        type: count
+        filters:
+          - sql: "{CUBE}.is_release_noted IS NOT NULL AND {CUBE}.is_release_noted != '[]'"
+        description: Count of bugs appearing in release notes
+
+      - name: with_workaround_count
+        type: count
+        filters:
+          - sql: "NULLIF(TRIM({CUBE}.workaround), '') IS NOT NULL"
+        description: Count of bugs that have an available workaround
+
+      - name: unresolved_rule_count
+        type: count
+        filters:
+          - sql: "{CUBE}.version_relations_unresolved"
+        description: Count of bugs with unresolved version relations
+
+      - name: avg_updated_epoch
+        type: avg
+        sql: "EXTRACT(EPOCH FROM {CUBE}.updated_at)"
+        description: Average update timestamp in epoch seconds
+
+      - name: min_updated_epoch
+        type: min
+        sql: "EXTRACT(EPOCH FROM {CUBE}.updated_at)"
+        description: Earliest update timestamp in epoch seconds
+
+      - name: max_updated_epoch
+        type: max
+        sql: "EXTRACT(EPOCH FROM {CUBE}.updated_at)"
+        description: Latest update timestamp in epoch seconds
+
+    dimensions:
+      - name: bugKey
+        sql: "{CUBE}.bug_id || ':' || {CUBE}.account_id"
+        type: string
+        primary_key: true
+        public: true
+
+      # Scope dimensions (used by cube.js queryRewrite for account isolation)
+      - { name: accountId, sql: account_id, type: string }
+      - { name: account_id, sql: account_id, type: string }
+      - { name: scopeAccountId, sql: account_id, type: string }
+
+      # Exact field names expected by MCP consumers (BUG_DETAIL_FIELDS)
+      - { name: bug_id, sql: bug_id, type: string }
+      - { name: summary, sql: summary, type: string }
+      - { name: severity, sql: severity, type: string }
+      - { name: jira_status, sql: jira_status, type: string }
+      - { name: bug_status, sql: bug_status, type: string }
+      - { name: bug_classification, sql: bug_classification, type: string }
+      - { name: os, sql: os, type: string }
+      - { name: components, sql: components, type: string }
+      - { name: features, sql: features, type: string }
+      - { name: impact_category, sql: impact_category, type: string }
+      - { name: impacted_product_types, sql: impacted_product_types, type: string }
+      - { name: hardware, sql: hardware, type: string }
+      - { name: description, sql: description, type: string }
+      - { name: trigger, sql: trigger, type: string }
+      - { name: workaround, sql: workaround, type: string }
+      - { name: cli, sql: cli, type: string }
+      - { name: updated_at, sql: updated_at, type: time }
+      - { name: version_relations_unresolved, sql: version_relations_unresolved, type: boolean }
+      - { name: affects_in_version, sql: affects_in_version, type: string }
+      - { name: fixed_in_versions, sql: fixed_in_versions, type: string }
+      - { name: is_release_noted, sql: is_release_noted, type: string }
+
+      # CamelCase aliases matching ITSM semantic conventions
+      - { name: bugId, sql: bug_id, type: string }
+      - { name: jiraStatus, sql: jira_status, type: string }
+      - { name: bugStatus, sql: bug_status, type: string }
+      - { name: bugClassification, sql: bug_classification, type: string }
+      - { name: impactCategory, sql: impact_category, type: string }
+      - { name: impactedProductTypes, sql: impacted_product_types, type: string }
+      - { name: updatedAt, sql: updated_at, type: time }
+      - { name: versionRelationsUnresolved, sql: version_relations_unresolved, type: boolean }
+      - { name: affectedVersionRules, sql: affects_in_version, type: string }
+      - { name: fixedVersionRules, sql: fixed_in_versions, type: string }
+      - { name: releaseNotedVersions, sql: is_release_noted, type: string }
+
+      # Age and staleness helpers (using ITSM globals.py Jinja helpers)
+      - name: ageBucket
+        sql: "{{ age_bucket('{CUBE}.updated_at') | safe }}"
+        type: string
+      - name: isStale72h
+        sql: "{{ older_than('{CUBE}.updated_at', 72) | safe }}"
+        type: boolean
+
+      # Semantic flags and population helpers matching ITSM conventions
+      - { name: hasWorkaround, sql: "NULLIF(TRIM({CUBE}.workaround), '') IS NOT NULL", type: boolean }
+      - { name: hasTrigger, sql: "NULLIF(TRIM({CUBE}.trigger), '') IS NOT NULL", type: boolean }
+      - { name: isHighSeverity, sql: "LOWER({CUBE}.severity) IN ('critical', 'high', '1', '2')", type: boolean }
+      - { name: isReleaseNoted, sql: "{CUBE}.is_release_noted IS NOT NULL AND {CUBE}.is_release_noted != '[]'", type: boolean }
+
+      # Sort helpers matching ITSM (missing values sort last as in Dgraph)
+      - { name: updatedAtMissing, sql: "{CUBE}.updated_at IS NULL", type: boolean }
+      - { name: severityMissing, sql: "NULLIF(TRIM({CUBE}.severity), '') IS NULL", type: boolean }

@@ -4,28 +4,29 @@
 // holds the caller's authorized `account_ids`. Queries without account scope
 // are rejected.
 //
-// Tickets authorized only through an in-scope device are resolved in Dgraph by
-// the MCP server. Their IDs travel in the query as a filter on
-// `<cube>.deviceScopeTicket`, and the token carries `device_scope_digest`: the
-// SHA-256 of the sorted, de-duplicated IDs joined by "\n". The IDs are admitted
-// only when they match the digest, so the token stays small however many
-// tickets the device route yields.
+// A caller may see a ticket raised by one of their accounts or sub-accounts,
+// located at one of their sites or sub-sites, or affecting one of their
+// devices. Each ticket cube computes `scopeAccounts`, every account that may
+// see the ticket as ",hex(A),hex(B),", from the org directory and the device
+// inventory (see globals.py), and every query is narrowed to tickets whose
+// list holds one of the caller's accounts.
 
-const crypto = require('crypto');
 // Cube's own handler error maps to an HTTP status (403 here) instead of 500,
 // and its message is returned without a stack trace.
 const { CubejsHandlerError } = require('@cubejs-backend/api-gateway/dist/src/cubejs-handler-error');
 
-// Cubes that can be queried directly and the members used to scope them.
-// `ticket` is set for ticket cubes so device-route tickets can be admitted.
+// Cubes that can be queried directly and how each is scoped: `accounts` is a
+// ",hex(A),hex(B)," list matched per caller account, `account` a single
+// account column.
 const TICKET_SCOPE = {
-  incidents: { account: 'scopeAccountId', ticket: 'deviceScopeTicket' },
-  cases: { account: 'scopeAccountId', ticket: 'deviceScopeTicket' },
-  change_requests: { account: 'scopeAccountId', ticket: 'deviceScopeTicket' },
-  pet_requests: { account: 'scopeAccountId', ticket: 'deviceScopeTicket' },
-  tac_cases: { account: 'scopeAccountId', ticket: 'deviceScopeTicket' },
-  tickets: { account: 'scopeAccountId', ticket: 'deviceScopeTicket' },
-  org: { account: 'accountId', ticket: null },
+  incidents: { accounts: 'scopeAccounts' },
+  cases: { accounts: 'scopeAccounts' },
+  change_requests: { accounts: 'scopeAccounts' },
+  pet_requests: { accounts: 'scopeAccounts' },
+  tac_cases: { accounts: 'scopeAccounts' },
+  tickets: { accounts: 'scopeAccounts' },
+  org: { account: 'accountId' },
+  bug_details: { account: 'accountId' },
 };
 
 // Cubes that are only reachable through a scoped cube (joins).
@@ -61,40 +62,15 @@ function collectFilterMembers(filters) {
   return out;
 }
 
-function isDeviceScopeMember(member) {
-  return typeof member === 'string' && member.endsWith('.deviceScopeTicket');
+// The account lists name other accounts, so they are a scope input only.
+function isScopeListMember(member) {
+  return typeof member === 'string' && member.endsWith('.scopeAccounts');
 }
 
-function digestOf(ids) {
-  const unique = [...new Set(ids.map(String))].sort();
-  return crypto.createHash('sha256').update(unique.join('\n')).digest('hex');
-}
-
-// Pull top-level device-route filters out of the query, verify them against
-// the signed digest, and return the admitted IDs plus the remaining filters.
-function extractDeviceScope(filters, digest) {
-  const remaining = [];
-  let ids = null;
-  for (const filter of filters) {
-    const member = filter.member || filter.dimension;
-    if (isDeviceScopeMember(member)) {
-      if (filter.operator !== 'equals' || !Array.isArray(filter.values)) {
-        throw new ScopeError('device scope filter must use the equals operator');
-      }
-      if (ids !== null) throw new ScopeError('only one device scope filter is allowed');
-      ids = filter.values;
-      continue;
-    }
-    if (collectFilterMembers([filter]).some(isDeviceScopeMember)) {
-      throw new ScopeError('device scope filter must be a top-level filter');
-    }
-    remaining.push(filter);
-  }
-  if (ids === null) return { ids: [], remaining };
-  if (typeof digest !== 'string' || digestOf(ids) !== digest) {
-    throw new ScopeError('device scope tickets do not match the signed digest');
-  }
-  return { ids, remaining };
+// `order` is an object or a list of [member, direction] pairs.
+function orderMembers(order) {
+  if (!order) return [];
+  return Array.isArray(order) ? order.map((pair) => pair[0]) : Object.keys(order);
 }
 
 module.exports = {
@@ -103,6 +79,12 @@ module.exports = {
     const accountIds = context.account_ids;
     if (!Array.isArray(accountIds) || accountIds.length === 0) {
       throw new ScopeError('account scope required: account_ids missing from security context');
+    }
+    for (const id of accountIds) {
+      // The list match is ",id,", so an ID must not contain the delimiter.
+      if (typeof id !== 'string' || id === '' || id.includes(',')) {
+        throw new ScopeError('account_ids must be non-empty strings without commas');
+      }
     }
 
     const cubes = cubesInQuery(query);
@@ -115,33 +97,32 @@ module.exports = {
     if (scoped.length === 0) {
       throw new ScopeError('query must include a scoped cube');
     }
-    for (const member of [...(query.dimensions || []), ...(query.measures || [])]) {
-      if (isDeviceScopeMember(member)) {
-        throw new ScopeError('deviceScopeTicket is a scope input, not a selectable member');
-      }
+    const selected = [
+      ...(query.dimensions || []),
+      ...(query.measures || []),
+      ...(query.timeDimensions || []).map((td) => td.dimension),
+      ...orderMembers(query.order),
+      ...collectFilterMembers(query.filters || []),
+    ];
+    if (selected.some(isScopeListMember)) {
+      throw new ScopeError('scopeAccounts is a scope input, not a queryable member');
     }
-
-    const { ids: deviceTickets, remaining } = extractDeviceScope(
-      query.filters || [],
-      context.device_scope_digest,
-    );
 
     const scopeFilters = scoped.map((cube) => {
       const members = TICKET_SCOPE[cube];
-      const byAccount = {
-        member: `${cube}.${members.account}`,
-        operator: 'equals',
-        values: accountIds,
-      };
-      if (deviceTickets.length === 0 || !members.ticket) return byAccount;
+      if (members.account) {
+        return { member: `${cube}.${members.account}`, operator: 'equals', values: accountIds };
+      }
+      // Cube compiles `contains` to ILIKE (wildcards escaped), one alternative
+      // per value. The lists hold lower-case hex of each ID, so the
+      // case-insensitive match is exact.
       return {
-        or: [
-          byAccount,
-          { member: `${cube}.${members.ticket}`, operator: 'equals', values: deviceTickets },
-        ],
+        member: `${cube}.${members.accounts}`,
+        operator: 'contains',
+        values: accountIds.map((id) => `,${Buffer.from(id, 'utf8').toString('hex')},`),
       };
     });
 
-    return { ...query, filters: [...remaining, ...scopeFilters] };
+    return { ...query, filters: [...(query.filters || []), ...scopeFilters] };
   },
 };

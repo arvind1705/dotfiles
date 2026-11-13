@@ -12,14 +12,24 @@ cubes:
       - { name: caseSubject, sql: case_subject, type: string }
       - { name: caseDescription, sql: case_description, type: string }
       - { name: severity, sql: severity, type: string }
-      - { name: state, sql: state, type: string }
-      - { name: contactEmail, sql: contact_email, type: string }
-      - { name: alternateEmail, sql: alternate_email, type: string }
       - { name: serialNumber, sql: serial_number, type: string }
+      - { name: productNumber, sql: product_number, type: string }
       - { name: createdAt, sql: created_at, type: time }
       - { name: createdBy, sql: created_by, type: string }
       - { name: updatedAt, sql: updated_at, type: time }
-      - { name: accountId, sql: account_id, type: string }
+      - { name: updatedBy, sql: updated_by, type: string }
+      - { name: countryCode, sql: country_code, type: string }
       - { name: issueDescription, sql: issue_description, type: string }
-      - { name: caseNumberId, sql: case_number_id, type: string }
+      - { name: contactEmail, sql: contact_email, type: string }
+      - { name: alternateEmail, sql: alternate_email, type: string }
+      - { name: errorMessages, sql: error_messages, type: string }
       - { name: customerSite, sql: customer_site, type: string }
+      - { name: accountId, sql: account_id, type: string }
+      - { name: caseNumberId, sql: case_number_id, type: string }
+      - { name: messageId, sql: message_id, type: string }
+      - { name: state, sql: state, type: string }
+      - { name: productSeries, sql: product_series, type: string }
+      - { name: platform, sql: platform, type: string }
+      - { name: provider, sql: provider, type: string }
+      - { name: oldTacCaseNumber, sql: old_tac_case_number, type: string }
+      - { name: migratedAt, sql: migrated_at, type: time }

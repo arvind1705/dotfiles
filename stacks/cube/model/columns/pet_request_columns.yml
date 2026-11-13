@@ -7,28 +7,119 @@ cubes:
     public: false
 
     dimensions:
-      - { name: requestedItemNumber, sql: requested_item_number, type: string, primary_key: true, public: true }
-      - { name: accountName, sql: account_name, type: string }
-      - { name: shortDescription, sql: short_description, type: string }
+      - { name: caseNumber, sql: case_number, type: string }
+      - { name: tacCaseNumber, sql: tac_case_number, type: string }
+      - { name: scheduledDate, sql: scheduled_date, type: string }
+      - { name: storeNumber, sql: store_number, type: string }
       - { name: severity, sql: severity, type: string }
-      - { name: state, sql: state, type: string }
+      - { name: aogAomReason, sql: aog_aom_reason, type: string }
+      - { name: issueCableNature, sql: issue_cable_nature, type: string }
+      - { name: stepsFollowed, sql: steps_followed, type: string }
+      - { name: approval, sql: approval, type: string }
+      - { name: lift, sql: lift, type: string }
+      - { name: typeOfLift, sql: type_of_lift, type: string }
+      - { name: spotter, sql: spotter, type: string }
+      - { name: cableTesters, sql: cable_testers, type: string }
+      - { name: laptop, sql: laptop, type: boolean }
+      - { name: ethernetTester, sql: ethernet_tester, type: boolean }
+      - { name: consoleCable, sql: console_cable, type: boolean }
+      - { name: flashDrive, sql: flash_drive, type: boolean }
+      - { name: cellPhone, sql: cell_phone, type: boolean }
+      - { name: netNewAp, sql: net_new_ap, type: string }
+      - { name: apRequired, sql: ap_required, type: string }
+      - { name: isBracketRequired, sql: is_bracket_required, type: string }
+      - { name: quantity, sql: quantity, type: string }
+      - { name: partNumber, sql: part_number, type: string }
+      - { name: serialNumber, sql: serial_number, type: string }
+      - { name: assetName, sql: asset_name, type: string }
+      - { name: modelNumber, sql: model_number, type: string }
+      - { name: switchPortNumber, sql: switch_port_number, type: string }
+      - { name: heatMap, sql: heat_map, type: string }
+      - { name: fiberOrEthernet, sql: fiber_or_ethernet, type: string }
+      - { name: problemDescription, sql: problem_description, type: string }
+      - { name: apJackNumber, sql: ap_jack_number, type: string }
+      - { name: businessImpact, sql: business_impact, type: string }
+      - { name: dataJackLocation, sql: data_jack_location, type: string }
+      - { name: storeAddress, sql: store_address, type: string }
+      - { name: onsiteVisit, sql: onsite_visit, type: time }
+      - { name: storePhoneNumber, sql: store_phone_number, type: string }
+      - { name: contactName, sql: contact_name, type: string }
+      - { name: contactPhoneNumber, sql: contact_phone_number, type: string }
+      - { name: storeHours, sql: store_hours, type: string }
       - { name: requestType, sql: request_type, type: string }
       - { name: deviceType, sql: device_type, type: string }
       - { name: vendor, sql: vendor, type: string }
-      - { name: caseNumber, sql: case_number, type: string }
-      - { name: tacCaseNumber, sql: tac_case_number, type: string }
-      - { name: serialNumber, sql: serial_number, type: string }
+      - { name: comments, sql: comments, type: string }
+      - { name: assignedTo, sql: assigned_to, type: string }
+      - { name: assignmentGroup, sql: assignment_group, type: string }
+      - { name: cancelledAt, sql: cancelled_at, type: time }
+      - { name: cancelledBy, sql: cancelled_by, type: string }
+      - { name: closedAt, sql: closed_at, type: time }
+      - { name: closedBy, sql: closed_by, type: string }
       - { name: createdAt, sql: created_at, type: time }
+      - { name: createdBy, sql: created_by, type: string }
+      - { name: description, sql: description, type: string }
+      - { name: requestedItemNumber, sql: requested_item_number, type: string, primary_key: true, public: true }
+      - { name: openedAt, sql: opened_at, type: time }
+      - { name: openedBy, sql: opened_by, type: string }
+      - { name: priority, sql: priority, type: string }
+      - { name: request, sql: request, type: string }
+      - { name: requestedFor, sql: requested_for, type: string }
+      - { name: shortDescription, sql: short_description, type: string }
+      - { name: state, sql: state, type: string }
+      - { name: updatedAt, sql: updated_at, type: time }
+      - { name: updatedBy, sql: updated_by, type: string }
+      - { name: workNotes, sql: work_notes, type: string }
+      - { name: watchList, sql: watch_list, type: string }
+      - { name: catItem, sql: cat_item, type: string }
+      - { name: accountName, sql: account_name, type: string }
+      - { name: subAccountName, sql: sub_account_name, type: string }
+      - { name: accountId, sql: account_id, type: string }
+      - { name: subAccountId, sql: sub_account_id, type: string }
+      - { name: requestedBy, sql: requested_by, type: string }
+      - { name: typeOfRequest, sql: type_of_request, type: string }
+      - { name: tellUsAboutScope, sql: tell_us_about_scope, type: string }
+      - { name: tellUsAboutAsm, sql: tell_us_about_asm, type: string }
+      - { name: justification, sql: justification, type: string }
+      - { name: issueType, sql: issue_type, type: string }
+      - { name: specifyTheDetail, sql: specify_the_detail, type: string }
+      - { name: issueDescription, sql: issue_description, type: string }
+      - { name: siteLocationDetails, sql: site_location_details, type: string }
+      - { name: siteId, sql: site_id, type: string }
+      - { name: primaryContact, sql: primary_contact, type: string }
+      - { name: siteEmail, sql: site_email, type: string }
+      - { name: sitePhoneNumber, sql: site_phone_number, type: string }
+      - { name: equipmentShipToLocation, sql: equipment_ship_to_location, type: string }
+      - { name: expectedEquipmentDeliveryDate, sql: expected_equipment_delivery_date, type: string }
+      - { name: expectedSiteDeploymentDate, sql: expected_site_deployment_date, type: string }
+      - { name: projectManager, sql: project_manager, type: string }
+      - { name: generalProjectDescription, sql: general_project_description, type: string }
+      - { name: isEscalated, sql: is_escalated, type: boolean }
+      - { name: otherTool, sql: other_tool, type: string }
+      - { name: apName, sql: ap_name, type: string }
+      - { name: bracket, sql: bracket, type: string }
+      - { name: cableDrop, sql: cable_drop, type: string }
+      - { name: cablingResponsibility, sql: cabling_responsibility, type: string }
+      - { name: macAddress, sql: mac_address, type: string }
+      - { name: petNotes, sql: pet_notes, type: string }
+      - { name: timezone, sql: timezone, type: string }
+      - { name: zone, sql: zone, type: string }
+      - { name: failedSloCategories, sql: failed_slo_categories, type: string }
+      - { name: metSloCategories, sql: met_slo_categories, type: string }
+      - { name: sloDetails, sql: slo_details, type: string }
+      - { name: fieldEngineerInformation, sql: field_engineer_information, type: string }
+      - { name: odMailSentAt, sql: od_mail_sent_at, type: time }
+      - { name: odMailSentBy, sql: od_mail_sent_by, type: string }
+      - { name: odSchedule, sql: od_schedule, type: boolean }
+      - { name: petTeamUpdate, sql: pet_team_update, type: string }
+      - { name: maintenanceTime, sql: maintenance_time, type: string }
+      - { name: odApprover, sql: od_approver, type: string }
+      - { name: ethernetPatchCable, sql: ethernet_patch_cable, type: boolean }
+      - { name: fieldEngineerRequired, sql: field_engineer_required, type: boolean }
+      - { name: siteTimezone, sql: site_timezone, type: string }
+      - { name: pleaseSelectAsset, sql: please_select_asset, type: string }
+      - { name: shippersTrackingNumber, sql: shippers_tracking_number, type: string }
+      - { name: technicianLeftWithoutBeingReleased, sql: technician_left_without_being_released, type: boolean }
       - { name: timeArrived, sql: time_arrived, type: time }
       - { name: timeReleased, sql: time_released, type: time }
-      - { name: technicianLeftWithoutBeingReleased, sql: technician_left_without_being_released, type: boolean }
-      - { name: updatedAt, sql: updated_at, type: time }
-      - { name: accountId, sql: account_id, type: string }
-      - { name: assignmentGroup, sql: assignment_group, type: string }
-      - { name: assignedTo, sql: assigned_to, type: string }
-      - { name: issueType, sql: issue_type, type: string }
-      - { name: subAccountId, sql: sub_account_id, type: string }
-      - { name: siteId, sql: site_id, type: string }
-      - { name: catItem, sql: cat_item, type: string }
-      - { name: assetName, sql: asset_name, type: string }
-      - { name: description, sql: description, type: string }
+      - { name: shipmentService, sql: shipment_service, type: string }

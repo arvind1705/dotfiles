@@ -3,24 +3,21 @@
 # name; this cube adds membership, scope, normalization, flags and joins.
 cubes:
   - name: cases
+    # Results are cached until the source rows or the scope tables change
+    # (checked every minute).
+    refresh_key:
+      every: 1 minute
+      sql: "SELECT COUNT(*), MAX(updated_at), (SELECT COUNT(*) || '|' || MAX(updated) FROM public.account_count_summary), (SELECT COUNT(*) FILTER (WHERE is_active) || '|' || MAX(id) FROM public.device_account_mapping) FROM public.case30d"
     extends: case_columns
     public: true
     sql: >
       SELECT
         c.*,
-        -- Normalized as the loader normalizes it.
-        CASE TRIM(c.priority)
-        WHEN '1 - Critical' THEN 'P1' WHEN '1-Critical-Down' THEN 'P1'
-        WHEN '2 - High' THEN 'P2' WHEN '2-Critical-Degraded' THEN 'P2'
-        WHEN '3 - Moderate' THEN 'P3' WHEN '3-Normal' THEN 'P3'
-        WHEN '4 - Low' THEN 'P4' WHEN '4-Low' THEN 'P4'
-        WHEN 'Priority 1' THEN 'P1' WHEN 'PRIORITY 1' THEN 'P1'
-        WHEN 'Priority 2' THEN 'P2' WHEN 'PRIORITY 2' THEN 'P2'
-        WHEN 'Priority 3' THEN 'P3' WHEN 'PRIORITY 3' THEN 'P3'
-        WHEN 'Priority 4' THEN 'P4' WHEN 'PRIORITY 4' THEN 'P4'
-        ELSE TRIM(c.priority)
-        END AS priority_norm,
-        LOWER(REPLACE(TRIM(c.state), '_', ' ')) IN ('new', 'open', 'pending customer', 'in progress', 'on hold') AS is_open_flag,
+        -- Normalization and state sets are the semantic layer rules
+        -- (globals.py, generated from its TTL).
+        {{ normalize('c.priority', 'TicketPriority') | safe }} AS priority_norm,
+        {{ in_set('c.state', 'CaseOpenStates') | safe }} AS is_open_flag,
+        {{ lifecycle('c.state', 'CaseFinishedStates', 'CaseCancelledStates') | safe }} AS lifecycle,
         am.name AS alert_name,
         CASE
           WHEN c.comments = '[]' THEN NULL
@@ -31,14 +28,25 @@ cubes:
             'g'
           )
         END AS latest_comment,
-        COALESCE(
-          c.account_id,
-          (SELECT a.account_id FROM public.account_count_summary a
-            WHERE a.sub_account_id = c.sub_account_id LIMIT 1),
-          (SELECT a.account_id FROM public.account_count_summary a
-            WHERE a.site_id = c.site_id LIMIT 1)
-        ) AS scope_account_id
+        {{ scope_account('c', 'sub_account,site,sub_site') | safe }} AS scope_account_id,
+        {{ scope_accounts('c', 'sub_account,site,sub_site') | safe }} AS scope_accounts,
+        -- Child links as Dgraph records them: from the case row and from the
+        -- child rows (see the loader's ID sync).
+        (NULLIF(TRIM(c.incident_number), '') IS NOT NULL
+          OR link_inc.case_number IS NOT NULL) AS has_incident_link,
+        link_cr.case_number IS NOT NULL AS has_change_request_link,
+        link_pet.case_number IS NOT NULL AS has_pet_request_link
       FROM public.case30d c
+      {{ scope_joins('c', 'case30d', 'case_number', 'sub_account,site,sub_site', 'device_id') | safe }}
+      LEFT JOIN (SELECT DISTINCT case_number FROM public.incident30d
+        WHERE NULLIF(TRIM(case_number), '') IS NOT NULL) link_inc
+        ON link_inc.case_number = c.case_number
+      LEFT JOIN (SELECT DISTINCT case_number FROM public.change_request_30d
+        WHERE NULLIF(TRIM(case_number), '') IS NOT NULL) link_cr
+        ON link_cr.case_number = c.case_number
+      LEFT JOIN (SELECT DISTINCT case_number FROM public.petdata_30d
+        WHERE NULLIF(TRIM(case_number), '') IS NOT NULL) link_pet
+        ON link_pet.case_number = c.case_number
       LEFT JOIN public.alert_metadata am
         ON c.alert_category = am.category
        AND c.alert_sub_category = am.sub_category
@@ -67,6 +75,16 @@ cubes:
         filters:
           - sql: "{CUBE}.is_open_flag"
 
+      # Creation time as epoch seconds; ticket aging derives the mean and
+      # maximum age from these and the caller's "now".
+      - name: avg_created_epoch
+        type: avg
+        sql: "EXTRACT(EPOCH FROM {CUBE}.created_at)"
+
+      - name: min_created_epoch
+        type: min
+        sql: "EXTRACT(EPOCH FROM {CUBE}.created_at)"
+
       - name: device_count
         type: count_distinct
         sql: device_id
@@ -80,15 +98,28 @@ cubes:
       - { name: ticketNumber, sql: case_number, type: string }
       - { name: stateKey, sql: "LOWER(REPLACE(TRIM({CUBE}.state), '_', ' '))", type: string }
       - { name: is_open, sql: is_open_flag, type: boolean }
+      # finished, cancelled or other (the layer's finished/cancelled state sets).
+      - { name: lifecycle, sql: lifecycle, type: string }
       - { name: priorityNorm, sql: priority_norm, type: string }
       # From alert_metadata, matched on alert category and sub-category.
       - { name: alertName, sql: alert_name, type: string }
       # The most recent entry of the comments column.
       - { name: latestComment, sql: latest_comment, type: string }
-      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
-      # queryRewrite when they match the signed digest in the token.
-      - { name: deviceScopeTicket, sql: case_number, type: string }
+      # Every account that may see the ticket, as ,hex(A),hex(B), (queryRewrite
+      # matches each caller account). Scope input only, never selected.
+      - { name: scopeAccounts, sql: scope_accounts, type: string }
       - { name: scopeAccountId, sql: scope_account_id, type: string }
+      - { name: hasIncidentLink, sql: has_incident_link, type: boolean }
+      - { name: hasChangeRequestLink, sql: has_change_request_link, type: boolean }
+      - { name: hasPetRequestLink, sql: has_pet_request_link, type: boolean }
+      # Creation age bucket and staleness by the database clock; the producer
+      # reads them only when its clock is the real one (no frozen MOCK_NOW).
+      - name: ageBucket
+        sql: "{{ age_bucket('{CUBE}.created_at') | safe }}"
+        type: string
+      - name: isStale72h
+        sql: "{{ older_than('{CUBE}.updated_at', 72) | safe }}"
+        type: boolean
 
       # Population summary flags. Blank assignment values count as absent.
       - name: isUnassigned
@@ -98,10 +129,10 @@ cubes:
         sql: "NULLIF(TRIM({CUBE}.assignment_group), '') IS NOT NULL"
         type: boolean
       - name: isReopened
-        sql: "{CUBE}.reopened_at IS NOT NULL"
+        sql: "COALESCE({CUBE}.u_reopen_count, 0) > 0"
         type: boolean
       - name: isHighPriority
-        sql: "{CUBE}.priority_norm IN ('P1', 'P2')"
+        sql: "{{ in_labels('{CUBE}.priority_norm', 'HighPriority') | safe }}"
         type: boolean
       # Sort helpers: missing values sort last in both directions, as in Dgraph.
       - { name: createdAtMissing, sql: "{CUBE}.created_at IS NULL", type: boolean }

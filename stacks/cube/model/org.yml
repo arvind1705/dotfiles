@@ -3,6 +3,9 @@
 # account_count_summary column comes from the generated base (columns/).
 cubes:
   - name: org
+    # The organization directory changes rarely; cached for 10 minutes.
+    refresh_key:
+      every: 10 minute
     extends: org_columns
     public: true
 

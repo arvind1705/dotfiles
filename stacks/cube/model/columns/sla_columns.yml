@@ -7,14 +7,30 @@ cubes:
     public: false
 
     dimensions:
-      - { name: taskId, sql: task_id, type: string }
+      - { name: id, sql: id, type: number }
       - { name: sla, sql: sla, type: string }
       - { name: active, sql: active, type: string }
+      - { name: businessDuration, sql: business_duration, type: string }
+      - { name: businessPauseDuration, sql: business_pause_duration, type: string }
+      - { name: businessPercentage, sql: business_percentage, type: string }
+      - { name: businessTimeLeft, sql: business_time_left, type: string }
+      - { name: duration, sql: duration, type: string }
+      - { name: endTime, sql: end_time, type: time }
       - { name: hasBreached, sql: has_breached, type: string }
+      - { name: originalBreachTime, sql: original_breach_time, type: time }
+      - { name: pauseDuration, sql: pause_duration, type: string }
+      - { name: pauseTime, sql: pause_time, type: time }
+      - { name: percentage, sql: percentage, type: string }
+      - { name: plannedEndTime, sql: planned_end_time, type: time }
+      - { name: schedule, sql: schedule, type: string }
       - { name: stage, sql: stage, type: string }
+      - { name: startTime, sql: start_time, type: time }
+      - { name: createdBy, sql: created_by, type: string }
+      - { name: createdAt, sql: created_at, type: time }
+      - { name: updatedBy, sql: updated_by, type: string }
+      - { name: updatedAt, sql: updated_at, type: time }
+      - { name: timezone, sql: timezone, type: string }
       - { name: timeLeft, sql: time_left, type: string }
+      - { name: taskId, sql: task_id, type: string }
       - { name: nearBreached, sql: near_breached, type: string }
       - { name: target, sql: target, type: string }
-      - { name: businessPercentage, sql: business_percentage, type: string }
-      - { name: startTime, sql: start_time, type: time }
-      - { name: endTime, sql: end_time, type: time }

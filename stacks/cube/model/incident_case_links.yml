@@ -3,6 +3,10 @@
 # ticket cube; the linked case must itself be authorized (cases scope).
 cubes:
   - name: incident_case_links
+    # Results are cached until the source rows change (checked every minute).
+    refresh_key:
+      every: 1 minute
+      sql: "SELECT SUM(n), MAX(u) FROM (SELECT COUNT(*) AS n, MAX(updated_at) AS u FROM public.incident30d UNION ALL SELECT COUNT(*) AS n, MAX(updated_at) AS u FROM public.case30d) k"
     sql: >
       SELECT DISTINCT incident_number, case_number FROM (
         SELECT incident_number, case_number FROM public.incident30d

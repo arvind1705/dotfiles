@@ -2,6 +2,10 @@
 # device plus each serial in other_asset_ids. Reachable only through incidents.
 cubes:
   - name: incident_devices
+    # Results are cached until the source rows change (checked every minute).
+    refresh_key:
+      every: 1 minute
+      sql: "SELECT COUNT(*), MAX(updated_at) FROM public.incident30d"
     sql: >
       SELECT DISTINCT i.incident_number, TRIM(d.serial) AS serial
       FROM public.incident30d i

@@ -5,12 +5,17 @@
 # absent on that type in Dgraph).
 cubes:
   - name: tickets
+    # Results are cached until the source rows or the scope tables change
+    # (checked every minute).
+    refresh_key:
+      every: 1 minute
+      sql: "SELECT SUM(n), MAX(u), (SELECT COUNT(*) || '|' || MAX(updated) FROM public.account_count_summary), (SELECT COUNT(*) FILTER (WHERE is_active) || '|' || MAX(id) FROM public.device_account_mapping) FROM (SELECT COUNT(*) AS n, MAX(updated_at) AS u FROM public.incident30d UNION ALL SELECT COUNT(*) AS n, MAX(updated_at) AS u FROM public.case30d UNION ALL SELECT COUNT(*) AS n, MAX(updated_at) AS u FROM public.change_request_30d UNION ALL SELECT COUNT(*) AS n, MAX(updated_at) AS u FROM public.petdata_30d UNION ALL SELECT COUNT(*) AS n, MAX(updated_at) AS u FROM public.customerdata_supporttaccase) k"
     sql: >
       SELECT 'Incident' AS ticket_type, t.incident_number AS ticket_number, t.state,
         t.priority_norm AS priority, NULL::text AS severity, t.incident_category AS category, t.issue_type,
         t.created_at, t.updated_at, t.resolved_at, NULL::timestamptz AS closed_at,
         t.creation_type, t.assigned_to, t.assignment_group, t.device_id,
-        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id,
+        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id, t.scope_accounts,
         t.is_open_flag AS is_open
       FROM ({incidents.sql()}) t
       UNION ALL
@@ -18,7 +23,7 @@ cubes:
         t.priority_norm, NULL::text, NULL::text, t.issue_type,
         t.created_at, t.updated_at, t.resolved_at, NULL::timestamptz,
         t.creation_type, t.assigned_to, t.assignment_group, t.device_id,
-        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id,
+        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id, t.scope_accounts,
         t.is_open_flag
       FROM ({cases.sql()}) t
       UNION ALL
@@ -26,7 +31,7 @@ cubes:
         t.priority_norm, NULL::text, t.category, t.issue_type,
         t.created_at, t.updated_at, NULL::timestamptz, t.closed_at,
         t.creation_type, t.assigned_to, t.assignment_group, t.device_id,
-        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id,
+        t.account_id, t.sub_account_id, t.site_id, t.sub_site_id, t.scope_account_id, t.scope_accounts,
         t.is_open_flag
       FROM ({change_requests.sql()}) t
       UNION ALL
@@ -34,7 +39,7 @@ cubes:
         NULL::text, t.severity_norm, NULL::text, t.issue_type,
         t.created_at, t.updated_at, NULL::timestamptz, NULL::timestamptz,
         NULL::text, t.assigned_to, t.assignment_group, t.serial_number,
-        t.account_id, t.sub_account_id, t.site_id, NULL::text, t.scope_account_id,
+        t.account_id, t.sub_account_id, t.site_id, NULL::text, t.scope_account_id, t.scope_accounts,
         t.is_open_flag
       FROM ({pet_requests.sql()}) t
       UNION ALL
@@ -42,7 +47,7 @@ cubes:
         NULL::text, t.severity_norm, NULL::text, NULL::text,
         t.created_at, t.updated_at, NULL::timestamptz, NULL::timestamptz,
         NULL::text, NULL::text, NULL::text, t.serial_number,
-        t.account_id, NULL::text, NULL::text, NULL::text, t.scope_account_id,
+        t.account_id, NULL::text, NULL::text, NULL::text, t.scope_account_id, t.scope_accounts,
         NULL::boolean
       FROM ({tac_cases.sql()}) t
 
@@ -82,9 +87,9 @@ cubes:
       - { name: subAccountId, sql: sub_account_id, type: string }
       - { name: siteId, sql: site_id, type: string }
       - { name: subSiteId, sql: sub_site_id, type: string }
-      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
-      # queryRewrite when they match the signed digest in the token.
-      - { name: deviceScopeTicket, sql: ticket_number, type: string }
+      # Every account that may see the ticket, as ,hex(A),hex(B), (queryRewrite
+      # matches each caller account). Scope input only, never selected.
+      - { name: scopeAccounts, sql: scope_accounts, type: string }
       - { name: scopeAccountId, sql: scope_account_id, type: string }
       - { name: createdAt, sql: created_at, type: time }
       - { name: updatedAt, sql: updated_at, type: time }

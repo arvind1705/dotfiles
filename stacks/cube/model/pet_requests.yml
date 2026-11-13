@@ -3,32 +3,27 @@
 # name; this cube adds membership, scope, normalization and flags.
 cubes:
   - name: pet_requests
+    # Results are cached until the source rows or the scope tables change
+    # (checked every minute).
+    refresh_key:
+      every: 1 minute
+      sql: "SELECT COUNT(*), MAX(updated_at), (SELECT COUNT(*) || '|' || MAX(updated) FROM public.account_count_summary), (SELECT COUNT(*) FILTER (WHERE is_active) || '|' || MAX(id) FROM public.device_account_mapping) FROM public.petdata_30d"
     extends: pet_request_columns
     public: true
     sql: >
       SELECT
         p.*,
-        -- Normalized as the loader normalizes it.
-        CASE TRIM(p.severity)
-        WHEN '1 - Critical' THEN 'Critical' WHEN '1-Critical-Down' THEN 'Critical'
-        WHEN '2 - High' THEN 'Major' WHEN '2-Critical-Degraded' THEN 'Major'
-        WHEN '3 - Moderate' THEN 'Minor' WHEN '3 - Normal' THEN 'Normal'
-        WHEN '3-Normal' THEN 'Normal' WHEN '4 - Low' THEN 'Warning' WHEN '4-Low' THEN 'Warning'
-        WHEN 'CRITICAL' THEN 'Critical' WHEN 'MAJOR' THEN 'Major' WHEN 'MINOR' THEN 'Minor'
-        WHEN 'NORMAL' THEN 'Normal' WHEN 'WARNING' THEN 'Warning' WHEN 'BLOCKER' THEN 'Blocker'
-        WHEN 'HIGH' THEN 'Major' WHEN 'MEDIUM' THEN 'Minor' WHEN 'LOW' THEN 'Warning'
-        WHEN 'Critical' THEN 'Critical' WHEN 'Major' THEN 'Major' WHEN 'Minor' THEN 'Minor'
-        WHEN 'Normal' THEN 'Normal' WHEN 'Warning' THEN 'Warning' WHEN 'Blocker' THEN 'Blocker'
-        END AS severity_norm,
-        LOWER(REPLACE(TRIM(p.state), '_', ' ')) IN ('open', 'in progress') AS is_open_flag,
-        COALESCE(
-          p.account_id,
-          (SELECT a.account_id FROM public.account_count_summary a
-            WHERE a.sub_account_id = p.sub_account_id LIMIT 1),
-          (SELECT a.account_id FROM public.account_count_summary a
-            WHERE a.site_id = p.site_id LIMIT 1)
-        ) AS scope_account_id
+        -- Normalization and state sets are the semantic layer rules
+        -- (globals.py, generated from its TTL).
+        {{ normalize('p.severity', 'Severity') | safe }} AS severity_norm,
+        {{ in_set('p.state', 'PETRequestOpenStates') | safe }} AS is_open_flag,
+        {{ lifecycle('p.state', 'PETRequestFinishedStates', 'PETRequestCancelledStates') | safe }} AS lifecycle,
+        {{ scope_account('p', 'sub_account,site') | safe }} AS scope_account_id,
+        {{ scope_accounts('p', 'sub_account,site') | safe }} AS scope_accounts,
+        -- Linked to a case: the column the loader's belongsToCase edge comes from.
+        NULLIF(TRIM(p.case_number), '') IS NOT NULL AS in_case_flag
       FROM public.petdata_30d p
+      {{ scope_joins('p', 'petdata_30d', 'requested_item_number', 'sub_account,site', 'serial_number') | safe }}
 
     joins:
       - name: sla
@@ -48,17 +43,42 @@ cubes:
         filters:
           - sql: "{CUBE}.is_open_flag"
 
+      # Creation time as epoch seconds; ticket aging derives the mean and
+      # maximum age from these and the caller's "now".
+      - name: avg_created_epoch
+        type: avg
+        sql: "EXTRACT(EPOCH FROM {CUBE}.created_at)"
+
+      - name: min_created_epoch
+        type: min
+        sql: "EXTRACT(EPOCH FROM {CUBE}.created_at)"
+
     dimensions:
       # Ticket key shared by every ticket cube (here the requested item number).
       - { name: ticketNumber, sql: requested_item_number, type: string }
       - { name: stateKey, sql: "LOWER(REPLACE(TRIM({CUBE}.state), '_', ' '))", type: string }
       - { name: is_open, sql: is_open_flag, type: boolean }
+      - { name: isInCase, sql: in_case_flag, type: boolean }
+      # finished, cancelled or other (the layer's finished/cancelled state sets).
+      - { name: lifecycle, sql: lifecycle, type: string }
       # Unrecognized severities are dropped, as the loader does today.
       - { name: severityNorm, sql: severity_norm, type: string }
-      # Carries Dgraph-resolved device-route ticket IDs; only accepted by
-      # queryRewrite when they match the signed digest in the token.
-      - { name: deviceScopeTicket, sql: requested_item_number, type: string }
+      # Every account that may see the ticket, as ,hex(A),hex(B), (queryRewrite
+      # matches each caller account). Scope input only, never selected.
+      - { name: scopeAccounts, sql: scope_accounts, type: string }
       - { name: scopeAccountId, sql: scope_account_id, type: string }
+      # Lower-cased keys for case-insensitive equality filters.
+      - name: vendorKey
+        sql: "LOWER(TRIM({CUBE}.vendor))"
+        type: string
+      # Creation age bucket and staleness by the database clock; the producer
+      # reads them only when its clock is the real one (no frozen MOCK_NOW).
+      - name: ageBucket
+        sql: "{{ age_bucket('{CUBE}.created_at') | safe }}"
+        type: string
+      - name: isStale72h
+        sql: "{{ older_than('{CUBE}.updated_at', 72) | safe }}"
+        type: boolean
       - name: isUnassigned
         sql: "NULLIF(TRIM({CUBE}.assigned_to), '') IS NULL"
         type: boolean

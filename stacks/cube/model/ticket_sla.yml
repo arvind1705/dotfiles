@@ -4,6 +4,10 @@
 # state is unknown). Reachable only through a scoped ticket cube.
 cubes:
   - name: ticket_sla
+    # Results are cached until the source rows change (checked every minute).
+    refresh_key:
+      every: 1 minute
+      sql: "SELECT COUNT(*), MAX(updated_at) FROM public.customerdata_sla"
     sql: >
       SELECT
         task_id,

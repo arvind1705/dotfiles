@@ -18,23 +18,31 @@ cubes:
       - { name: subSiteName, sql: sub_site_name, type: string }
       - { name: deviceUp, sql: device_up, type: number }
       - { name: deviceDown, sql: device_down, type: number }
-      - { name: criticalIncidents, sql: critical_incidents, type: number }
-      - { name: proactiveIncidents, sql: proactive_incidents, type: number }
+      - { name: criticalIncidents, sql: critical_incidents, type: string }
+      - { name: proactiveIncidents, sql: proactive_incidents, type: string }
       - { name: upcomingChanges, sql: upcoming_changes, type: number }
-      - { name: incidents, sql: incidents, type: number }
-      - { name: alerts, sql: alerts, type: number }
-      - { name: openCases, sql: open_cases, type: number }
-      - { name: tacCasesCount, sql: tac_cases_count, type: number }
-      - { name: aiCount, sql: ai_count, type: number }
-      - { name: uxiAlertsCount, sql: uxi_alerts_count, type: number }
-      - { name: starlinkCount, sql: starlink_count, type: number }
-      - { name: deviceOffline, sql: device_offline, type: number }
-      - { name: sdwanAlarmsCount, sql: sdwan_alarms_count, type: number }
-      - { name: upcomingChangesSite, sql: upcoming_changes_site, type: number }
-      - { name: centralLicense, sql: central_license, type: number }
       - { name: overallHealth, sql: overall_health, type: string }
       - { name: uptime, sql: uptime, type: string }
       - { name: systemHealth, sql: system_health, type: string }
       - { name: rfHealth, sql: rf_health, type: string }
       - { name: clientHealth, sql: client_health, type: string }
-      - { name: caseCheck, sql: case_check, type: boolean }
+      - { name: updated, sql: updated, type: time }
+      - { name: created, sql: created, type: time }
+      - { name: rfHealth24, sql: rf_health_24, type: string }
+      - { name: rfHealth5, sql: rf_health_5, type: string }
+      - { name: userIds, sql: user_ids, type: string }
+      - { name: country, sql: country, type: string }
+      - { name: incidents, sql: incidents, type: string }
+      - { name: alerts, sql: alerts, type: string }
+      - { name: centralLicense, sql: central_license, type: number }
+      - { name: aiCount, sql: ai_count, type: string }
+      - { name: openCases, sql: open_cases, type: string }
+      - { name: updatedBy, sql: updated_by, type: string }
+      - { name: uxiAlertsCount, sql: uxi_alerts_count, type: string }
+      - { name: caseCheck, sql: case_check, type: string }
+      - { name: deviceOffline, sql: device_offline, type: number }
+      - { name: sdwanAlarmsCount, sql: sdwan_alarms_count, type: string }
+      - { name: upcomingChangesSite, sql: upcoming_changes_site, type: string }
+      - { name: tacCasesCount, sql: tac_cases_count, type: string }
+      - { name: uxiSensorCount, sql: uxi_sensor_count, type: number }
+      - { name: starlinkCount, sql: starlink_count, type: number }
