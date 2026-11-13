@@ -17,7 +17,8 @@ import subprocess
 import threading
 import urllib.error
 import urllib.request
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from concurrent.futures import ThreadPoolExecutor
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 PORT = 9108
 HOST = "127.0.0.1"
@@ -38,8 +39,13 @@ class MetricsCollector:
         self.cached_http_services = {}
         self.media_transition = None
         self.media_transition_lock = threading.Lock()
+        self._media_active_cache = None
 
     def _is_media_active(self):
+        now = time.monotonic()
+        if self._media_active_cache and (now - self._media_active_cache[0] < 2.0):
+            return self._media_active_cache[1]
+        active = False
         try:
             res = subprocess.run(
                 ["systemctl", "is-active", "stack@media-server"],
@@ -48,22 +54,24 @@ class MetricsCollector:
                 timeout=1.5
             )
             if res.stdout.strip() == "active":
-                return True
+                active = True
         except Exception:
             pass
-        try:
-            res = subprocess.run(
-                ["docker", "ps", "--filter", "name=jellyfin", "--filter", "name=qbittorrent", "--format", "{{.Names}}"],
-                capture_output=True,
-                text=True,
-                timeout=1.5
-            )
-            names = res.stdout.strip().split()
-            if "jellyfin" in names or "qbittorrent" in names:
-                return True
-        except Exception:
-            pass
-        return False
+        if not active:
+            try:
+                res = subprocess.run(
+                    ["docker", "ps", "--filter", "name=jellyfin", "--filter", "name=qbittorrent", "--format", "{{.Names}}"],
+                    capture_output=True,
+                    text=True,
+                    timeout=1.5
+                )
+                names = res.stdout.strip().split()
+                if "jellyfin" in names or "qbittorrent" in names:
+                    active = True
+            except Exception:
+                pass
+        self._media_active_cache = (now, active)
+        return active
 
     def get_media_status(self):
         with self.media_transition_lock:
@@ -109,6 +117,7 @@ class MetricsCollector:
             return True, current
 
         target_trans = "starting" if action == "start" else "stopping"
+        self._media_active_cache = None
         with self.media_transition_lock:
             self.media_transition = (target_trans, time.time())
 
@@ -233,7 +242,24 @@ class MetricsCollector:
             "cube": "/api/health/cube",
             "t3": "/api/health/t3",
         }
-        return {name: self._check_http(path) for name, path in paths.items()}
+        results = {}
+        media_stopped = (self.get_media_status() == "stopped")
+        to_probe = {}
+        for name, path in paths.items():
+            if media_stopped and name in ("jellyfin", "qbittorrent"):
+                results[name] = {"online": False, "latency": 0, "kind": "http"}
+            else:
+                to_probe[name] = path
+
+        if to_probe:
+            with ThreadPoolExecutor(max_workers=len(to_probe)) as pool:
+                futures = {name: pool.submit(self._check_http, path) for name, path in to_probe.items()}
+                for name, fut in futures.items():
+                    try:
+                        results[name] = fut.result()
+                    except Exception:
+                        results[name] = {"online": False, "latency": 0, "kind": "http"}
+        return results
 
     def _read_temperature(self):
         """Find coretemp Package id 0 temperature, or fallback to CPU thermal zones."""
@@ -581,7 +607,7 @@ def main():
     t = threading.Thread(target=background_sampler, daemon=True)
     t.start()
 
-    server = HTTPServer((HOST, PORT), MetricsHandler)
+    server = ThreadingHTTPServer((HOST, PORT), MetricsHandler)
     print(f"Devbox metrics listening on http://{HOST}:{PORT}/api/system", file=sys.stderr)
     try:
         server.serve_forever()
