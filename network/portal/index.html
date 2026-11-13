@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-type="software" data-radius="sharp" data-buttons="solid">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
+<meta name="page-type" content="software">
+<meta name="site-kind" content="software">
 <meta name="description" content="Devbox home services & dev infra — open web apps, copy database connection commands, and check live status.">
 <title>Devbox — Services</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
@@ -16,7 +18,8 @@
 :root {
   /* Dark theme: navy-black surfaces + steel blue accent.
      --accent is for solid fills (white text on it passes AA);
-     --accent-ink is for text/links/focus on dark surfaces. */
+     --accent-ink is for text/links/focus on dark surfaces.
+     Radii: sharp dev-tool scale (taste: no single generous radius everywhere). */
   --bg-app: #0a0d12;
   --bg-app-translucent: rgba(10, 13, 18, 0.84);
   --bg-card: #121820;
@@ -47,8 +50,8 @@
   --cat-data-bg: rgba(251, 191, 36, 0.14);
   --cat-data-fg: #fbbf24;
 
-  --radius-sm: 6px;
-  --radius: 10px;
+  --radius-sm: 4px;
+  --radius: 6px;
   --radius-pill: 9999px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -74,8 +77,6 @@ html {
 body {
   font-family: var(--font);
   background-color: var(--bg-app);
-  background-image: radial-gradient(ellipse 80% 45% at 50% -10%, rgba(29, 78, 216, 0.14), transparent 70%);
-  background-repeat: no-repeat;
   color: var(--text-primary);
   min-height: 100vh;
   display: flex;
@@ -119,29 +120,39 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 18px rgba(29, 78, 216, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .brand-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 1px;
 }
 
 .ip-badge {
   font-family: var(--font-mono);
   font-size: 11px;
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: var(--radius-sm);
   background: var(--bg-subtle);
   color: var(--text-secondary);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .ip-badge:hover {
   background: var(--bg-subtle-hover);
   color: var(--text-primary);
+}
+.ip-badge:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
 }
 
 .header-right {
@@ -192,9 +203,6 @@ header {
   color: var(--success);
   border-color: rgba(16, 185, 129, 0.25);
 }
-.stat-pill.online .dot {
-  box-shadow: 0 0 8px currentColor;
-}
 .stat-pill.warning {
   background: var(--warning-subtle);
   color: var(--warning);
@@ -220,8 +228,8 @@ header {
 
 /* Icon Buttons */
 .btn-icon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,12 +238,16 @@ header {
   background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .btn-icon:hover {
   background: var(--bg-card-hover);
   color: var(--text-primary);
   border-color: var(--border-hover);
+}
+.btn-icon:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
 }
 
 /* Search Bar — sticky so filters stay reachable while scrolling. */
@@ -350,7 +362,7 @@ header {
 }
 
 .filter-btn {
-  padding: 6px 10px;
+  padding: 7px 12px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
@@ -358,10 +370,14 @@ header {
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .filter-btn:hover {
   color: var(--text-primary);
+}
+.filter-btn:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
 }
 .filter-btn.active {
   background: var(--accent-subtle);
@@ -381,7 +397,7 @@ header {
   background: var(--bg-card);
   border: 1px solid var(--border);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 .profile-strip.is-running {
   border-color: rgba(52, 211, 153, 0.25);
@@ -411,7 +427,7 @@ header {
   font-weight: 500;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   background: var(--bg-subtle);
   color: var(--text-tertiary);
   border: 1px solid var(--border);
@@ -422,7 +438,7 @@ header {
   border-color: rgba(16, 185, 129, 0.25);
 }
 .profile-status-badge.running .dot {
-  box-shadow: 0 0 8px currentColor;
+  background-color: var(--success);
 }
 .profile-status-badge.stopped {
   background: var(--bg-subtle);
@@ -448,13 +464,17 @@ header {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.profile-btn:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
 }
 .profile-btn.turn-on {
   background: var(--accent);
@@ -507,6 +527,7 @@ header {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+  margin: 0;
 }
 
 .section-count {
@@ -540,13 +561,14 @@ header {
   text-decoration: none;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 }
 
 .card:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
 }
 
 .card.is-stopped {
@@ -571,7 +593,7 @@ header {
 .card-icon {
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--bg-subtle);
   border: 1px solid var(--border);
   display: flex;
@@ -660,7 +682,6 @@ header {
 }
 .card-dot.online {
   background-color: var(--success);
-  box-shadow: 0 0 6px rgba(52, 211, 153, 0.55);
 }
 .card-dot.offline {
   background-color: var(--danger);
@@ -749,6 +770,9 @@ header {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .card:hover {
+    transform: none;
   }
 }
 
@@ -899,8 +923,8 @@ footer a:hover {
         </svg>
       </div>
       <div>
-        <div class="brand-title">Devbox — Services</div>
-        <div style="font-size:12px; color:var(--text-tertiary); margin-top:1px;">Home services &amp; dev infra</div>
+        <h1 class="brand-title">Devbox — Services</h1>
+        <div class="brand-subtitle">Home services &amp; dev infra</div>
       </div>
       <span class="ip-badge" onclick="copy('192.168.0.172', 'LAN IP copied')" title="Click to copy LAN IP" role="button" tabindex="0" aria-label="Copy LAN IP 192.168.0.172">192.168.0.172</span>
     </div>
@@ -911,13 +935,13 @@ footer a:hover {
           <span class="dot" aria-hidden="true"></span>
           <span id="status-text">Checking services…</span>
         </div>
-        <div class="stat-pill clickable" id="uptime-pill" title="System uptime (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('uptime')"><span class="metric-label">Uptime</span> --</div>
-        <div class="stat-pill clickable" id="cpu-pill" title="CPU usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('cpu')"><span class="metric-label">CPU</span> --</div>
-        <div class="stat-pill clickable" id="ram-pill" title="Memory in use (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('ram')"><span class="metric-label">RAM</span> --</div>
-        <div class="stat-pill clickable" id="disk-pill" title="Disk usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('disk')"><span class="metric-label">Disk</span> --</div>
+        <div class="stat-pill clickable" id="uptime-pill" title="System uptime (click for details)" role="button" tabindex="0" aria-expanded="false" aria-controls="sys-details" onclick="toggleSystemDetails('uptime')"><span class="metric-label">Uptime</span> --</div>
+        <div class="stat-pill clickable" id="cpu-pill" title="CPU usage (click for details)" role="button" tabindex="0" aria-expanded="false" aria-controls="sys-details" onclick="toggleSystemDetails('cpu')"><span class="metric-label">CPU</span> --</div>
+        <div class="stat-pill clickable" id="ram-pill" title="Memory in use (click for details)" role="button" tabindex="0" aria-expanded="false" aria-controls="sys-details" onclick="toggleSystemDetails('ram')"><span class="metric-label">RAM</span> --</div>
+        <div class="stat-pill clickable" id="disk-pill" title="Disk usage (click for details)" role="button" tabindex="0" aria-expanded="false" aria-controls="sys-details" onclick="toggleSystemDetails('disk')"><span class="metric-label">Disk</span> --</div>
       </div>
 
-      <button class="btn-icon" id="btn-refresh" title="Probe Endpoints" onclick="refreshAll()">
+      <button class="btn-icon" id="btn-refresh" title="Probe Endpoints" aria-label="Refresh service status" onclick="refreshAll()">
         <svg id="refresh-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
         </svg>
@@ -1363,7 +1387,7 @@ function render() {
     const online = items.filter(s => healthMap[s.id]?.status === 'online').length;
     const countLabel = healthMap[items[0].id] ? `${online}/${items.length} online` : `${items.length} services`;
     html += `<div class="section-head">
-      <span class="section-title">${sec.title}</span>
+      <h2 class="section-title">${sec.title}</h2>
       <span class="section-count">${countLabel}</span>
     </div>`;
     html += `<div class="grid">${items.map(renderCard).join('')}</div>`;
@@ -1377,6 +1401,8 @@ function clearFilters() {
   currentCat = 'all';
   const input = document.getElementById('search-input');
   if (input) input.value = '';
+  const wrap = document.getElementById('search-wrap');
+  if (wrap) wrap.classList.remove('has-value');
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
   render();
 }
@@ -1614,7 +1640,10 @@ function toggleSystemDetails(tab) {
   el.classList.toggle('open', activeDetailTab !== null);
   ['uptime', 'cpu', 'ram', 'disk'].forEach(k => {
     const pill = document.getElementById(`${k}-pill`);
-    if (pill) pill.classList.toggle('is-selected', activeDetailTab === k);
+    if (pill) {
+      pill.classList.toggle('is-selected', activeDetailTab === k);
+      pill.setAttribute('aria-expanded', activeDetailTab === k ? 'true' : 'false');
+    }
   });
   if (activeDetailTab && lastTelemetry) {
     renderSystemDetails(lastTelemetry);
