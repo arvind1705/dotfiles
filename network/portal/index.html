@@ -802,7 +802,8 @@ footer a:hover {
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
-.stat-pill.clickable:hover {
+.stat-pill.clickable:hover,
+.stat-pill.clickable.is-selected {
   border-color: var(--border-hover);
   color: var(--text-primary);
 }
@@ -872,10 +873,10 @@ footer a:hover {
           <span class="dot" aria-hidden="true"></span>
           <span id="status-text">Checking services…</span>
         </div>
-        <div class="stat-pill clickable" id="uptime-pill" title="System uptime (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">Uptime</span> --</div>
-        <div class="stat-pill clickable" id="cpu-pill" title="CPU usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">CPU</span> --</div>
-        <div class="stat-pill clickable" id="ram-pill" title="Memory in use (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">RAM</span> --</div>
-        <div class="stat-pill clickable" id="disk-pill" title="Disk usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails()"><span class="metric-label">Disk</span> --</div>
+        <div class="stat-pill clickable" id="uptime-pill" title="System uptime (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('uptime')"><span class="metric-label">Uptime</span> --</div>
+        <div class="stat-pill clickable" id="cpu-pill" title="CPU usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('cpu')"><span class="metric-label">CPU</span> --</div>
+        <div class="stat-pill clickable" id="ram-pill" title="Memory in use (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('ram')"><span class="metric-label">RAM</span> --</div>
+        <div class="stat-pill clickable" id="disk-pill" title="Disk usage (click for details)" role="button" tabindex="0" onclick="toggleSystemDetails('disk')"><span class="metric-label">Disk</span> --</div>
       </div>
 
       <button class="btn-icon" id="btn-refresh" title="Probe Endpoints" onclick="refreshAll()">
@@ -886,20 +887,7 @@ footer a:hover {
     </div>
   </header>
 
-  <section class="sys-details" id="sys-details" aria-label="System details">
-    <div>
-      <div class="sys-block-title">Host &amp; Memory</div>
-      <div id="sys-host-rows"></div>
-    </div>
-    <div>
-      <div class="sys-block-title">Network &amp; Load</div>
-      <div id="sys-net-rows"></div>
-    </div>
-    <div>
-      <div class="sys-block-title">Top Processes</div>
-      <div id="sys-proc-rows"></div>
-    </div>
-  </section>
+  <section class="sys-details" id="sys-details" aria-label="System details"></section>
 
   <!-- Search & Category Filters -->
   <div class="search-row">
@@ -1468,7 +1456,9 @@ function setMetric(id, label, value, pct) {
   if (typeof pct === 'number') {
     const clamped = Math.max(0, Math.min(100, pct));
     el.style.setProperty('--pct', `${clamped.toFixed(0)}%`);
-    el.className = 'stat-pill has-meter' + (clamped >= 90 ? ' offline' : clamped >= 75 ? ' warning' : '');
+    el.classList.add('has-meter');
+    el.classList.toggle('warning', clamped >= 75 && clamped < 90);
+    el.classList.toggle('offline', clamped >= 90);
   }
 }
 
@@ -1563,9 +1553,21 @@ function refreshAll() {
   loadTelemetry(true);
 }
 
-function toggleSystemDetails() {
+let activeDetailTab = null;
+let lastTelemetry = null;
+
+function toggleSystemDetails(tab) {
   const el = document.getElementById('sys-details');
-  if (el) el.classList.toggle('open');
+  if (!el) return;
+  activeDetailTab = (activeDetailTab === tab) ? null : tab;
+  el.classList.toggle('open', activeDetailTab !== null);
+  ['uptime', 'cpu', 'ram', 'disk'].forEach(k => {
+    const pill = document.getElementById(`${k}-pill`);
+    if (pill) pill.classList.toggle('is-selected', activeDetailTab === k);
+  });
+  if (activeDetailTab && lastTelemetry) {
+    renderSystemDetails(lastTelemetry);
+  }
 }
 
 function formatRate(bytesPerSec) {
@@ -1575,33 +1577,60 @@ function formatRate(bytesPerSec) {
   return `${(bytesPerSec / (1024 * 1024)).toFixed(2)} MB/s`;
 }
 
+function kvBlock(title, rows) {
+  return `<div><div class="sys-block-title">${title}</div>${rows
+    .map(([k, v]) => `<div class="sys-kv"><span>${k}</span><span>${v}</span></div>`)
+    .join('')}</div>`;
+}
+
 function renderSystemDetails(d) {
-  const hostEl = document.getElementById('sys-host-rows');
-  const netEl = document.getElementById('sys-net-rows');
-  const procEl = document.getElementById('sys-proc-rows');
-  if (!hostEl || !netEl || !procEl) return;
+  lastTelemetry = d;
+  const el = document.getElementById('sys-details');
+  if (!el || !activeDetailTab) return;
 
   const gib = 1024 * 1024 * 1024;
-  const swapUsed = d.memory && typeof d.memory.swap_used === 'number' ? (d.memory.swap_used / gib).toFixed(2) : '--';
-  const swapPct = d.memory && typeof d.memory.swap_percent === 'number' ? `${d.memory.swap_percent.toFixed(0)}%` : '--';
-  const diskFree = d.disk && typeof d.disk.free === 'number' ? `${(d.disk.free / gib).toFixed(0)}G` : '--';
-  hostEl.innerHTML = [
-    ['Cores / Threads', d.cpu ? `${d.cpu.physical_cores}c / ${d.cpu.threads}t` : '--'],
-    ['Swap', `${swapUsed}G (${swapPct})`],
-    ['Disk Free', diskFree]
-  ].map(([k, v]) => `<div class="sys-kv"><span>${k}</span><span>${v}</span></div>`).join('');
+  const procs = Array.isArray(d.top_processes) ? d.top_processes : [];
 
-  const loadStr = d.cpu && Array.isArray(d.cpu.load) ? d.cpu.load.map(x => x.toFixed(2)).join(' ') : '--';
-  netEl.innerHTML = [
-    ['Load (1/5/15m)', loadStr],
-    ['Net RX', d.network ? formatRate(d.network.rx_rate) : '--'],
-    ['Net TX', d.network ? formatRate(d.network.tx_rate) : '--']
-  ].map(([k, v]) => `<div class="sys-kv"><span>${k}</span><span>${v}</span></div>`).join('');
-
-  const procs = Array.isArray(d.top_processes) ? d.top_processes.slice(0, 3) : [];
-  procEl.innerHTML = procs.length
-    ? procs.map(p => `<div class="sys-kv"><span>${escapeHtml(p.name)}</span><span>${p.cpu.toFixed(1)}% · ${p.mem.toFixed(1)}%m</span></div>`).join('')
-    : '<div class="sys-kv"><span>No data</span><span>--</span></div>';
+  if (activeDetailTab === 'uptime') {
+    const s = d.uptime_seconds || 0;
+    const upStr = `${Math.floor(s / 86400)}d ${Math.floor((s % 86400) / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
+    const loadStr = d.cpu && Array.isArray(d.cpu.load) ? d.cpu.load.map(x => x.toFixed(2)).join(' · ') : '--';
+    el.innerHTML = kvBlock('Uptime & Load', [
+      ['Uptime', upStr],
+      ['Load (1/5/15m)', loadStr]
+    ]) + kvBlock('Network Throughput', [
+      ['RX Rate', d.network ? formatRate(d.network.rx_rate) : '--'],
+      ['TX Rate', d.network ? formatRate(d.network.tx_rate) : '--']
+    ]);
+  } else if (activeDetailTab === 'cpu') {
+    const perCpu = d.cpu && Array.isArray(d.cpu.per_cpu) ? d.cpu.per_cpu.map((v, i) => [`Core ${i}`, `${v.toFixed(0)}%`]) : [];
+    const topCpu = procs.slice(0, 4).map(p => [escapeHtml(p.name), `${p.cpu.toFixed(1)}%`]);
+    el.innerHTML = kvBlock('Processor', [
+      ['Model', escapeHtml(d.cpu?.name ? d.cpu.name.replace(/\(R\)|\(TM\)|CPU /g, '').trim() : '--')],
+      ['Topology', d.cpu ? `${d.cpu.physical_cores}c / ${d.cpu.threads}t` : '--'],
+      ['Temperature', typeof d.cpu?.temp === 'number' ? `${d.cpu.temp.toFixed(1)}°C` : '--']
+    ]) + kvBlock('Per-Thread Load', perCpu.length ? perCpu : [['Threads', '--']])
+      + kvBlock('Top CPU Processes', topCpu.length ? topCpu : [['None', '--']]);
+  } else if (activeDetailTab === 'ram') {
+    const m = d.memory || {};
+    const topMem = [...procs].sort((a, b) => b.mem - a.mem).slice(0, 4).map(p => [escapeHtml(p.name), `${p.mem.toFixed(1)}%`]);
+    el.innerHTML = kvBlock('Memory', [
+      ['Used / Total', m.total ? `${(m.used / gib).toFixed(2)}G / ${(m.total / gib).toFixed(2)}G` : '--'],
+      ['Available', typeof m.available === 'number' ? `${(m.available / gib).toFixed(2)}G` : '--'],
+      ['Usage', typeof m.percent === 'number' ? `${m.percent.toFixed(1)}%` : '--']
+    ]) + kvBlock('Swap', [
+      ['Used / Total', m.swap_total ? `${(m.swap_used / gib).toFixed(2)}G / ${(m.swap_total / gib).toFixed(2)}G` : '--'],
+      ['Usage', typeof m.swap_percent === 'number' ? `${m.swap_percent.toFixed(1)}%` : '--']
+    ]) + kvBlock('Top Memory Processes', topMem.length ? topMem : [['None', '--']]);
+  } else if (activeDetailTab === 'disk') {
+    const dk = d.disk || {};
+    el.innerHTML = kvBlock('Root Filesystem (/)', [
+      ['Used', typeof dk.used === 'number' ? `${(dk.used / gib).toFixed(1)} GB` : '--'],
+      ['Free', typeof dk.free === 'number' ? `${(dk.free / gib).toFixed(1)} GB` : '--'],
+      ['Total', typeof dk.total === 'number' ? `${(dk.total / gib).toFixed(1)} GB` : '--'],
+      ['Usage', typeof dk.percent === 'number' ? `${dk.percent.toFixed(1)}%` : '--']
+    ]);
+  }
 }
 
 function writeClipboard(text) {
