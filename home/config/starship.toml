@@ -4,20 +4,49 @@ add_newline = false
 
 scan_timeout = 5000
 
-format = "$hostname$python$directory$git_branch$character"
+format = "$hostname${custom.venv}$conda$nodejs$directory$git_branch$git_status$cmd_duration$character"
+
+[custom.venv]
+when = '[ -n "$VIRTUAL_ENV" ]'
+command = 'n=$(basename "$(dirname "$VIRTUAL_ENV")"); [ "$n" = "$(basename "$PWD")" ] && echo venv || echo "$n"'
+format = "[\\($output\\) ](bold #c678dd)"
+shell = ["sh"]
+
+[conda]
+format = "[\\($environment\\) ](bold #e5c07b)"
+ignore_base = false
+
+[nodejs]
+format = "[$symbol($version )](bold #98d8a8)"
+
+[cmd_duration]
+min_time = 2000
+format = "took [$duration](bold #e5c07b) "
 
 [directory]
-format = "[$path](bold cyan) "
+format = "[$path](bold #61afef) "
 
 [git_branch]
-format = "on [$branch](bold green) "
+symbol = " "
+format = "on [$symbol$branch(:$remote_branch)](bold #98c379) "
+always_show_remote = false
+
+[git_status]
+format = "([\\[$all_status$ahead_behind\\]](bold #e06c75) )"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+modified = "!${count}"
+untracked = "?${count}"
+staged = "+${count}"
+deleted = "✘${count}"
 
 [python]
-format = "[(\\($virtualenv\\) )](bold purple)"
+format = ""
 
 [character]
-success_symbol = "[➜](bold green)"
-error_symbol = "[➜](bold red)"
+success_symbol = "[➜](bold #98c379)"
+error_symbol = "[➜](bold #e06c75)"
 
 [package]
 disabled = true
@@ -25,4 +54,4 @@ disabled = true
 [hostname]
 ssh_only = false
 format = "[$hostname]($style) "
-style = "bold green"
+style = "bold #56b6c2"
