@@ -52,6 +52,8 @@ All services are accessible on your local LAN via mDNS (`.local` domain names) r
 | **ClickHouse Native** | `clickhouse.local:9002` | `9002` | `devdeps` | High-performance binary ingestion protocol |
 | **Dgraph HTTP** | `http://dgraph.local` | `8080` | `devdeps` | Distributed graph database HTTP & GraphQL API |
 | **Dgraph gRPC** | `dgraph.local:9080` | `9080` | `devdeps` | Distributed graph database binary gRPC endpoint |
+| **Weaviate HTTP** | `http://192.168.0.172:8088` | `8088` | `devdeps` | Vector database HTTP API |
+| **Weaviate gRPC** | `192.168.0.172:50051` | `50051` | `devdeps` | Vector database gRPC API |
 | **PostgreSQL** | `postgres.local:5432` | `5432` | `devdeps` | Primary relational database (backing Langfuse) |
 | **Redis** | `redis.local:6380` | `6380` | `devdeps` | High-throughput in-memory cache & pub/sub broker |
 
@@ -129,6 +131,8 @@ All container resource limits are carefully budgeted for host stability on a 2-c
   - Intentionally kept disabled at boot to conserve CPU and RAM on headless restarts until needed.
 
 ### 4. Devdeps Datastores (`stacks/devdeps/compose.yaml`)
+
+- **Weaviate**: Single-node vector database with persistent Docker volume `weaviate_data`. Anonymous access is enabled on the LAN; use only on a trusted network. The default `text2vec-transformers` vectorizer uses the local `sentence-transformers/all-MiniLM-L6-v2` model. Existing collections retain their own vectorizer configuration.
 - **PostgreSQL**: Tuned with `shared_buffers=256MB` (allowing 100% of the active database to live in RAM), `work_mem=16MB`, and `synchronous_commit=off` to eliminate mechanical disk `fsync` stalls.
 - **Redis**: Tuned with `--maxmemory 192mb --maxmemory-policy allkeys-lru` to auto-evict expired cache keys without risking Docker OOM kills, with conservative RDB disk snapshot intervals.
 - **ClickHouse**: Configured with `<async_insert>1</async_insert>` and `<wait_for_async_insert>0</wait_for_async_insert>` in `users-tuning.xml` to buffer incoming inserts in RAM and consolidate disk writes.
