@@ -16,11 +16,14 @@ for stack in stacks/*/compose.yaml; do
   target_dir="$scratch/${source_dir##*/}"
   mkdir -p "$target_dir"
   cp "$stack" "$target_dir/compose.yaml"
-  for template in "$source_dir/.env.example" "$source_dir/langfuse.env.example"; do
-    if [[ -f "$template" ]]; then
-      cp "$template" "$target_dir/$(basename "${template%.example}")"
-    fi
-  done
+  if [[ "$source_dir" == stacks/cube ]]; then
+    cp stacks/cube.env.example "$target_dir/.env"
+  elif [[ -f "$source_dir/.env.example" ]]; then
+    cp "$source_dir/.env.example" "$target_dir/.env"
+  fi
+  if [[ -f "$source_dir/langfuse.env.example" ]]; then
+    cp "$source_dir/langfuse.env.example" "$target_dir/langfuse.env"
+  fi
   printf 'Validating %s\n' "$stack"
   (cd "$target_dir" && docker compose config --quiet)
 done
