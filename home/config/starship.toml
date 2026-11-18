@@ -3,6 +3,7 @@
 add_newline = false
 
 scan_timeout = 5000
+command_timeout = 2000
 
 format = "$hostname${custom.venv}$conda$nodejs$directory$git_branch$git_status$cmd_duration$character"
 
