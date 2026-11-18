@@ -31,6 +31,14 @@ Or install specific components selectively:
 ./install.sh --stacks     # Docker Compose datastores & media stack
 ```
 
+Preview local changes with `./install.sh --dotfiles --dry-run`. Applying the dotfiles saves replaced files under `~/.dotfiles-backup.*` and leaves symlink destinations alone. Review differences before applying, especially editor settings. Use `~/.zsh/env.local.zsh` for environment overrides in all Zsh sessions, `~/.zsh/local.zsh` for interactive-only settings, and `~/.zsh/secrets.zsh` for private interactive credentials. The installer leaves all three untouched.
+
+Conda initializes on first use (`conda activate <env>`). The installer does not overwrite `~/.condarc`; if you use Conda's own startup hook, set `auto_activate_base: false` to avoid activating base on startup. Use `CONDA_ROOT` in your local environment override if Miniconda is not at `~/miniconda3`.
+
+The `encrypt` and `decrypt` shell helpers prompt for a passphrase. Previously encrypted files still need their original passphrase; re-encrypt anything that used the old shared default.
+
+Run `bash scripts/validate.sh` to check shell syntax and Compose configuration with example environment files, without starting containers. `./stacks/stacks.sh health` probes endpoints in parallel, reports stopped on-demand services without failing, and exits nonzero when a required or running on-demand endpoint is offline.
+
 ---
 
 ## Local Endpoints & Discovery

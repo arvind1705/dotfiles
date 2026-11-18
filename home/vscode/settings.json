@@ -146,6 +146,12 @@
     "hediet.vscode-drawio.resizeImages": null,
     "gitlens.views.branches.branches.layout": "list",
     "gitlens.views.showRelativeDateMarkers": false,
-    "gitlens.views.branches.showRemoteBranches": true,
-    "gitlens.graph.details.location": "auto"
+    "gitlens.graph.details.location": "auto",
+    "chat.titleBar.openInAgentsWindow.enabled": false,
+    "workbench.layoutControl.enabled": false,
+    "workbench.navigationControl.enabled": false,
+    "workbench.browser.showInTitleBar": false,
+    "claudeCode.preferredLocation": "panel",
+    "claudeCode.hideOnboarding": true,
+    "gitlens.views.branches.showRemoteBranches": true
 }

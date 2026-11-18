@@ -5,6 +5,8 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=0
+BACKUP_DIR=""
 
 usage() {
   cat <<EOF
@@ -13,6 +15,7 @@ Usage: $0 [options]
 Options:
   --all         Run complete installation (dotfiles + system + network + stacks)
   --dotfiles    Install user shell, git, starship, and editor dotfiles
+  --dry-run     Preview --dotfiles without writing to your home directory
   --system      Apply host OS configs (headless, ssh, wifi, firewall, apt)
   --network     Deploy Caddy reverse proxy, devbox dashboard, and Avahi mDNS
   --stacks      Initialize container configs, data directories, and systemd boot units
@@ -26,57 +29,75 @@ EOF
   exit 0
 }
 
+sync_file() {
+  local source="$REPO_DIR/home/$1" target="$2"
+  if [[ ! -f "$source" ]]; then
+    printf 'Missing managed source: %s\n' "$source" >&2
+    return 1
+  fi
+  if [[ -L "$target" || ( -e "$target" && ! -f "$target" ) ]]; then
+    printf 'Skip non-regular destination: %s\n' "$target"
+    return 0
+  fi
+  if cmp -s "$source" "$target"; then
+    return 0
+  fi
+  if [[ -f "$target" ]]; then
+    printf 'Replace (with backup): %s\n' "$target"
+    if (( ! DRY_RUN )); then
+      if [[ -z "$BACKUP_DIR" ]]; then
+        BACKUP_DIR="$(mktemp -d "$HOME/.dotfiles-backup.XXXXXX")"
+        printf 'Backups: %s\n' "$BACKUP_DIR"
+      fi
+      mkdir -p "$BACKUP_DIR/$(dirname "$1")"
+      cp -p "$target" "$BACKUP_DIR/$1"
+    fi
+  else
+    printf 'Install: %s\n' "$target"
+  fi
+  if (( ! DRY_RUN )); then
+    mkdir -p "$(dirname "$target")"
+    cp "$source" "$target"
+  fi
+}
+
 install_dotfiles() {
-  echo "========================================================================"
-  echo " 1. INSTALLING USER DOTFILES"
-  echo "========================================================================"
+  local entry config_dir="$HOME/.config" vscode_dir
+  for entry in \
+    .zshenv .zprofile .zshrc \
+    .zsh/aliases.zsh .zsh/functions.zsh .zsh/integrations.zsh \
+    .zsh/oc.zsh .zsh/path.zsh .zsh/runtimes.zsh; do
+    sync_file "zsh/$entry" "$HOME/$entry"
+  done
+  if [[ ! -e "$HOME/.zsh/secrets.zsh" && ! -e "$HOME/.zsh/secrets.zsh.example" ]]; then
+    sync_file zsh/.zsh/secrets.zsh.example "$HOME/.zsh/secrets.zsh.example"
+  fi
+  sync_file bin/dev "$HOME/.local/bin/dev"
+  for entry in ghostty/config ghostty/material-ocean.icns git/ignore \
+    opencode/cli.json opencode/opencode.jsonc starship.toml; do
+    sync_file "config/$entry" "$config_dir/$entry"
+  done
 
-  # Zsh files
-  echo "==> Deploying zsh startup files to ~"
-  cp "$REPO_DIR/home/zsh/.zshenv" "$HOME/.zshenv"
-  cp "$REPO_DIR/home/zsh/.zprofile" "$HOME/.zprofile"
-  cp "$REPO_DIR/home/zsh/.zshrc" "$HOME/.zshrc"
-
-  mkdir -p "$HOME/.zsh"
-  cp "$REPO_DIR/home/zsh/.zsh/"*.zsh "$HOME/.zsh/"
-  if [[ ! -f "$HOME/.zsh/secrets.zsh" ]] && [[ -f "$REPO_DIR/home/zsh/.zsh/secrets.zsh.example" ]]; then
-    cp "$REPO_DIR/home/zsh/.zsh/secrets.zsh.example" "$HOME/.zsh/secrets.zsh.example"
+  if command -v git >/dev/null && ! git config --global --get core.excludesfile >/dev/null; then
+    printf 'Set Git global ignore file: %s\n' "$config_dir/git/ignore"
+    if (( ! DRY_RUN )); then
+      git config --global core.excludesfile "$config_dir/git/ignore"
+    fi
   fi
 
-  echo "==> Deploying user commands to ~/.local/bin"
-  mkdir -p "$HOME/.local/bin"
-  cp "$REPO_DIR/home/bin/dev" "$HOME/.local/bin/dev"
-
-  # Config directories (~/.config)
-  echo "==> Deploying ~/.config configurations"
-  mkdir -p "$HOME/.config"
-  if [[ -d "$REPO_DIR/home/config/opencode" ]]; then
-    mkdir -p "$HOME/.config/opencode"
-    cp -r "$REPO_DIR/home/config/opencode/"* "$HOME/.config/opencode/"
+  if [[ "$(uname -s)" == Darwin ]]; then
+    vscode_dir="$HOME/Library/Application Support/Code/User"
+    if [[ -d "$config_dir/rex" ]]; then
+      sync_file config/rex/init.lua "$config_dir/rex/init.lua"
+    fi
+  else
+    vscode_dir="${XDG_CONFIG_HOME:-$config_dir}/Code/User"
   fi
-  if [[ -d "$REPO_DIR/home/config/ghostty" ]]; then
-    mkdir -p "$HOME/.config/ghostty"
-    cp -r "$REPO_DIR/home/config/ghostty/"* "$HOME/.config/ghostty/"
+  if [[ -d "$vscode_dir" ]]; then
+    for entry in settings.json keybindings.json; do
+      sync_file "vscode/$entry" "$vscode_dir/$entry"
+    done
   fi
-  if [[ -f "$REPO_DIR/home/config/starship.toml" ]]; then
-    cp "$REPO_DIR/home/config/starship.toml" "$HOME/.config/starship.toml"
-  fi
-  if [[ -f "$REPO_DIR/home/config/git/ignore" ]]; then
-    mkdir -p "$HOME/.config/git"
-    cp "$REPO_DIR/home/config/git/ignore" "$HOME/.config/git/ignore"
-  fi
-
-  # Git config
-  if [[ -f "$REPO_DIR/home/git/ignore-global" ]]; then
-    git config --global core.excludesfile "$HOME/.config/git/ignore" || true
-  fi
-
-  # VSCode
-  if [[ -d "$HOME/.config/Code/User" ]]; then
-    cp "$REPO_DIR/home/vscode/"*.json "$HOME/.config/Code/User/" 2>/dev/null || true
-  fi
-
-  echo "    ✓ User dotfiles installed successfully."
 }
 
 install_system() {
@@ -106,6 +127,18 @@ install_stacks() {
 if [[ $# -eq 0 ]]; then
   usage
 fi
+
+for arg in "$@"; do
+  if [[ "$arg" == --dry-run ]]; then
+    if [[ $# -ne 2 || ( "$1" != --dotfiles && "$2" != --dotfiles ) ]]; then
+      echo 'Use --dry-run only with --dotfiles.' >&2
+      exit 1
+    fi
+    DRY_RUN=1
+    install_dotfiles
+    exit 0
+  fi
+done
 
 while [[ $# -gt 0 ]]; do
   case "$1" in

@@ -1,6 +1,8 @@
 # Secrets / creds — never commit
 .zsh/secrets.zsh
 **/secrets.zsh
+**/.zsh/env.local.zsh
+**/.zsh/local.zsh
 **/service.json
 **/auth.json
 **/*oauth-token*

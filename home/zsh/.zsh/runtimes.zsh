@@ -41,15 +41,10 @@ corepack() { load-nvm; command corepack "$@"; }
 pnpm()    { load-nvm; command pnpm "$@"; }
 yarn()    { load-nvm; command yarn "$@"; }
 
-# Conda — eager init so `conda activate` is always available
-__conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "$HOME/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="$HOME/miniconda3/bin:$PATH"
-    fi
+if [[ -r "${CONDA_ROOT:-$HOME/miniconda3}/etc/profile.d/conda.sh" ]] && (( ! $+functions[conda] )); then
+  conda() {
+    unfunction conda
+    source "${CONDA_ROOT:-$HOME/miniconda3}/etc/profile.d/conda.sh" || return
+    conda "$@"
+  }
 fi
-unset __conda_setup
