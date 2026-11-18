@@ -132,7 +132,7 @@ All container resource limits are carefully budgeted for host stability on a 2-c
 
 ### 4. Devdeps Datastores (`stacks/devdeps/compose.yaml`)
 
-- **Weaviate**: Single-node vector database with persistent Docker volume `weaviate_data`. Anonymous access is enabled on the LAN; use only on a trusted network. The default `text2vec-transformers` vectorizer uses the local `sentence-transformers/all-MiniLM-L6-v2` model. Existing collections retain their own vectorizer configuration.
+- **Weaviate**: Start or stop the vector database and its MiniLM embedding service from `http://devbox.local`. Both are off at boot and excluded from normal `devdeps` startup. From `stacks/devdeps`, use `docker compose up -d --wait weaviate` to start and `docker compose --profile weaviate stop weaviate weaviate-transformers` to stop. The `weaviate_data` volume persists across stops. Anonymous access is enabled on the LAN; use only on a trusted network. Existing collections retain their vectorizer configuration.
 - **PostgreSQL**: Tuned with `shared_buffers=256MB` (allowing 100% of the active database to live in RAM), `work_mem=16MB`, and `synchronous_commit=off` to eliminate mechanical disk `fsync` stalls.
 - **Redis**: Tuned with `--maxmemory 192mb --maxmemory-policy allkeys-lru` to auto-evict expired cache keys without risking Docker OOM kills, with conservative RDB disk snapshot intervals.
 - **ClickHouse**: Configured with `<async_insert>1</async_insert>` and `<wait_for_async_insert>0</wait_for_async_insert>` in `users-tuning.xml` to buffer incoming inserts in RAM and consolidate disk writes.
