@@ -39,6 +39,7 @@ The `encrypt` and `decrypt` shell helpers prompt for a passphrase. Previously en
 
 Run `bash scripts/validate.sh` to check shell syntax and Compose configuration with example environment files, without starting containers. `./stacks/stacks.sh health` probes endpoints in parallel, reports stopped on-demand services without failing, and exits nonzero when a required or running on-demand endpoint is offline.
 
+
 ---
 
 ## Local Endpoints & Discovery
@@ -148,6 +149,7 @@ All container resource limits are carefully budgeted for host stability on a 2-c
 - **MinIO**: Memory limited to `512M`, `cpus: '0.75'`.
 
 ### 5. Cube (`stacks/cube/compose.yaml`)
+- Only `compose.yaml` is tracked in `stacks/cube/`. Bootstrap creates the local `.env` from `stacks/cube.env.example`; supply `cube.js` and `model/` separately from the private model source before starting Cube.
 - HTTP API is bound to localhost and exposed through Caddy at `cube.local`.
 - Cube SQL remains LAN-bound on port `15432`.
 - The image is pinned by digest, with a 768M memory and 0.75 CPU ceiling.
