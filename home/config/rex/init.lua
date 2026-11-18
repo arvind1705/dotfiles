@@ -1,0 +1,5 @@
+rex.bind("cmd+c", "pane.copy")
+rex.bind("alt+cmd+left", "client.tab.previous")
+rex.bind("alt+cmd+right", "client.tab.next")
+rex.bind("cmd+left", "pane.focus_previous")
+rex.bind("cmd+right", "pane.focus_next")
