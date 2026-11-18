@@ -8,6 +8,8 @@
 
 alias timeout='gtimeout'
 alias uall='upall'
+alias l='ls -lah'
+alias la='ls -lAh'
 
 # =============================================================================
 #   LOGS

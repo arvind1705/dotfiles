@@ -1,12 +1,21 @@
 # =============================================================================
-#   OH MY ZSH
+#   SHELL DEFAULTS
 # =============================================================================
 
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME=""
-plugins=(git)
+: ${HISTFILE:=$HOME/.zsh_history}
+HISTSIZE=50000
+SAVEHIST=10000
+setopt extended_history hist_expire_dups_first hist_ignore_dups hist_ignore_space hist_verify share_history
+setopt auto_cd auto_pushd pushd_ignore_dups pushdminus
 
-source "$ZSH/oh-my-zsh.sh"
+bindkey -e
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[OA' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+bindkey '^[OB' down-line-or-beginning-search
 
 
 # =============================================================================
@@ -14,6 +23,11 @@ source "$ZSH/oh-my-zsh.sh"
 # =============================================================================
 
 source "$HOME/.zsh/path.zsh"
+
+if (( ! $+functions[compdef] )); then
+    autoload -Uz compinit
+    compinit
+fi
 
 
 # =============================================================================
