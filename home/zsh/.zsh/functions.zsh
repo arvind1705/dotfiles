@@ -27,13 +27,6 @@ upall() {
     fi
   fi
 
-  echo "→ opencode"
-  if opencode upgrade >/dev/null 2>&1; then
-    echo "✓ $(opencode --version 2>/dev/null)"
-  else
-    echo "✗ opencode failed"
-  fi
-
   echo "→ codex"
   if codex update >/dev/null 2>&1; then
     echo "✓ $(codex --version 2>/dev/null)"
