@@ -1,1 +1,7 @@
 **/.claude/settings.local.json
+.commandcode/
+.zsh/secrets.zsh
+.dev-mode
+.env.mode
+compose.override.yaml
+.devcontainer/
