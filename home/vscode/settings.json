@@ -101,7 +101,7 @@
         "fileHistory": false,
         "repositories": false,
         "searchAndCompare": false,
-        "launchpad": false
+        "launchpad": true
     },
     "git.suggestSmartCommit": false,
     "editor.unicodeHighlight.nonBasicASCII": false,
@@ -165,5 +165,7 @@
         "https://spec.openapis.org/": true,
         "https://www.schemastore.org/": true,
         "https://models.dev/model-schema.json": true
-    }
+    },
+    "gitlens.views.launchpad.files.layout": "list",
+    "gitlens.views.launchpad.avatars": false
 }

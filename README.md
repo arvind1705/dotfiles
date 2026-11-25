@@ -16,6 +16,8 @@ cd ~/dev/dotfiles
 ./install.sh --dotfiles
 ```
 
+Work- and machine-specific settings stay out of this repository. Put them in `~/.zsh/env.local.zsh` (environment for every shell, e.g. work paths and cloud CLI settings) or `~/.zsh/local.zsh` (interactive functions), and keep `~/.config/opencode/opencode.jsonc` local: the installer does not manage it.
+
 Preview local changes with `./install.sh --dotfiles --dry-run`. Applying the dotfiles saves replaced files under `~/.dotfiles-backup.*` and leaves symlink destinations alone. Review differences before applying, especially editor settings. Use `~/.zsh/env.local.zsh` for environment overrides in all Zsh sessions, `~/.zsh/local.zsh` for interactive-only settings, and `~/.zsh/secrets.zsh` for private interactive credentials. The installer leaves all three untouched.
 
 Conda initializes on first use (`conda activate <env>`). The installer does not overwrite `~/.condarc`; if you use Conda's own startup hook, set `auto_activate_base: false` to avoid activating base on startup. Use `CONDA_ROOT` in your local environment override if Miniconda is not at `~/miniconda3`.

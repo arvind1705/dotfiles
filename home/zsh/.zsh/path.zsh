@@ -5,8 +5,6 @@
 # Keep PATH free of duplicates, including later modifications.
 typeset -U path PATH
 
-# Cargo / Rust (adds ~/.cargo/bin when rustup is installed)
-[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
 # User-local binaries and tool CLIs, highest priority first.
 path=(
