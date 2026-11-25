@@ -70,7 +70,6 @@ install_dotfiles() {
   if [[ ! -e "$HOME/.zsh/secrets.zsh" && ! -e "$HOME/.zsh/secrets.zsh.example" ]]; then
     sync_file zsh/.zsh/secrets.zsh.example "$HOME/.zsh/secrets.zsh.example"
   fi
-  sync_file bin/dev "$HOME/.local/bin/dev"
   for entry in ghostty/config ghostty/material-ocean.icns git/ignore \
     opencode/cli.json opencode/opencode.jsonc starship.toml; do
     sync_file "config/$entry" "$config_dir/$entry"

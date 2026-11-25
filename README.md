@@ -34,7 +34,6 @@ Run `bash scripts/validate.sh` to check shell syntax.
 ├── scripts/validate.sh # Shell syntax checks
 └── home/
     ├── zsh/            # .zshenv, .zprofile, .zshrc, modules in .zsh/
-    ├── bin/dev         # Development environment CLI
     ├── config/         # starship, ghostty, opencode, git ignore
     ├── git/            # git config
     ├── vscode/         # settings.json, keybindings.json
