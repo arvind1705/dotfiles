@@ -7,7 +7,7 @@
 	rebase = true
 [core]
 	pager = cat
-	excludesFile = ~/.gitignore
+	excludesFile = ~/.config/git/ignore
 [pager]
 	diff = cat
 [filter "lfs"]
