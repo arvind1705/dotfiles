@@ -2,17 +2,9 @@
 #   ALIASES
 # =============================================================================
 
-# =============================================================================
-#   SYSTEM
-# =============================================================================
-
-alias timeout='gtimeout'
-alias uall='upall'
 alias l='ls -lah'
 alias la='ls -lAh'
+alias uall='upall'
 
-# =============================================================================
-#   LOGS
-# =============================================================================
-
-alias agentlog='tail -n 100 -F /tmp/ai-infra-local-8010/agent.log'
+# GNU timeout on macOS (coreutils installs it as gtimeout)
+(( ! $+commands[gtimeout] )) || alias timeout='gtimeout'

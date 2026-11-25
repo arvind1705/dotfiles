@@ -1,16 +1,13 @@
 # =============================================================================
-#   CUSTOM FUNCTIONS
+#   FUNCTIONS
 # =============================================================================
 
-# =============================================================================
-#   UPDATES
-# =============================================================================
+# --- Updates ----------------------------------------------------------------------
 
-# Upgrade all development tools
+# Upgrade the OS packages (Homebrew or apt) and the agent CLIs that are installed.
 upall() {
-  # OS package manager: Homebrew on macOS, apt on Ubuntu
-  if [[ "$(uname -s)" == "Darwin" ]]; then
-    if command -v brew >/dev/null 2>&1; then
+  if [[ "$(uname -s)" == Darwin ]]; then
+    if (( $+commands[brew] )); then
       echo "→ brew"
       if brew update >/dev/null 2>&1 && brew upgrade >/dev/null 2>&1 && brew cleanup >/dev/null 2>&1; then
         echo "✓ brew latest"
@@ -27,28 +24,22 @@ upall() {
     fi
   fi
 
-  echo "→ codex"
-  if codex update >/dev/null 2>&1; then
-    echo "✓ $(codex --version 2>/dev/null)"
-  else
-    echo "✗ codex failed"
-  fi
-
-  echo "→ claude"
-  if claude update >/dev/null 2>&1; then
-    echo "✓ $(claude --version 2>/dev/null)"
-  else
-    echo "✗ claude failed"
-  fi
-
-  echo "→ agy"
-  if agy update >/dev/null 2>&1; then
-    echo "✓ $(agy --version 2>/dev/null)"
-  else
-    echo "✗ agy failed"
-  fi
+  local tool
+  for tool in codex claude agy; do
+    (( $+commands[$tool] )) || continue
+    echo "→ $tool"
+    if "$tool" update >/dev/null 2>&1; then
+      echo "✓ $("$tool" --version 2>/dev/null | head -n 1)"
+    else
+      echo "✗ $tool failed"
+    fi
+  done
 
   echo "✓ All upgrades complete"
 }
 
+# --- Files ------------------------------------------------------------------------
 
+# Passphrase-encrypt a file to FILE.enc, and back.
+encrypt() { openssl enc -aes-256-cbc -pbkdf2 -salt -in "${1:?usage: encrypt file}" -out "$1.enc"; }
+decrypt() { openssl enc -d -aes-256-cbc -pbkdf2 -in "${1:?usage: decrypt file.enc}" -out "${1%.enc}"; }
