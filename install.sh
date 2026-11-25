@@ -64,7 +64,7 @@ install_dotfiles() {
   for entry in \
     .zshenv .zprofile .zshrc \
     .zsh/aliases.zsh .zsh/functions.zsh .zsh/integrations.zsh \
-    .zsh/oc.zsh .zsh/path.zsh .zsh/runtimes.zsh; do
+    .zsh/path.zsh .zsh/runtimes.zsh; do
     sync_file "zsh/$entry" "$HOME/$entry"
   done
   if [[ ! -e "$HOME/.zsh/secrets.zsh" && ! -e "$HOME/.zsh/secrets.zsh.example" ]]; then
