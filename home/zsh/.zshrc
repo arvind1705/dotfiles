@@ -1,7 +1,7 @@
 # =============================================================================
 #   ~/.zshrc — interactive shells
 #
-#   Load order: options → PATH → integrations → completion → editor →
+#   Load order: options → PATH → integrations → colors → completion → editor →
 #   secrets → runtimes → functions → aliases → ~/.zsh/local.zsh (last, so
 #   machine-local settings can override anything above).
 #   Environment for every shell lives in ~/.zshenv; PATH in ~/.zsh/path.zsh.
@@ -31,12 +31,22 @@ bindkey '^[OB' down-line-or-beginning-search
 source "$HOME/.zsh/path.zsh"
 source "$HOME/.zsh/integrations.zsh"
 
+# --- Colors for ls and completion lists ---------------------------------------
+
+if [[ "$(uname -s)" == Darwin ]]; then
+  export CLICOLOR=1                            # BSD ls
+  export LSCOLORS='Gxfxcxdxbxegedabagacad'
+elif (( $+commands[dircolors] )); then
+  eval "$(dircolors -b)"                       # GNU ls: sets LS_COLORS
+fi
+
 # --- Completion (after integrations, which may extend fpath) -------------------
 
 if (( ! $+functions[compdef] )); then
   autoload -Uz compinit
   compinit
 fi
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 [[ ! -s "$BUN_INSTALL/_bun" ]] || source "$BUN_INSTALL/_bun"
 
 # --- Editor ---------------------------------------------------------------------
