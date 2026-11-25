@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Unified Installer & Provisioner for Dotfiles, System, Network, and Stacks
+# Dotfiles installer (machine roles, stacks and the portal live in the fleet repo)
 # =============================================================================
 set -euo pipefail
 
@@ -13,18 +13,16 @@ usage() {
 Usage: $0 [options]
 
 Options:
-  --all         Run complete installation (dotfiles + system + network + stacks)
   --dotfiles    Install user shell, git, starship, and editor dotfiles
   --dry-run     Preview --dotfiles without writing to your home directory
-  --system      Apply host OS configs (headless, ssh, wifi, firewall, apt)
-  --network     Deploy Caddy reverse proxy, devbox dashboard, and Avahi mDNS
-  --stacks      Initialize container configs, data directories, and systemd boot units
   -h, --help    Show this help message
 
+Host setup, Docker stacks, DNS and the portal moved to
+https://github.com/arvind1705/fleet.
+
 Examples:
-  ./install.sh --all
   ./install.sh --dotfiles
-  ./install.sh --stacks
+  ./install.sh --dotfiles --dry-run
 EOF
   exit 0
 }
@@ -100,29 +98,6 @@ install_dotfiles() {
   fi
 }
 
-install_system() {
-  echo "========================================================================"
-  echo " 2. APPLYING SYSTEM HARDENING & CONFIGURATION"
-  echo "========================================================================"
-  "$REPO_DIR/system/setup-system.sh"
-}
-
-install_network() {
-  echo "========================================================================"
-  echo " 3. DEPLOYING NETWORK INGRESS & DISCOVERY"
-  echo "========================================================================"
-  "$REPO_DIR/network/setup-network.sh"
-}
-
-install_stacks() {
-  echo "========================================================================"
-  echo " 4. BOOTSTRAPPING DOCKER COMPOSE STACKS & AUTO-BOOT"
-  echo "========================================================================"
-  "$REPO_DIR/stacks/setup-stacks.sh"
-  echo "==> Starting all services..."
-  "$REPO_DIR/stacks/stacks.sh" up
-}
-
 # Parse command line arguments
 if [[ $# -eq 0 ]]; then
   usage
@@ -142,29 +117,8 @@ done
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --all)
-      install_dotfiles
-      install_system
-      install_network
-      install_stacks
-      echo ""
-      echo "✓ All components installed and started successfully!"
-      exit 0
-      ;;
     --dotfiles)
       install_dotfiles
-      shift
-      ;;
-    --system)
-      install_system
-      shift
-      ;;
-    --network)
-      install_network
-      shift
-      ;;
-    --stacks)
-      install_stacks
       shift
       ;;
     -h|--help)

@@ -31,15 +31,6 @@ config/raycast/node-compile-cache/
 .zcompdump*
 .DS_Store
 
-# Persistent state & volumes in stacks
-stacks/**/data/
-stacks/**/backup/
-stacks/**/config/
-stacks/**/library/
-data/
-/stacks/cube/*
-!/stacks/cube/compose.yaml
-
 # Python / editor noise (kept minimal)
 __pycache__/
 *.py[codz]
